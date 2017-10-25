@@ -24,7 +24,6 @@ import org.apache.logging.log4j.core.config.Configurator;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Longs;
 
-import cz.cuni.mff.d3s.spl.ComparisonResult.Relation;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.TestcaseType;
 import de.dagere.kopeme.generated.TestcaseType.Datacollector.Result;
@@ -33,6 +32,7 @@ import de.peran.analysis.helper.MinimalExecutionDeterminer;
 import de.peran.measurement.analysis.AnalyseFullData;
 import de.peran.measurement.analysis.statistics.ANOVATest;
 import de.peran.measurement.analysis.statistics.ConfidenceIntervalInterpretion;
+import de.peran.measurement.analysis.statistics.Relation;
 import de.precision.processing.util.RepetitionFolderHandler;
 import de.precision.processing.util.Util;
 
