@@ -1,0 +1,13 @@
+*.tar
+default/
+target/
+.settings/
+.gradle/
+scripts/execution*
+build/
+results/
+gradle/
+gradlew.bat
+.project
+.classpath
+/bin/

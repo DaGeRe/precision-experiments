@@ -1,0 +1,51 @@
+buildscript {
+    repositories {
+	jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+    }
+}
+
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+//apply plugin: 'com.github.johnrengelman.shadow'
+
+sourceCompatibility = 1.8
+version = '2.13'
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'Precision-Experiment',
+        	'Implementation-Version': 0.1,
+        	'Main-Class': 'processing.repetitions.GeneratePrecisionPlot'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven{
+		url 'https://oss.sonatype.org/content/repositories/snapshots'
+	}
+}
+
+
+dependencies {
+   compile group: "de.dagere.kopeme", name: "kopeme-junit", version: "0.8-SNAPSHOT"
+   compile group: "cz.cuni.mff.d3s.spl", name: "spl-evaluation-java", version: "0.1-SNAPSHOT"
+   compile group: 'commons-io', name: 'commons-io', version: '2.4'
+   compile group: 'de.peran', name: 'analysis', version: '0.1-SNAPSHOT'
+   compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+}
+
+test {
+    testLogging.showStandardStreams = true
+    // jvmArgs "-agentpath:.../vm_logging/loggingAgent.o"
+    // Uncoment this, if you want to measure CPU temperature along with workload duration
+    exclude 'de/precision/**'
+}
