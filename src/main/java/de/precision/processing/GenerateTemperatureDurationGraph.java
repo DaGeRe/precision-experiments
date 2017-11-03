@@ -30,7 +30,7 @@ import de.peran.analysis.helper.MinimalExecutionDeterminer;
  *
  */
 public class GenerateTemperatureDurationGraph {
-	public final static File RESULTFOLDER = new File("results/tempvalue/");
+	public static final File RESULTFOLDER = new File("results/tempvalue/");
 
 	static {
 		if (!RESULTFOLDER.exists()) {
@@ -59,7 +59,7 @@ public class GenerateTemperatureDurationGraph {
 
 	private final File indexCorrelationFile;
 	private final Map<Integer, Integer> temperatureMap;
-	final List<Result> results;
+	private final List<Result> results;
 
 	public GenerateTemperatureDurationGraph(final File timeValueFile, final File temperatureFile) throws JAXBException, FileNotFoundException, IOException {
 		temperatureMap = readTemperature(temperatureFile);

@@ -9,11 +9,27 @@ import javax.xml.bind.JAXBException;
 
 import de.precision.processing.util.RepetitionFolderHandler.Creator;
 
-public class Util {
+/**
+ * Helper class for processing folders
+ * 
+ * @author reichelt
+ *
+ */
+public final class Util {
 
+	private Util() {
+
+	}
+
+	/**
+	 * Processes all repetition-folders in the given folder in the order of their repetition count by using the Creator
+	 * 
+	 * @param folder Folder to look for repetition folders
+	 * @param creator Creator for ReptitionFolderHandler
+	 */
 	public static void processFolder(final File folder, final Creator creator) throws JAXBException, IOException {
-		final File[] sequenceFolders = folder.listFiles();
-		Arrays.sort(sequenceFolders, new Comparator<File>() {
+		final File[] repetitionFolders = folder.listFiles();
+		Arrays.sort(repetitionFolders, new Comparator<File>() {
 
 			@Override
 			public int compare(final File o1, final File o2) {
@@ -39,7 +55,7 @@ public class Util {
 				}
 			}
 		});
-		for (final File subfolder : sequenceFolders) {
+		for (final File subfolder : repetitionFolders) {
 			if (subfolder.getName().matches("repetition_[0-9]+")) {
 				creator.createHandler(subfolder).handleVersion();
 			}

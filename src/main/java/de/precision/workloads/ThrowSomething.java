@@ -1,8 +1,14 @@
 package de.precision.workloads;
 
+/**
+ * Throws something for benchmarking how much time throwing takes
+ * 
+ * @author reichelt
+ *
+ */
 public class ThrowSomething {
-	public int returnMe(int whatToDo){
-		if (whatToDo == 1){
+	public int returnMe(final int whatToDo) {
+		if (whatToDo == 1) {
 			return 1;
 		}
 		throw new RuntimeException("Give me one!");

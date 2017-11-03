@@ -30,7 +30,7 @@ import de.dagere.kopeme.generated.TestcaseType.Datacollector.Result;
 import de.dagere.kopeme.generated.TestcaseType.Datacollector.Result.Fulldata.Value;
 import de.peran.analysis.helper.MinimalExecutionDeterminer;
 import de.peran.measurement.analysis.AnalyseFullData;
-import de.peran.measurement.analysis.statistics.ANOVATest;
+import de.peran.measurement.analysis.MultipleVMTestUtil;
 import de.peran.measurement.analysis.statistics.ConfidenceIntervalInterpretion;
 import de.peran.measurement.analysis.statistics.Relation;
 import de.precision.processing.util.RepetitionFolderHandler;
@@ -64,7 +64,7 @@ public class GeneratePrecisionPlot extends RepetitionFolderHandler {
 		precisionRecallWriter = new BufferedWriter(new FileWriter(new File(RESULTFOLDER, "precision.csv")));
 		precisionRecallWriter.write("#repetitions ; vms ; warmup ; overhead ; duration ;");
 		for (final String method : new MethodResult().results.keySet()) {
-			precisionRecallWriter.write(method + ";");
+			precisionRecallWriter.write(method + ";" + ";" + ";");
 		}
 		precisionRecallWriter.write("\n");
 
@@ -91,9 +91,7 @@ public class GeneratePrecisionPlot extends RepetitionFolderHandler {
 		super(sequenceFolder);
 	}
 
-	final static Random random = new Random();
-
-	int overallcount;
+	private final static Random RANDOM = new Random();
 
 	private final MethodResult truePositives = new MethodResult();
 	private final MethodResult falseNegative = new MethodResult();
@@ -102,11 +100,15 @@ public class GeneratePrecisionPlot extends RepetitionFolderHandler {
 
 	private static BufferedWriter precisionRecallWriter;
 
+	/**
+	 * Saves a value for each statistic method that is examined
+	 * @author reichelt
+	 *
+	 */
 	static class MethodResult {
 		Map<String, Integer> results = new LinkedHashMap<>();
 
 		public MethodResult() {
-			// results.put("ANOVA", 0);
 			results.put("MEAN", 0);
 			results.put("CONFIDENCE", 0);
 			// results.put("MANN", 0);
@@ -136,7 +138,7 @@ public class GeneratePrecisionPlot extends RepetitionFolderHandler {
 	private long overhead = 0;
 	private long duration = 0;
 
-	private DecimalFormat df = new DecimalFormat("##.##");
+	private DecimalFormat df = new DecimalFormat("00.00");
 
 	/**
 	 * Calculates the precision of the given sequence-folder
@@ -155,15 +157,15 @@ public class GeneratePrecisionPlot extends RepetitionFolderHandler {
 
 		warmup = 2000;
 		executions = 2000;
-		for (int myVms = 2; myVms < 50; myVms += 2) {
+		for (int myVms = 2; myVms < 40; myVms += 10) {
 			vms = myVms;
 			overhead = 0;
 			duration = 0;
 			super.handleVersion();
 			precisionRecallWriter.write(repetitions + ";" + vms + ";" + warmup + ";" + overhead + ";" + duration + ";");
 			for (final String method : truePositives.results.keySet()) {
-				final double precision = (selected.results.get(method) > 0) ? ((double) truePositives.results.get(method)) / selected.results.get(method) : 0;
-				final double recall = ((double) truePositives.results.get(method)) / (truePositives.results.get(method) + falseNegative.results.get(method));
+				final double precision = 100d * ((selected.results.get(method) > 0) ? ((double) truePositives.results.get(method)) / selected.results.get(method) : 0);
+				final double recall = 100d * (((double) truePositives.results.get(method)) / (truePositives.results.get(method) + falseNegative.results.get(method)));
 				final double wrongGreaterSelectionRate = (selected.results.get(method) > 0) ? ((double) wrongGreater.results.get(method)) / selected.results.get(method) : 0;
 				precisionRecallWriter.write(df.format(precision) + ";" + df.format(recall) + ";" + df.format(wrongGreaterSelectionRate) + ";");
 			}
@@ -172,41 +174,41 @@ public class GeneratePrecisionPlot extends RepetitionFolderHandler {
 			LOG.info("Results: " + truePositives.toString());
 		}
 
-		vms = 20;
-		for (int myWarmup = 500; myWarmup < 5000; myWarmup += 500) {
-			warmup = 1000;
-			overhead = 0;
-			duration = 0;
-			super.handleVersion();
-			precisionRecallWriter.write(repetitions + ";" + vms + ";" + warmup + ";" + overhead + ";" + duration + ";");
-			for (final String method : truePositives.results.keySet()) {
-				final double precision = (selected.results.get(method) > 0) ? ((double) truePositives.results.get(method)) / selected.results.get(method) : 0;
-				final double recall = ((double) truePositives.results.get(method)) / (truePositives.results.get(method) + falseNegative.results.get(method));
-				final double wrongGreaterSelectionRate = (selected.results.get(method) > 0) ? ((double) wrongGreater.results.get(method)) / selected.results.get(method) : 0;
-				precisionRecallWriter.write(df.format(precision) + ";" + df.format(recall) + ";" + df.format(wrongGreaterSelectionRate) + ";");
-			}
-			precisionRecallWriter.write("\n");
-			precisionRecallWriter.flush();
-			LOG.info("Results: " + truePositives.toString());
-		}
-
-		warmup = 1000;
-		for (int myExecutions = 100; myExecutions < 3000; myExecutions += 100) {
-			executions = myExecutions;
-			overhead = 0;
-			duration = 0;
-			super.handleVersion();
-			precisionRecallWriter.write(repetitions + ";" + vms + ";" + warmup + ";" + overhead + ";" + duration + ";");
-			for (final String method : truePositives.results.keySet()) {
-				final double precision = (selected.results.get(method) > 0) ? ((double) truePositives.results.get(method)) / selected.results.get(method) : 0;
-				final double recall = ((double) truePositives.results.get(method)) / (truePositives.results.get(method) + falseNegative.results.get(method));
-				final double wrongGreaterSelectionRate = (selected.results.get(method) > 0) ? ((double) wrongGreater.results.get(method)) / selected.results.get(method) : 0;
-				precisionRecallWriter.write(df.format(precision) + ";" + df.format(recall) + ";" + df.format(wrongGreaterSelectionRate) + ";");
-			}
-			precisionRecallWriter.write("\n");
-			precisionRecallWriter.flush();
-			LOG.info("Results: " + truePositives.toString());
-		}
+//		vms = 20;
+//		for (int myWarmup = 500; myWarmup < 5000; myWarmup += 500) {
+//			warmup = 1000;
+//			overhead = 0;
+//			duration = 0;
+//			super.handleVersion();
+//			precisionRecallWriter.write(repetitions + ";" + vms + ";" + warmup + ";" + overhead + ";" + duration + ";");
+//			for (final String method : truePositives.results.keySet()) {
+//				final double precision = (selected.results.get(method) > 0) ? ((double) truePositives.results.get(method)) / selected.results.get(method) : 0;
+//				final double recall = ((double) truePositives.results.get(method)) / (truePositives.results.get(method) + falseNegative.results.get(method));
+//				final double wrongGreaterSelectionRate = (selected.results.get(method) > 0) ? ((double) wrongGreater.results.get(method)) / selected.results.get(method) : 0;
+//				precisionRecallWriter.write(df.format(precision) + ";" + df.format(recall) + ";" + df.format(wrongGreaterSelectionRate) + ";");
+//			}
+//			precisionRecallWriter.write("\n");
+//			precisionRecallWriter.flush();
+//			LOG.info("Results: " + truePositives.toString());
+//		}
+//
+//		warmup = 1000;
+//		for (int myExecutions = 100; myExecutions < 3000; myExecutions += 100) {
+//			executions = myExecutions;
+//			overhead = 0;
+//			duration = 0;
+//			super.handleVersion();
+//			precisionRecallWriter.write(repetitions + ";" + vms + ";" + warmup + ";" + overhead + ";" + duration + ";");
+//			for (final String method : truePositives.results.keySet()) {
+//				final double precision = (selected.results.get(method) > 0) ? ((double) truePositives.results.get(method)) / selected.results.get(method) : 0;
+//				final double recall = ((double) truePositives.results.get(method)) / (truePositives.results.get(method) + falseNegative.results.get(method));
+//				final double wrongGreaterSelectionRate = (selected.results.get(method) > 0) ? ((double) wrongGreater.results.get(method)) / selected.results.get(method) : 0;
+//				precisionRecallWriter.write(df.format(precision) + ";" + df.format(recall) + ";" + df.format(wrongGreaterSelectionRate) + ";");
+//			}
+//			precisionRecallWriter.write("\n");
+//			precisionRecallWriter.flush();
+//			LOG.info("Results: " + truePositives.toString());
+//		}
 	}
 
 	@Override
@@ -227,8 +229,8 @@ public class GeneratePrecisionPlot extends RepetitionFolderHandler {
 
 		DescriptiveStatistics averageDuration = new DescriptiveStatistics();
 
-		for (int i = 0; i < 500; i++) {// TODO Konvergenzzeitpunkt bestimmen,
-										// statt einfach 100 mal..
+		// TODO Konvergenzzeitpunkt bestimmen statt einfach 500 mal..
+		for (int i = 0; i < 500; i++) {
 			final List<Result> beforeSelected = selectPart(beforeShortened, vms);
 			final List<Result> afterSelected = selectPart(afterShortened, vms);
 
@@ -241,8 +243,6 @@ public class GeneratePrecisionPlot extends RepetitionFolderHandler {
 			final List<Result> beforeSecond = selectPart(beforeShortened, vms);
 
 			executeComparisons(beforeSelected, beforeSecond, Relation.EQUAL, testclazz.getClazz());
-
-			overallcount++;
 		}
 		LOG.debug("Duration: {} Average duration: {}", duration, averageDuration.getMean());
 
@@ -259,8 +259,8 @@ public class GeneratePrecisionPlot extends RepetitionFolderHandler {
 			values.get(1)[i] = afterShortened.get(i).getValue();
 		}
 
-		double avgBefore = ANOVATest.getStatistic(beforeShortened).getMean();
-		double avgAfter = ANOVATest.getStatistic(afterShortened).getMean();
+		double avgBefore = MultipleVMTestUtil.getStatistic(beforeShortened).getMean();
+		double avgAfter = MultipleVMTestUtil.getStatistic(afterShortened).getMean();
 
 		if (avgBefore < avgAfter * 0.99) {
 			relations.put("MEAN", Relation.LESS_THAN);
@@ -346,7 +346,7 @@ public class GeneratePrecisionPlot extends RepetitionFolderHandler {
 		return histogramValues;
 	}
 
-	private static void insertValues(DescriptiveStatistics before, final long min, long stepSize, final long[] histogramValues) {
+	private static void insertValues(final DescriptiveStatistics before, final long min, final long stepSize, final long[] histogramValues) {
 		long currentMax = min + stepSize;
 		int count = 1, index = 0;
 		for (double val : before.getSortedValues()) {
@@ -392,7 +392,7 @@ public class GeneratePrecisionPlot extends RepetitionFolderHandler {
 		final List<Result> beforeSelected = new LinkedList<>();
 		for (int insertion = 0; insertion < vms; insertion++) {
 
-			final Result randomlyPickedResult = beforeShortened.get(random.nextInt(beforeShortened.size()));
+			final Result randomlyPickedResult = beforeShortened.get(RANDOM.nextInt(beforeShortened.size()));
 			beforeSelected.add(randomlyPickedResult);
 		}
 		return beforeSelected;

@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import de.dagere.kopeme.annotations.PerformanceTest;
 import de.precision.Constants;
-import de.precision.workloads.AddRandomNumbers;
 
 public class TypeTest2 {
 	

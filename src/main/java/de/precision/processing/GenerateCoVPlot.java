@@ -25,11 +25,21 @@ import de.dagere.kopeme.generated.TestcaseType.Datacollector.Result;
 import de.peran.measurement.analysis.AnalyseFullData;
 import de.peran.measurement.analysis.statistics.MeanCoVData;
 
-public class GenerateCoVPlot {
+/**
+ * Generates csv-files and gnuplot-commands for printing an graph of the values and the coefficient of variation of all result files in one folder
+ * 
+ * @author reichelt
+ *
+ */
+public final class GenerateCoVPlot {
+
+	private GenerateCoVPlot() {
+
+	}
 
 	private static final Logger LOG = LogManager.getLogger(AnalyseFullData.class);
 
-	public final static File RESULTFOLDER = new File("results/cov/");
+	public static final File RESULTFOLDER = new File("results/cov/");
 
 	static {
 		if (!RESULTFOLDER.exists()) {
@@ -37,7 +47,7 @@ public class GenerateCoVPlot {
 		}
 	}
 
-	final static int AVG_COUNT = 100;
+	static final int AVG_COUNT = 100;
 
 	public static void main(final String[] args) throws JAXBException, IOException {
 
@@ -70,7 +80,6 @@ public class GenerateCoVPlot {
 		handleTestcase(otherPackageTestcase.getClazz(), otherPackageTestcase.getTestcase().get(0));
 	}
 
-
 	public static void handleTestcase(final String clazzname, final TestcaseType testcase) throws IOException {
 		final MeanCoVData data = new MeanCoVData(testcase, AVG_COUNT);
 		data.printTestcaseData(GenerateCoVPlot.RESULTFOLDER);
@@ -89,9 +98,6 @@ public class GenerateCoVPlot {
 				result.getFulldata().getValue().forEach(value -> statistics.addValue(Double.parseDouble(value.getValue())));
 				writer.write(statistics.getMean() + ";" + statistics.getVariance() + "\n");
 			}
-			// for (int i = 0; i < allMeans.size(); i++) {
-			// writer.write(allMeans.get(i).getMean() + ";" + allCoVs.get(i).getMean() + "\n");
-			// }
 			writer.flush();
 
 			System.out.println("set title 'Means and Variation for " + clazzname + "." + testcase.getName() + "'");

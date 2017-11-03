@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import de.dagere.kopeme.annotations.PerformanceTest;
 import de.dagere.kopeme.annotations.PerformanceTestingClass;
 import de.dagere.kopeme.junit.testrunner.time.TimeBasedTestRunner;
-import de.precision.Constants;
 import de.precision.workloads.AddRandomNumbers;
 
 @PerformanceTestingClass(logFullData = true, overallTimeout = 0)

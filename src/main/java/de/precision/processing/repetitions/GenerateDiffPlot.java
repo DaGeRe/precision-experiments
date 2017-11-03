@@ -18,6 +18,12 @@ import de.peran.measurement.analysis.AnalyseFullData;
 import de.precision.processing.util.RepetitionFolderHandler;
 import de.precision.processing.util.Util;
 
+/**
+ * Generates the csv-file for a plot showing how the differences change with growing repetition count
+ * 
+ * @author reichelt
+ *
+ */
 public class GenerateDiffPlot extends RepetitionFolderHandler {
 
 	public GenerateDiffPlot(final File sequenceFolder) {

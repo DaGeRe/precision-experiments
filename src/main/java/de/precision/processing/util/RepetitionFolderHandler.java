@@ -17,10 +17,21 @@ import de.dagere.kopeme.datastorage.XMLDataLoader;
 import de.dagere.kopeme.generated.Kopemedata;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 
+/**
+ * Base class for a class that processes each testcase of a repetition folder
+ * 
+ * @author reichelt
+ *
+ */
 public abstract class RepetitionFolderHandler {
 
 	private static final Logger LOG = LogManager.getLogger(RepetitionFolderHandler.class);
 
+	/**
+	 * Creates a instance of RepetitionFolderHandler
+	 * @author reichelt
+	 *
+	 */
 	@FunctionalInterface
 	public static interface Creator {
 		public RepetitionFolderHandler createHandler(File repetitionFolder);
@@ -29,9 +40,9 @@ public abstract class RepetitionFolderHandler {
 	protected final int repetitions;
 	private final File repetitionFolder;
 
-	public RepetitionFolderHandler(final File sequenceFolder) {
-		this.repetitionFolder = sequenceFolder;
-		repetitions = Integer.parseInt(sequenceFolder.getName().substring("sequence_".length()));
+	public RepetitionFolderHandler(final File repetitionFolder) {
+		this.repetitionFolder = repetitionFolder;
+		repetitions = Integer.parseInt(repetitionFolder.getName().substring("repetition_".length()));
 	}
 
 	public File getFolder() {

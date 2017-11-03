@@ -1,13 +1,14 @@
-package de.precision.type;
+package de.precision.assertType;
 
 import java.util.Random;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import de.dagere.kopeme.annotations.PerformanceTest;
 import de.precision.Constants;
 
-public class TypeTest1 {
+public class TypeAssertTest1 {
 	
 	private static final Random r = new Random();
 	
@@ -25,6 +26,6 @@ public class TypeTest1 {
 		long i = r.nextLong();
 		int sum = r.nextInt(100000) + r.nextInt(100000) + r.nextInt(100000);
 		i+=sum;
-		System.out.println(i);
+		Assert.assertEquals(i, i);
 	}
 }

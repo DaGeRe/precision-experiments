@@ -3,15 +3,14 @@ package de.precision.workloads;
 import java.util.Random;
 
 /**
- * Adds random numbers
- * 
+ * Adds random numbers synchronized
  * @author reichelt
  *
  */
-public class AddRandomNumbers {
+public class AddRandomNumbersSynchronized {
 	int x = 0;
 
-	public void addSomething() {
+	public synchronized void addSomething() {
 		x += new Random().nextInt(100);
 	}
 
