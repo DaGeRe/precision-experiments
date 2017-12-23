@@ -62,3 +62,7 @@ The performance of unit tests in equal hardware and software environments differ
 5. Run 
 	cat precission.csv | awk -F ';' '{if ($6>0.95 && $7>0.95) print $4+$5 ";" $0}' | sort -k1 -t ';' -n
 The first line gives you the fastest configuration, where precission and recall are above 95%. 
+
+# Funding
+
+The creation of this project was funded by Hanns-Seidel-Stiftung (https://www.hss.de/).

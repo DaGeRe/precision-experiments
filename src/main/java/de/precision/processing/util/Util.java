@@ -43,7 +43,7 @@ public final class Util {
 						return o1Num - o2Num;
 					} else {
 						System.out.println("No match: " + o1.getName() + " " + o2.getName());
-						return 0;
+						return 10000;
 					}
 				} else {
 					if (o2Matches) {

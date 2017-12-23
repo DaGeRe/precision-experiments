@@ -3,10 +3,15 @@ package de.precision.type;
 import java.util.Random;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import de.dagere.kopeme.annotations.PerformanceTest;
+import de.dagere.kopeme.annotations.PerformanceTestingClass;
+import de.dagere.kopeme.junit.testrunner.PerformanceTestRunnerJUnit;
 import de.precision.Constants;
 
+@PerformanceTestingClass(logFullData = true, overallTimeout = 0)
+@RunWith(PerformanceTestRunnerJUnit.class)
 public class TypeTest1 {
 	
 	private static final Random r = new Random();
@@ -22,9 +27,9 @@ public class TypeTest1 {
 	}
 
 	private void doIntStuff() {
-		long i = r.nextLong();
-		int sum = r.nextInt(100000) + r.nextInt(100000) + r.nextInt(100000);
-		i+=sum;
-		System.out.println(i);
+		int val = r.nextInt(Integer.MAX_VALUE / 2);
+		int val2 = r.nextInt(Integer.MAX_VALUE / 2);
+		int sum = val2 + val;
+		System.out.println(sum + " " + val2);
 	}
 }

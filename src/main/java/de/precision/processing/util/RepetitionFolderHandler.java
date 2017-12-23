@@ -51,7 +51,7 @@ public abstract class RepetitionFolderHandler {
 
 	public void handleVersion() throws JAXBException, IOException {
 		final Map<String, Testcases> testcases = new HashMap<>();
-		LOG.debug("Loading: " + repetitions + " " + repetitionFolder);
+		LOG.debug("Loading: {} Repetitions: {}", repetitionFolder,  repetitions);
 
 		for (final File dataFile : FileUtils.listFiles(repetitionFolder, new WildcardFileFilter("*.xml"), TrueFileFilter.INSTANCE)) {
 			final Kopemedata data = new XMLDataLoader(dataFile).getFullData();

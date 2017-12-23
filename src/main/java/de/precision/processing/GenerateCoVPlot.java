@@ -47,7 +47,7 @@ public final class GenerateCoVPlot {
 		}
 	}
 
-	static final int AVG_COUNT = 100;
+	static final int AVG_COUNT = 50;
 
 	public static void main(final String[] args) throws JAXBException, IOException {
 

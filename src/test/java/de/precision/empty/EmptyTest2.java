@@ -1,4 +1,4 @@
-package de.precision.sysout;
+package de.precision.empty;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,27 +7,33 @@ import de.dagere.kopeme.annotations.PerformanceTest;
 import de.dagere.kopeme.annotations.PerformanceTestingClass;
 import de.dagere.kopeme.junit.testrunner.PerformanceTestRunnerJUnit;
 import de.precision.Constants;
-import de.precision.workloads.WriteToSystemOut;
+import de.precision.workloads.AddRandomNumbers;
 
 @PerformanceTestingClass(logFullData = true, overallTimeout = 0)
 @RunWith(PerformanceTestRunnerJUnit.class)
-public class Sysout2Test {
+public class EmptyTest2 {
+
 	@PerformanceTest(warmupExecutions = 0, executionTimes = Constants.EXECUTIONS, logFullData = true, timeout = 0, dataCollectors = "ONLYTIME")
 	@Test
-	public void sysout() {
+	public void add() {
 		final int parseInt = System.getenv().containsKey("repetitions") ? Integer.parseInt(System.getenv().get("repetitions")) : 1;
-
 		System.out.println("Executing " + parseInt + " times");
 		for (int i = 0; i < parseInt; i++) {
-			sysoutSomething();
+			addSmall();
+			doEmptyStuff();
 		}
 	}
-	
-	private void sysoutSomething(){
-		final WriteToSystemOut rm = new WriteToSystemOut();
-		for (int i = 0; i < 11; i++) {
-			rm.doSomething();
+
+	private void addSmall() {
+		final AddRandomNumbers rm = new AddRandomNumbers();
+		for (int i = 0; i < 5; i++) {
+			rm.addSomething();
 		}
 		System.out.println(rm.getValue());
 	}
+	
+	private void doEmptyStuff(){
+		int j = 15;
+	}
+	
 }
