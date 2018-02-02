@@ -47,5 +47,5 @@ test {
     testLogging.showStandardStreams = true
     // jvmArgs "-agentpath:.../vm_logging/loggingAgent.o"
     // Uncoment this, if you want to measure CPU temperature along with workload duration
-    exclude 'de/precision/**'
+  // exclude 'de/precision/**'
 }

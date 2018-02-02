@@ -1,6 +1,6 @@
 #!/bin/bash
 
-val1=( de.repetition.add.Sequence1AddTest de.repetition.add.AddSmall1 )
+val1=( de.sequence.add.Sequence1AddTest de.sequence.add.AddSmall1 de.sequence.file.Sequence1FileTest de.sequence.ram.Sequence1RAMTest )
 
 if [[ -z "$VMS" ]]; then
   vms=30

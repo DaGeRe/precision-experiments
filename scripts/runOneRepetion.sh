@@ -4,10 +4,8 @@ val1=( de.precision.add.AddSmall1 de.precision.add.Add1BigTest de.precision.type
 
 vms=30
 
-for repititions in {10..100..20}
-do
-    echo "Executing $repititions times"
-    export repetitions=$repititions
+echo "Executing 1 time"
+export repetitions=1
     for testcase in "${val1[@]}"
     do
         testcase2=$(echo $testcase | sed "s/1/2/")
@@ -18,16 +16,10 @@ do
                   gradle -p .. clean test --tests $testcase2 >> execution_$i.txt
         done
     done
-    echo "Creating folder  ~/.KoPeMe/default/repetition_$repititions"
-    mkdir ~/.KoPeMe/default/repetition_$repititions
-    mv ~/.KoPeMe/default/de.* ~/.KoPeMe/default/repetition_$repititions
-    tar -I pxz -cf ~/.KoPeMe/results_$repititions.tar  -C ~/.KoPeMe/default/ .
-done
+echo "Creating folder  ~/.KoPeMe/default/repetition_$repititions"
+mkdir ~/.KoPeMe/default/repetition_$repititions
+mv ~/.KoPeMe/default/de.* ~/.KoPeMe/default/repetition_$repititions
+tar -I pxz -cf ~/.KoPeMe/results_$repititions.tar  -C ~/.KoPeMe/default/ .
 
-for (( i=1; i<=$max; i++ ))
-do
-     gradle -p .. clean test --tests de.precision.BaselineTest >> execution_base_$i.txt
-done
-
-tar -I pxz -cf ~/.KoPeMe/results_full_"$vms"_"$Repititions".tar  -C ~/.KoPeMe/default/ .
+tar -I pxz -cf ~/.KoPeMe/results_full_"$vms"_"$repititions".tar  -C ~/.KoPeMe/default/ .
 
