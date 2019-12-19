@@ -37,9 +37,9 @@ repositories {
 
 
 dependencies {
-   compile group: "de.dagere.kopeme", name: "kopeme-junit", version: "0.8-SNAPSHOT"
+   compile group: "de.dagere.kopeme", name: "kopeme-junit", version: "0.10-SNAPSHOT"
    compile group: 'commons-io', name: 'commons-io', version: '2.4'
-   compile group: 'de.peran', name: 'analysis', version: '0.1-SNAPSHOT'
+   compile group: 'de.peass', name: 'analysis', version: '0.1-SNAPSHOT'
    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 }
 

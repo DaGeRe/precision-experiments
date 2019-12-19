@@ -26,14 +26,13 @@ import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Longs;
 
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
+import de.dagere.kopeme.generated.Result;
+import de.dagere.kopeme.generated.Result.Fulldata;
+import de.dagere.kopeme.generated.Result.Fulldata.Value;
 import de.dagere.kopeme.generated.TestcaseType;
-import de.dagere.kopeme.generated.TestcaseType.Datacollector.Result;
-import de.dagere.kopeme.generated.TestcaseType.Datacollector.Result.Fulldata;
-import de.dagere.kopeme.generated.TestcaseType.Datacollector.Result.Fulldata.Value;
+import de.peass.measurement.analysis.MultipleVMTestUtil;
+import de.peass.measurement.analysis.Relation;
 import de.peran.measurement.analysis.AnalyseFullData;
-import de.peran.measurement.analysis.MultipleVMTestUtil;
-import de.peran.measurement.analysis.statistics.ConfidenceIntervalInterpretion;
-import de.peran.measurement.analysis.statistics.Relation;
 import de.precision.processing.util.RepetitionFolderHandler;
 import de.precision.processing.util.Util;
 
@@ -350,7 +349,7 @@ public class GenerateStopPlot extends RepetitionFolderHandler {
 
 		relations.put("COMBINE", tchange || gchange ? Relation.LESS_THAN : Relation.EQUAL);
 
-		final Relation confidence = ConfidenceIntervalInterpretion.compare(afterShortened, afterShortened) == de.peran.measurement.analysis.statistics.Relation.EQUAL
+		final Relation confidence = de.peass.analysis.statistics.ConfidenceIntervalInterpretion.compare(afterShortened, afterShortened) == Relation.EQUAL
 				? Relation.EQUAL : Relation.LESS_THAN;
 		relations.put("CONFIDENCE", confidence);
 		LOG.trace("Confidence: " + confidence);

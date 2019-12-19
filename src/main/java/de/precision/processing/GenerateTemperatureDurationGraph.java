@@ -18,10 +18,11 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import de.dagere.kopeme.datastorage.XMLDataLoader;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
+import de.dagere.kopeme.generated.Result;
+import de.dagere.kopeme.generated.Result.Fulldata.Value;
 import de.dagere.kopeme.generated.TestcaseType;
-import de.dagere.kopeme.generated.TestcaseType.Datacollector.Result;
-import de.dagere.kopeme.generated.TestcaseType.Datacollector.Result.Fulldata.Value;
-import de.peran.analysis.helper.MinimalExecutionDeterminer;
+import de.peass.statistics.ConfidenceInterval;
+import de.peran.breaksearch.helper.MinimalExecutionDeterminer;
 
 /**
  * Plots a graph of execution time and cpu temperature. Unfortunately, no correlation could be detected.
@@ -66,7 +67,7 @@ public class GenerateTemperatureDurationGraph {
 
 		final Testcases testcases = new XMLDataLoader(timeValueFile).getFullData().getTestcases();
 		final TestcaseType testcase = testcases.getTestcase().get(0);
-		results = MinimalExecutionDeterminer.shortenValues(testcase.getDatacollector().get(0).getResult(), 10000, 20000);
+		results = ConfidenceInterval.shortenValues(testcase.getDatacollector().get(0).getResult(), 10000, 20000);
 		// results = testcase.getDatacollector().get(0).getResult();
 
 		indexCorrelationFile = new File(RESULTFOLDER, "indexcorrelation_" + testcases.getClazz() + "_" + testcase.getName() + ".csv");

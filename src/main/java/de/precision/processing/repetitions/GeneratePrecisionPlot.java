@@ -28,14 +28,14 @@ import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Longs;
 
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
+import de.dagere.kopeme.generated.Result;
+import de.dagere.kopeme.generated.Result.Fulldata.Value;
 import de.dagere.kopeme.generated.TestcaseType;
-import de.dagere.kopeme.generated.TestcaseType.Datacollector.Result;
-import de.dagere.kopeme.generated.TestcaseType.Datacollector.Result.Fulldata.Value;
-import de.peran.analysis.helper.MinimalExecutionDeterminer;
+import de.peass.measurement.analysis.MultipleVMTestUtil;
+import de.peass.measurement.analysis.Relation;
+import de.peass.statistics.ConfidenceInterval;
+import de.peran.breaksearch.helper.MinimalExecutionDeterminer;
 import de.peran.measurement.analysis.AnalyseFullData;
-import de.peran.measurement.analysis.MultipleVMTestUtil;
-import de.peran.measurement.analysis.statistics.ConfidenceIntervalInterpretion;
-import de.peran.measurement.analysis.statistics.Relation;
 import de.precision.processing.util.RepetitionFolderHandler;
 import de.precision.processing.util.Util;
 
@@ -263,8 +263,8 @@ public class GeneratePrecisionPlot extends RepetitionFolderHandler {
 		
 		// final int count =
 		// before.getDatacollector().get(0).getResult().get(0).getFulldata().getValue().size();
-		final List<Result> beforeShortened = MinimalExecutionDeterminer.shortenValues(before.getDatacollector().get(0).getResult(), warmup, allExecutions);
-		final List<Result> afterShortened = MinimalExecutionDeterminer.shortenValues(after.getDatacollector().get(0).getResult(), warmup, allExecutions);
+		final List<Result> beforeShortened = ConfidenceInterval.shortenValues(before.getDatacollector().get(0).getResult(), warmup, allExecutions);
+		final List<Result> afterShortened = ConfidenceInterval.shortenValues(after.getDatacollector().get(0).getResult(), warmup, allExecutions);
 
 		LOG.debug("Duration: {} VMs: {}", duration, vms);
 
@@ -335,7 +335,7 @@ public class GeneratePrecisionPlot extends RepetitionFolderHandler {
 
 		relations.put("COMBINE", tchange || gchange ? Relation.LESS_THAN : Relation.EQUAL);
 
-		final Relation confidence = ConfidenceIntervalInterpretion.compare(afterShortened, afterShortened) == de.peran.measurement.analysis.statistics.Relation.EQUAL
+		final Relation confidence = de.peass.analysis.statistics.ConfidenceIntervalInterpretion.compare(afterShortened, afterShortened) == Relation.EQUAL
 				? Relation.EQUAL : Relation.LESS_THAN;
 		relations.put("CONFIDENCE", confidence);
 		LOG.trace("Confidence: " + confidence);

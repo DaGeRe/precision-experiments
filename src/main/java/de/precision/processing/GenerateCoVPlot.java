@@ -20,8 +20,8 @@ import org.apache.logging.log4j.Logger;
 import de.dagere.kopeme.datastorage.XMLDataLoader;
 import de.dagere.kopeme.generated.Kopemedata;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
+import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.TestcaseType;
-import de.dagere.kopeme.generated.TestcaseType.Datacollector.Result;
 import de.peran.measurement.analysis.AnalyseFullData;
 import de.peran.measurement.analysis.statistics.MeanCoVData;
 

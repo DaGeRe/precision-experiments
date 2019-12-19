@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.dagere.kopeme.generated.TestcaseType.Datacollector.Result;
+import de.dagere.kopeme.generated.Result;
 import de.peran.measurement.analysis.AnalyseFullData;
 import de.precision.processing.util.RepetitionFolderHandler;
 import de.precision.processing.util.Util;
