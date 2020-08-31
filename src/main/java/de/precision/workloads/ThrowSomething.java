@@ -8,7 +8,7 @@ package de.precision.workloads;
  */
 public class ThrowSomething {
 	public int returnMe(final int whatToDo) {
-		if (whatToDo == 1) {
+		if (whatToDo != 1) {
 			return 1;
 		}
 		throw new RuntimeException("Give me one!");

@@ -16,6 +16,8 @@ sudo service cups-browsed stop
 sudo service rc.local stop
 sudo service speech-dispatcher stop
 
+sudo swapoff -a
+
 sudo service apache2 stop
 sudo service apache-htcacheclean stop
 sudo service docker stop

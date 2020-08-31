@@ -9,11 +9,12 @@ import java.util.Random;
  *
  */
 public class WriteToSystemOut {
+   private final Random random = new Random();
 	private static final int MAXIMUM_VALUE = 100;
 	int x = 0;
 
 	public void doSomething() {
-		x += new Random().nextInt(MAXIMUM_VALUE);
+      x += random.nextInt(MAXIMUM_VALUE);
 		System.out.println(x);
 	}
 

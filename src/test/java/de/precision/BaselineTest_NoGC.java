@@ -9,11 +9,11 @@ import de.dagere.kopeme.junit.testrunner.PerformanceTestRunnerJUnit;
 
 @PerformanceTestingClass(logFullData = true, overallTimeout = 0)
 @RunWith(PerformanceTestRunnerJUnit.class)
-public class BaselineTest {
+public class BaselineTest_NoGC {
    
    @PerformanceTest(warmupExecutions = 0, executionTimes = Constants.EXECUTIONS, 
          logFullData = true, useKieker = false, redirectToNull=Constants.REDIRECT, 
-         timeout = 0, dataCollectors = "ONLYTIME")  
+         timeout = 0, dataCollectors = "ONLYTIME_NOGC")  
 	@Test
 	public void baselinetest() {
 	}

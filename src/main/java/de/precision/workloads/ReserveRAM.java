@@ -20,7 +20,7 @@ public class ReserveRAM {
 
 	public void reserveRAM() {
 		for (int i = 0; i < ram.length; i++) {
-			ram[i] = new int[20 + RANDOM.nextInt(5)];
+			ram[i] = new int[3 + RANDOM.nextInt(3)];
 			for (int j = 0; j < ram[i].length; j++) {
 				ram[i][j] = RANDOM.nextInt();
 			}
