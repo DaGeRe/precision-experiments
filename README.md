@@ -1,4 +1,4 @@
-Precission Experiment
+Precision Experiment
 ===================
 
 The aim of this project is to determine a measurement method which is capable of distuingishing the performance of artificial unit tests. In general, performance tests for Java need multiple vm starts and in this multiple vm starts warmup executions, measurement executions and, if the testcase is small, which we consider as given, testcase repetitions. With this project, you can pick an arbitraty precission level and use experiments in order to determine how many executions are needed to reach this precission level. 
