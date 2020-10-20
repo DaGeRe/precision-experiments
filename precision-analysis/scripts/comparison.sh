@@ -1,0 +1,14 @@
+mkdir results_comparison
+cp results_noOutlierRemoval_AddTest/100000.csv results_comparison/AddTest_noRemoval.csv
+cp results_outlierRemoval_AddTest/100000.csv results_comparison/AddTest_removal.csv
+
+cp results_noOutlierRemoval_RAMTest/100000.csv results_comparison/RAMTest_noRemoval.csv
+cp results_outlierRemoval_RAMTest/100000.csv results_comparison/RAMTest_removal.csv
+
+cp results_noOutlierRemoval_SysoutTest/100000.csv results_comparison/SysoutTest_noRemoval.csv
+cp results_outlierRemoval_SysoutTest/100000.csv results_comparison/SysoutTest_removal.csv
+
+cp plotComparison.plt results_comparison_outlier
+cd results_comparison_outlier
+
+gnuplot -c plotComparison.plt

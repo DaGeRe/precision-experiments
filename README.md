@@ -1,10 +1,11 @@
-= Precission Experiment =
+Precission Experiment
+===================
 
 The aim of this project is to determine a measurement method which is capable of distuingishing the performance of artificial unit tests. In general, performance tests for Java need multiple vm starts and in this multiple vm starts warmup executions, measurement executions and, if the testcase is small, which we consider as given, testcase repetitions. With this project, you can pick an arbitraty precission level and use experiments in order to determine how many executions are needed to reach this precission level. 
 
 The artificial unit tests focus on addition and ram reservation. Unit tests for other purposes could be added. Experiments show, that I/O behaves much different from the aforementioned workloads.
 
-== Before all tests ==
+# Before all tests
 
 These tests should be executed in an environment with as less parallel processes as possible, therefore we recommend to use a separate maschine for measurements. Furthermore, the CPU should not change its scaling. This can be achieved by running ./PrepareMeasurements on an ubuntu system.
 
@@ -14,7 +15,7 @@ Optionally, you can control parameters of the tests by:
 * changing src/test/java/de/confidence/Constants.java: Count of executions (At least 5000 is recommended, else you will only measure warmup)
 * the environment variable VMS or changing the shell-skript that you are executing
 
-== Comparing Coefficient of Variation ==
+# Comparing Coefficient of Variation
 
 This shows, that the coefficient of variation is no proper indicator of reaching the steady state. Therefore, execute the following measurements on a suitable machine:
 
@@ -25,7 +26,7 @@ This shows, that the coefficient of variation is no proper indicator of reaching
 
 TODO
 
-== Comparing Different Repetition Counts == 
+# Comparing Different Repetition Counts
 
 1. ./runRepetitions.sh on your measurement computer. Optionally, you can control the tested reptitions by changing the line ``for repititions in {10..100..20}`` in runRepetition.sh
 2. Copy the results ~/.KoPeMe/default/ to your folder $RESULT.
@@ -33,13 +34,13 @@ TODO
 4. Run gnuplot and plot some of the given plot-recommendations. You could also combine them, like: 
   plot 'precission.csv' u 1:4 w lines title 'Precission ANOVA', 'precission.csv' u 1:5 w lines title 'Recall ANOVA', 'precission.csv' u 1:10 w lines title 'Precission Mann', 'precission.csv' u 1:11 w lines title 'Recall Mann','precission.csv' u 1:13 w lines title 'Precission Welch','precission.csv' u 1:14 w lines title 'Recall Welch'
 
-== Compare Equal, but not Same Hardware Environments ==
+# Compare Equal, but not Same Hardware Environments
 
 The performance of unit tests in equal hardware and software environments differs due to production inaccuracies. In order to reproduce the measurements that prove that, do the following:
 
 1. For every server: Start temperature logging ./get_temp.sh
 2. For every server: Start the tests with ./runAddSimple.sh
-3. Copy all results (temp.csv and ~/.KoPeMe/default/*) to an location with gnuplot
+3. Copy all results (temp.csv and ~/.KoPeMe/default/\*) to an location with gnuplot
 4. Summarize the temperature: ./get_temp_avg.sh temp.csv (creates the average over 10 temperature measurements)
 5. Assuming you have 3 folders server1, server2 and server3 containing measurements, plot temperature measurements in gnuplot with
 	set datafile separator ';'
@@ -53,14 +54,14 @@ The performance of unit tests in equal hardware and software environments differ
 	plot 'result_de.addtest.Add1Test_0_addSomething_all.csv' u ($0*200):1 title 'Mean', 'result_de.addtest.Add1Test_0_addSomething_all.csv' u ($0*200):2 title 'CoV' axes x1y2
   By combining them you can get an plot of all meaurements.
 
-== Determining Parameters ==
+# Determining Parameters 
 
 1. Prepare measurement parameters: Set EXECUTIONS in src/test/java/de/confidence/Constants.java to at least 5000, set the repetitions in ``for repititions in {10..100..20}`` and the vms in runRepetition.sh.
 2. ./runRepetitions.sh on your measurement computer.
 3. Copy the results ~/.KoPeMe/default/ to your folder $RESULT.
-4. Execute processing.repetitions.PlotPrecissions with $RESULT as parameter.
+4. Execute de.precision.processing.repetitions.GeneratePrecisionPlot with $RESULT as parameter.
 5. Run 
-	cat precission.csv | awk -F ';' '{if ($6>0.95 && $7>0.95) print $4+$5 ";" $0}' | sort -k1 -t ';' -n
+	cat precision.csv | awk '{if ($7>95.0 && $8>95.0) print $4+$5 ";" $0}' | sort -k1 -t ';' -n
 The first line gives you the fastest configuration, where precission and recall are above 95%. 
 
 # Funding

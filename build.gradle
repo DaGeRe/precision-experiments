@@ -9,23 +9,15 @@ buildscript {
 }
 
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: 'checkstyle'
-//apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'maven'
+
+group = "de.peass"
+version = "0.1-SNAPSHOT"
 
 sourceCompatibility = 1.8
-version = '2.13'
-task fatJar(type: Jar) {
-	manifest {
-        attributes 'Implementation-Title': 'Precision-Experiment',
-        	'Implementation-Version': 0.1,
-        	'Main-Class': 'processing.repetitions.GeneratePrecisionPlot'
-    }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
 
 repositories {
     mavenCentral()
@@ -37,14 +29,16 @@ repositories {
 
 
 dependencies {
-   compile group: "de.dagere.kopeme", name: "kopeme-junit", version: "0.10-SNAPSHOT"
+   compile group: "de.dagere.kopeme", name: "kopeme-junit", version: "0.11-SNAPSHOT"
+   compile group: "de.dagere.kopeme", name: "kopeme-junit3", version: "0.11-SNAPSHOT"
    compile group: 'commons-io', name: 'commons-io', version: '2.4'
-   compile group: 'de.peass', name: 'analysis', version: '0.1-SNAPSHOT'
-   compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+   compile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.23'
 }
 
 test {
-    testLogging.showStandardStreams = true
+//	jvmArgs "-XX:+PrintCompilation" , "-XX:+PrintGC"
+//    testLogging.showStandardStreams = true
+//    jvmArgs "-Xmx1g"
     // jvmArgs "-agentpath:.../vm_logging/loggingAgent.o"
     // Uncoment this, if you want to measure CPU temperature along with workload duration
   // exclude 'de/precision/**'

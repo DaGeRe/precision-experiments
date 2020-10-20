@@ -1,0 +1,45 @@
+buildscript {
+    repositories {
+	jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+    }
+}
+
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'checkstyle'
+//apply plugin: 'com.github.johnrengelman.shadow'
+
+sourceCompatibility = 1.8
+version = '2.13'
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'Precision-Experiment',
+        	'Implementation-Version': 0.1,
+        	'Main-Class': 'de.precision.analysis.repetitions.GeneratePrecisionPlot'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven{
+		url 'https://oss.sonatype.org/content/repositories/snapshots'
+	}
+}
+
+
+dependencies {
+   compile group: 'commons-io', name: 'commons-io', version: '2.4'
+   compile group: 'de.peass', name: 'analysis', version: '0.1-SNAPSHOT'
+   compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+   compile 'info.picocli:picocli:4.3.2'
+   testCompile group: 'de.peass', name: 'measurement', version: '0.1-SNAPSHOT', classifier: 'tests'
+}
