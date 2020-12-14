@@ -20,16 +20,18 @@ public class GenerateNoise {
             @Override
             public void run() {
                while (true) {
-                  int random = r.nextInt(3);
+                  int random = r.nextInt(5);
 
                   switch (random) {
                   case 0:
+                  case 1:
                      executeAddWorkload();
                      break;
-                  case 1:
+                  case 2:
+                  case 3:
                      reserveRAM();
                      break;
-                  case 2:
+                  case 4:
                      waitRandomly();
                      break;
                   }
@@ -42,7 +44,7 @@ public class GenerateNoise {
 
    private static void waitRandomly() {
       try {
-         final int waitDuration = 30 * 1000 + r.nextInt(1000 * 60 * 60);
+         final int waitDuration = 10 * 1000 + r.nextInt(1000 * 60 * 2);
          System.out.println("Waiting: " + waitDuration);
          Thread.sleep(waitDuration);
       } catch (InterruptedException e) {
@@ -51,7 +53,7 @@ public class GenerateNoise {
    }
 
    private static void reserveRAM() {
-      int randomRAM = 100000 + new Random().nextInt(100000);
+      int randomRAM = 1000000 + new Random().nextInt(100000);
       System.out.println("Reserving RAM: " + randomRAM);
       final ReserveRAM reserveRAM = new ReserveRAM(randomRAM);
       reserveRAM.reserveRAM();
@@ -61,7 +63,7 @@ public class GenerateNoise {
    }
 
    private static void executeAddWorkload() {
-      int randomAddition = 1000000 + new Random().nextInt(10000000);
+      long randomAddition = 10000000 + new Random().nextInt(10000000);
       System.out.println("Adding: " + randomAddition);
       final AddRandomNumbers addWorkload = new AddRandomNumbers();
       for (int i = 0; i < randomAddition; i++) {

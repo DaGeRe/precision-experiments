@@ -1,5 +1,6 @@
 jmh-test/dependency-reduced-pom.xml
 *.tar
+scripts/temp/
 default/
 target/
 .settings/

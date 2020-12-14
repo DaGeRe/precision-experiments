@@ -21,11 +21,21 @@ fi
 testName=${tests##*.}
 id=1
 resultfolder=~/.KoPeMe/repetitionEvolution_"$basesize"_"$redirect"_"$diffPercent"_"$testName"_"$id"
+if [ "$PARALLEL" ]
+then
+	resultfolder=$resultfolder"_parallel"
+fi		
 while [[ -d $resultfolder ]]
 do
-   id=$((id+1))
-   resultfolder=~/.KoPeMe/repetitionEvolution_"$basesize"_"$redirect"_"$diffPercent"_"$testName"_"$id"
+	id=$((id+1))
+	resultfolder=~/.KoPeMe/repetitionEvolution_"$basesize"_"$redirect"_"$diffPercent"_"$testName"_"$id"
+	if [ "$PARALLEL" ]
+	then
+		resultfolder=$resultfolder"_parallel"
+	fi		
 done
+
+rm temp/* -rf
 
 echo "Writing to $resultfolder"
 mkdir -p $resultfolder
@@ -35,7 +45,7 @@ function runRepetition(){
 	vms=$2
 	testcases=$3
 	basesize=$5
-    	diffAbsolute=$4
+    diffAbsolute=$4
  
 	echo "Executing $repetitions repetitions $vms VMs Diff: $diffPercent"
 	executions=$(echo "10000000/$repetitions" | bc)
@@ -50,18 +60,18 @@ function runRepetition(){
 		do
 			start=$(date +%s%N)
 			echo -n "Executing $i $testcase "
-			export workloadsize=$basesize
-			echo -n "Workload: $workloadsize ..."
-			../gradlew -p .. clean test --tests $testcases &> $i.txt
-			mv ~/.KoPeMe/de.peass/precision-experiment/$testcases $resultfolder/result_"$workloadsize"_"$i"
-			export workloadsize=$(echo $basesize+$diffAbsolute | bc)
-			echo -n " $workloadsize ..."
-			../gradlew -p .. clean test --tests $testcases &> "$i"_2.txt
-			mv ~/.KoPeMe/de.peass/precision-experiment/$testcases $resultfolder/result_"$workloadsize"_"$i"
+			
+			if [ "$PARALLEL" ]
+			then
+				runVersionMeasurementParallel
+			else
+				runVersionMeasurement
+			fi
+			
 			end=$(date +%s%N)
 			duration=$(echo "($end-$start)/1000000" | bc)
 			durations="$durations $duration"
-			average=$(echo $durations | getSum | awk '{print $2/1000}')
+			average=$(echo $durations | getSum | awk '{print $2/1000}' | tr "," ".")
 			remaining=$(echo "scale=2; $average*($vms-$i)/60" | bc -l)
 			echo " Remaining: $remaining minutes"
 		done

@@ -16,6 +16,12 @@ then
 	exit 1
 fi
 
+if [ $# -gt 1 ]
+then
+	size=$2
+else
+	size=100000
+fi
 
 start=$(pwd)
 
@@ -26,7 +32,7 @@ base=$base"_"$test
 
 type=$(echo $base | awk -F'_' '{print $2}')
 
-echo $base
+echo "Basefolder: $base Test: $test"
 
 mkdir -p $base
 
@@ -40,11 +46,16 @@ do
 	getHeatmapData 17 $start/$base/bimodal/$repetitions.csv $repetitions
 done
 
-getHeatmapData 9 $start/$base/100k_mean.csv 100000
-getHeatmapData 21 $start/$base/100k_confidence.csv 100000
-getHeatmapData 25 $start/$base/100k_mann.csv 100000
+getHeatmapData 9 $start/$base/100k_mean.csv $size
+getHeatmapData 21 $start/$base/100k_confidence.csv $size
+getHeatmapData 25 $start/$base/100k_mann.csv $size
 
 cd $start/$base
+
+if [ ! $size -eq 100000 ]
+then
+	mv $size.csv 100000.csv
+fi
 
 gnuplot -c $start/plotAllHeatmap.plt
 mv heatmap_all.pdf $test"_"$type.pdf
