@@ -58,3 +58,5 @@ done
 cd $start/$base
 gnuplot -c $start/plotParallelHeatmap.plt
 
+mv heatmap_parallel.pdf "$test"_heatmap_parallel.pdf
+
