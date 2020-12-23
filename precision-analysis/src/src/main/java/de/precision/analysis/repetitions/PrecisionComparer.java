@@ -43,7 +43,7 @@ public class PrecisionComparer {
       TestExecutors.getTTestRelation2(relations, data);
       
       if (config.isUseConfidenceInterval()) {
-         TestExecutors.getConfidenceRelation(beforeShortened, afterShortened, relations);
+         TestExecutors.getConfidenceRelation(data, relations);
       }
 
       TestExecutors.getMeanRelation(relations, data);

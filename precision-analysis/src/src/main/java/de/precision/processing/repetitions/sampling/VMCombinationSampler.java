@@ -36,14 +36,14 @@ public class VMCombinationSampler {
     * @param versionSlow
     * @return average VM-duration in seconds
     */
-   public double sampleArtificialVMCombinations(final Testcases testclazz, final TestcaseType versionFast, final TestcaseType versionSlow) {
+   public double sampleArtificialVMCombinations(final TestcaseType versionFast, final TestcaseType versionSlow) {
       final List<Result> fastShortened = StatisticUtil.shortenValues(versionFast.getDatacollector().get(0).getResult(), warmup, allExecutions);
       final List<Result> slowShortened = StatisticUtil.shortenValues(versionSlow.getDatacollector().get(0).getResult(), warmup, allExecutions);
 
-      return sampleArtificialVMCombinations(testclazz, fastShortened, slowShortened);
+      return sampleArtificialVMCombinations(fastShortened, slowShortened);
    }
 
-   public double sampleArtificialVMCombinations(final Testcases testclazz, final List<Result> fastShortened, final List<Result> slowShortened) {
+   public double sampleArtificialVMCombinations(final List<Result> fastShortened, final List<Result> slowShortened) {
       final SummaryStatistics averageDuration = new SummaryStatistics();
 
       for (int i = 0; i < config.getSamplingExecutions(); i++) {

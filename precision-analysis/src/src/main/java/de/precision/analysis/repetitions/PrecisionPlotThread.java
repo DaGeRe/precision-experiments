@@ -101,7 +101,7 @@ public class PrecisionPlotThread {
       writeValues(slowShortened, new File(writingData.getResultFolder(), "slow_" + executionData.getRepetitions() + ".csv"));
 
       final VMCombinationSampler vmCombinationSampler = new VMCombinationSampler(executionData.getWarmup(), allExecutions, comparer, config);
-      final double durationInS = (vmCombinationSampler.sampleArtificialVMCombinations(testclazz, fastShortened, slowShortened)) / 1000;
+      final double durationInS = (vmCombinationSampler.sampleArtificialVMCombinations(fastShortened, slowShortened)) / 1000;
       duration += durationInS;
       LOG.debug("Duration in s: {}", durationInS);
       

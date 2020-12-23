@@ -80,8 +80,8 @@ public class TestExecutors {
       }
    }
 
-   public static void getConfidenceRelation(final List<Result> beforeShortened, final List<Result> afterShortened, final Map<String, Relation> relations) {
-      final Relation confidence = ConfidenceIntervalInterpretion.compare(beforeShortened, afterShortened, 90);
+   public static void getConfidenceRelation(final CompareData cd, final Map<String, Relation> relations) {
+      final Relation confidence = ConfidenceIntervalInterpretion.compare(cd, 90);
       relations.put(GeneratePrecisionPlot.CONFIDENCE, confidence);
       LOG.trace("Confidence: " + confidence);
    }
