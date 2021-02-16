@@ -6,8 +6,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import de.precision.processing.ProcessConstants;
 
@@ -19,9 +19,36 @@ public class PrecisionWriter {
    private final ExecutionData executionData;
    
    
-   public PrecisionWriter(PrecisionComparer comparer, ExecutionData executionData) {
+   public PrecisionWriter(final PrecisionComparer comparer, final ExecutionData executionData) {
       this.comparer = comparer;
       this.executionData = executionData;
+   }
+   
+   public static void writeHeader(final BufferedWriter writer) throws IOException{
+      synchronized (writer) {
+         writer.write("repetitions" + ProcessConstants.DATAFILE_SEPARATOR +
+               "vms" + ProcessConstants.DATAFILE_SEPARATOR +
+               "executions" + ProcessConstants.DATAFILE_SEPARATOR +
+               "warmup" + ProcessConstants.DATAFILE_SEPARATOR +
+               "overhead" + ProcessConstants.DATAFILE_SEPARATOR +
+               "duration" + ProcessConstants.DATAFILE_SEPARATOR);
+         writer.write("\n");
+         writer.flush();
+      }
+   }
+   
+   public static void writeHeader(final BufferedWriter writer, final String[] types) throws IOException {
+      writer.write("repetitions" + ProcessConstants.DATAFILE_SEPARATOR +
+            "vms" + ProcessConstants.DATAFILE_SEPARATOR +
+            "executions" + ProcessConstants.DATAFILE_SEPARATOR +
+            "warmup" + ProcessConstants.DATAFILE_SEPARATOR +
+            "overhead" + ProcessConstants.DATAFILE_SEPARATOR +
+            "duration" + ProcessConstants.DATAFILE_SEPARATOR);
+      for (final String method : new MethodResult(GeneratePrecisionPlot.myTypes).getResults().keySet()) {
+         writer.write(method + ProcessConstants.DATAFILE_SEPARATOR + ProcessConstants.DATAFILE_SEPARATOR + ProcessConstants.DATAFILE_SEPARATOR);
+      }
+      writer.write("\n");
+      writer.flush();
    }
 
    public void writeTestcase(final BufferedWriter testcaseWriter, final Set<Entry<String, Map<String, Integer>>> statisticMethodResults) throws IOException {
@@ -40,7 +67,7 @@ public class PrecisionWriter {
       }
    }
    
-   private void writeData(final Map.Entry<String, Map<String, Integer>> methodResult, BufferedWriter writer) throws IOException {
+   private void writeData(final Map.Entry<String, Map<String, Integer>> methodResult, final BufferedWriter writer) throws IOException {
 
       final int selected = methodResult.getValue().get(MethodResult.SELECTED);
       // final int truepositive = methodResult.getValue().get(MethodResult.TRUEPOSITIVE);

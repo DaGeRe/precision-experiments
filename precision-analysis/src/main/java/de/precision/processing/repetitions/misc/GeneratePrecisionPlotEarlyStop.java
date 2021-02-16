@@ -28,7 +28,6 @@ import de.dagere.kopeme.generated.TestcaseType;
 import de.peass.measurement.analysis.MultipleVMTestUtil;
 import de.peass.measurement.analysis.Relation;
 import de.peass.measurement.analysis.StatisticUtil;
-import de.peran.measurement.analysis.AnalyseFullData;
 import de.precision.analysis.repetitions.MethodResult;
 import de.precision.processing.util.RepetitionFolderHandler;
 import de.precision.processing.util.PrecisionFolderUtil;
@@ -51,7 +50,7 @@ public class GeneratePrecisionPlotEarlyStop extends RepetitionFolderHandler {
 		}
 	}
 
-	private static final Logger LOG = LogManager.getLogger(AnalyseFullData.class);
+	private static final Logger LOG = LogManager.getLogger(GeneratePrecisionPlotEarlyStop.class);
 
 	public static void main(final String[] args) throws JAXBException, IOException {
 		// System.setOut(new PrintStream(new File("/dev/null")));

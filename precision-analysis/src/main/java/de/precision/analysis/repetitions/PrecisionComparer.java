@@ -26,28 +26,26 @@ public class PrecisionComparer {
       this.config = config;
    }
 
-   public void executeComparisons(final List<Result> beforeShortened, final List<Result> afterShortened, final Relation expectedRelation, final String testcaseName) {
+   public void executeComparisons(CompareData data, final Relation expectedRelation, final String testcaseName) {
       final Map<String, Relation> relations = new LinkedHashMap<>();
-
-      CompareData data = new CompareData(beforeShortened, afterShortened);
 
       boolean ttest = TestExecutors.getTTestRelation(relations, data);
       if (config.isPrintPicks()) {
-         System.out.println(data.getAvgBefore() + " " + data.getAvgAfter() + " " +
+         LOG.debug(data.getAvgBefore() + " " + data.getAvgAfter() + " " +
                data.getBeforeStat().getVariance() + " " + data.getAfterStat().getVariance()
                + " " + (ttest ? 1 : 0)
                + " " + new TTest().homoscedasticT(data.getBefore(), data.getAfter())
                + " " + data.getBefore().length + " " + data.getAfter().length);
       }
 
-      TestExecutors.getTTestRelation2(relations, data);
+      TestExecutors.getTTestRelationBimodal(relations, data);
       
       if (config.isUseConfidenceInterval()) {
-         TestExecutors.getConfidenceRelation(beforeShortened, afterShortened, relations);
+         TestExecutors.getConfidenceRelation(data, relations);
       }
 
       TestExecutors.getMeanRelation(relations, data);
-      TestExecutors.getMannWhitneyRelation(relations, data);
+//      TestExecutors.getMannWhitneyRelation(relations, data);
       // TestExecutors.getGTestRelation(beforeShortened, afterShortened, relations, data);
 
       manageResults(expectedRelation, testcaseName, relations);

@@ -33,8 +33,8 @@ import de.dagere.kopeme.generated.TestcaseType;
 import de.peass.analysis.statistics.ConfidenceIntervalInterpretion;
 import de.peass.measurement.analysis.MultipleVMTestUtil;
 import de.peass.measurement.analysis.Relation;
-import de.peran.measurement.analysis.AnalyseFullData;
 import de.precision.processing.util.RepetitionFolderHandler;
+import de.precision.analysis.repetitions.bimodal.CompareData;
 import de.precision.processing.util.PrecisionFolderUtil;
 
 /**
@@ -74,7 +74,7 @@ public class GenerateStopPlot extends RepetitionFolderHandler {
 		}
 	}
 
-	private static final Logger LOG = LogManager.getLogger(AnalyseFullData.class);
+	private static final Logger LOG = LogManager.getLogger(GenerateStopPlot.class);
 
 	public static void main(final String[] args) throws JAXBException, IOException {
 		// System.setOut(new PrintStream(new File("/dev/null")));
@@ -350,7 +350,8 @@ public class GenerateStopPlot extends RepetitionFolderHandler {
 
 		relations.put("COMBINE", tchange || gchange ? Relation.LESS_THAN : Relation.EQUAL);
 
-		final Relation confidence = ConfidenceIntervalInterpretion.compare(afterShortened, afterShortened) == Relation.EQUAL
+		CompareData data = new CompareData(afterShortened, afterShortened);
+		final Relation confidence = ConfidenceIntervalInterpretion.compare(data) == Relation.EQUAL
 				? Relation.EQUAL : Relation.LESS_THAN;
 		relations.put("CONFIDENCE", confidence);
 		LOG.trace("Confidence: " + confidence);

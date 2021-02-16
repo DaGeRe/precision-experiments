@@ -4,13 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +14,6 @@ import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.TestcaseType;
 import de.peass.measurement.analysis.StatisticUtil;
-import de.precision.processing.ProcessConstants;
 import de.precision.processing.repetitions.misc.DetermineAverageTime;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
 import de.precision.processing.repetitions.sampling.VMCombinationSampler;
@@ -39,7 +33,7 @@ public class PrecisionPlotThread {
    protected Map<String, Testcases> testcasesV1 = null;
    protected Map<String, Testcases> testcasesV2 = null;
 
-   public PrecisionPlotThread(ExecutionData executionData, WritingData writinData, PrecisionConfig precisionConfig, Map<String, Testcases> testcasesV1, Map<String, Testcases> testcasesV2) {
+   public PrecisionPlotThread(final ExecutionData executionData, final WritingData writinData, final PrecisionConfig precisionConfig, final Map<String, Testcases> testcasesV1, final Map<String, Testcases> testcasesV2) {
       this.executionData = executionData;
       this.writingData = writinData;
       this.precisionConfig = precisionConfig;
@@ -66,7 +60,7 @@ public class PrecisionPlotThread {
             if (testcaseWriter == null) {
                testcaseWriter = new BufferedWriter(new FileWriter(new File(writingData.getResultFolder(), entry.getKey() + ".csv")));
                writingData.getTestcaseWriters().put(entry.getKey(), testcaseWriter);
-               PrecisionPlotGenerationManager.writeHeader(testcaseWriter);
+               PrecisionWriter.writeHeader(testcaseWriter, GeneratePrecisionPlot.myTypes);
             }
             new PrecisionWriter(comparer, executionData).writeTestcase(testcaseWriter, entry.getValue().getResults().entrySet());
          } catch (final IOException e) {
@@ -101,7 +95,7 @@ public class PrecisionPlotThread {
       writeValues(slowShortened, new File(writingData.getResultFolder(), "slow_" + executionData.getRepetitions() + ".csv"));
 
       final VMCombinationSampler vmCombinationSampler = new VMCombinationSampler(executionData.getWarmup(), allExecutions, comparer, config);
-      final double durationInS = (vmCombinationSampler.sampleArtificialVMCombinations(testclazz, fastShortened, slowShortened)) / 1000;
+      final double durationInS = (vmCombinationSampler.sampleArtificialVMCombinations(fastShortened, slowShortened)) / 1000;
       duration += durationInS;
       LOG.debug("Duration in s: {}", durationInS);
       
@@ -109,7 +103,7 @@ public class PrecisionPlotThread {
       executionData.setOverhead(overhead);
    }
    
-   private void writeValues(final List<Result> values, File destination) {
+   private void writeValues(final List<Result> values, final File destination) {
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(destination))) {
          for (Result r : values) {
             writer.write(r.getValue() + "\n");

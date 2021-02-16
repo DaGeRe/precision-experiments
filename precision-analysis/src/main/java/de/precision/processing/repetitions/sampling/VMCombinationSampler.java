@@ -13,6 +13,8 @@ import de.dagere.kopeme.generated.TestcaseType;
 import de.peass.measurement.analysis.Relation;
 import de.peass.measurement.analysis.StatisticUtil;
 import de.precision.analysis.repetitions.PrecisionComparer;
+import de.precision.analysis.repetitions.bimodal.CompareData;
+import de.precision.processing.repetitions.misc.DetermineAverageTime;
 
 public class VMCombinationSampler {
 
@@ -36,26 +38,35 @@ public class VMCombinationSampler {
     * @param versionSlow
     * @return average VM-duration in seconds
     */
-   public double sampleArtificialVMCombinations(final Testcases testclazz, final TestcaseType versionFast, final TestcaseType versionSlow) {
+   public double sampleArtificialVMCombinations(final TestcaseType versionFast, final TestcaseType versionSlow) {
       final List<Result> fastShortened = StatisticUtil.shortenValues(versionFast.getDatacollector().get(0).getResult(), warmup, allExecutions);
       final List<Result> slowShortened = StatisticUtil.shortenValues(versionSlow.getDatacollector().get(0).getResult(), warmup, allExecutions);
 
-      return sampleArtificialVMCombinations(testclazz, fastShortened, slowShortened);
+      return sampleArtificialVMCombinations(fastShortened, slowShortened);
    }
 
-   public double sampleArtificialVMCombinations(final Testcases testclazz, final List<Result> fastShortened, final List<Result> slowShortened) {
-      final SummaryStatistics averageDuration = new SummaryStatistics();
-
+   /**
+    * 
+    * @param fastShortened
+    * @param slowShortened
+    * @return average duration in seconds
+    */
+   public double sampleArtificialVMCombinations(final List<Result> fastShortened, final List<Result> slowShortened) {
+      final double overallDuration = DetermineAverageTime.getDurationInMS(fastShortened, slowShortened);
+      final double calculatedDuration = overallDuration / fastShortened.size() * config.getVms();
+      
+      CompareData data = new CompareData(fastShortened, slowShortened);
       for (int i = 0; i < config.getSamplingExecutions(); i++) {
-         executeComparisons(config, fastShortened, slowShortened, averageDuration);
+         executeComparisons(config, data);
       }
-      return averageDuration.getMean() / 1000;
+      return calculatedDuration / 1000;
    }
 
-   private void executeComparisons(final SamplingConfig config, final List<Result> fastShortened, final List<Result> slowShortened, final SummaryStatistics averageDuration) {
-      final SamplingExecutor samplingExecutor = new SamplingExecutor(config, fastShortened, slowShortened, averageDuration, comparer);
+   private void executeComparisons(final SamplingConfig config, CompareData data) {
+      final SamplingExecutor samplingExecutor = new SamplingExecutor(config, data, comparer);
       samplingExecutor.executeComparisons(Relation.LESS_THAN);
-      final SamplingExecutor samplingExecutor2 = new SamplingExecutor(config, fastShortened, fastShortened, averageDuration, comparer);
+      CompareData equalData = new CompareData(data.getBefore(), data.getBefore());
+      final SamplingExecutor samplingExecutor2 = new SamplingExecutor(config, equalData, comparer);
       samplingExecutor2.executeComparisons(Relation.EQUAL);
    }
 

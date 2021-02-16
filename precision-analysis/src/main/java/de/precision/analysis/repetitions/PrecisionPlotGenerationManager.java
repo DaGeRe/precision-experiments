@@ -9,9 +9,8 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
-import de.precision.processing.ProcessConstants;
-import de.precision.processing.util.RepetitionFolderHandler.CreatorParallel;
 import de.precision.processing.util.PrecisionFolderUtil;
+import de.precision.processing.util.RepetitionFolderHandler.CreatorParallel;
 
 public class PrecisionPlotGenerationManager {
 
@@ -21,7 +20,7 @@ public class PrecisionPlotGenerationManager {
    private final File resultFolder;
    private final PrecisionConfig config;
 
-   public PrecisionPlotGenerationManager(File resultFolder, PrecisionConfig config) throws IOException {
+   public PrecisionPlotGenerationManager(final File resultFolder, final PrecisionConfig config) throws IOException {
       resultFolder.mkdir();
       this.resultFolder = resultFolder;
       this.config = config;
@@ -29,7 +28,7 @@ public class PrecisionPlotGenerationManager {
    }
 
    void handleFolder(final File inputFolder) throws IOException, JAXBException, InterruptedException {
-      writeHeader(precisionRecallWriter);
+      PrecisionWriter.writeHeader(precisionRecallWriter, GeneratePrecisionPlot.myTypes);
 
       boolean hasPrecisionChild = false;
       for (File child : inputFolder.listFiles()) {
@@ -41,7 +40,7 @@ public class PrecisionPlotGenerationManager {
       startProcessing(inputFolder, hasPrecisionChild);
    }
 
-   private void startProcessing(final File inputFolder, boolean hasPrecisionChild) throws JAXBException, IOException, InterruptedException {
+   private void startProcessing(final File inputFolder, final boolean hasPrecisionChild) throws JAXBException, IOException, InterruptedException {
       final WritingData writingData = new WritingData(resultFolder, precisionRecallWriter, testcaseWriters);
       if (inputFolder.getName().contains("Test") || hasPrecisionChild) {
          PrecisionFolderUtil.processFolderParallel(inputFolder, creatorFunction(writingData));
@@ -60,14 +59,5 @@ public class PrecisionPlotGenerationManager {
             return null;
          }
       };
-   }
-
-   public static void writeHeader(BufferedWriter writer) throws IOException {
-      writer.write("#repetitions vms executions warmup overheadInS duration ");
-      for (final String method : new MethodResult(GeneratePrecisionPlot.myTypes).getResults().keySet()) {
-         writer.write(method + ProcessConstants.DATAFILE_SEPARATOR + ProcessConstants.DATAFILE_SEPARATOR + ProcessConstants.DATAFILE_SEPARATOR);
-      }
-      writer.write("\n");
-      writer.flush();
    }
 }

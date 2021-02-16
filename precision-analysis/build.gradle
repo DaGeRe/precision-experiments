@@ -12,6 +12,7 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'checkstyle'
+apply plugin: 'maven-publish'
 //apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceCompatibility = 1.8
@@ -26,6 +27,22 @@ task fatJar(type: Jar) {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
+
+
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'de.peass'
+            artifactId = 'precision-analysis'
+            version = '0.1-SNAPSHOT'
+
+            from components.java
+        }
+    }
+}
+
+
 
 repositories {
     mavenCentral()

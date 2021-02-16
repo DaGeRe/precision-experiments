@@ -80,7 +80,7 @@ public class AggregatedValueSampler implements Callable<Void> {
       PrecisionComparer comparer = new PrecisionComparer(config);
       VMCombinationSampler sampler = new VMCombinationSampler(0, 1, comparer, config);
 
-      sampler.sampleArtificialVMCombinations(testclazz, versionFast, versionSlow);
+      sampler.sampleArtificialVMCombinations(versionFast, versionSlow);
 
       System.setOut(out);
 

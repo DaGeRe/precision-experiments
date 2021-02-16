@@ -46,7 +46,7 @@ public class TestExecutors {
       return tchange;
    }
 
-   public static boolean getTTestRelation2(final Map<String, Relation> relations, CompareData data) {
+   public static boolean getTTestRelationBimodal(final Map<String, Relation> relations, CompareData data) {
       final BimodalityTester tester = new BimodalityTester(data);
       final boolean tchange = tester.isTChange(0.001);
       if (tchange) {
@@ -80,8 +80,8 @@ public class TestExecutors {
       }
    }
 
-   public static void getConfidenceRelation(final List<Result> beforeShortened, final List<Result> afterShortened, final Map<String, Relation> relations) {
-      final Relation confidence = ConfidenceIntervalInterpretion.compare(beforeShortened, afterShortened, 90);
+   public static void getConfidenceRelation(final CompareData cd, final Map<String, Relation> relations) {
+      final Relation confidence = ConfidenceIntervalInterpretion.compare(cd, 90);
       relations.put(GeneratePrecisionPlot.CONFIDENCE, confidence);
       LOG.trace("Confidence: " + confidence);
    }
