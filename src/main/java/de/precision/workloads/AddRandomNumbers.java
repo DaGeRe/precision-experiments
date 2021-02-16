@@ -9,10 +9,13 @@ import java.util.Random;
  *
  */
 public class AddRandomNumbers {
+   
+   public static final Random r = new Random();
+   
 	int x = 0;
 
 	public void addSomething() {
-		x += new Random().nextInt(100);
+		x += r.nextInt(100);
 	}
 
 	public int getValue() {

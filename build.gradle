@@ -29,8 +29,8 @@ repositories {
 
 
 dependencies {
-   compile group: "de.dagere.kopeme", name: "kopeme-junit", version: "0.12-SNAPSHOT"
-   compile group: "de.dagere.kopeme", name: "kopeme-junit3", version: "0.12-SNAPSHOT"
+   compile group: "de.dagere.kopeme", name: "kopeme-junit", version: "0.13"
+   compile group: "de.dagere.kopeme", name: "kopeme-junit3", version: "0.13"
    compile group: 'commons-io', name: 'commons-io', version: '2.4'
    compile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.23'
 }

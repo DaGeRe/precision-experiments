@@ -12,7 +12,7 @@ import de.precision.workloads.AddRandomNumbersSynchronized;
 @PerformanceTestingClass(logFullData = true, overallTimeout = 0)
 @RunWith(PerformanceTestRunnerJUnit.class)
 public class SyncAddSmall1 {
-	@PerformanceTest(warmupExecutions = 0, executionTimes = Constants.EXECUTIONS, logFullData = true, timeout = 0, dataCollectors = "ONLYTIME")
+   @PerformanceTest(warmup = 0, iterations = Constants.EXECUTIONS, logFullData = true, timeout = 0, dataCollectors = "ONLYTIME")
 	@Test
 	public void add() {
 		final int parseInt = System.getenv().containsKey("repetitions") ? Integer.parseInt(System.getenv().get("repetitions")) : 1;

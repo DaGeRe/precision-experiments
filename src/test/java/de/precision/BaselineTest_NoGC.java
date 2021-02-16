@@ -11,7 +11,7 @@ import de.dagere.kopeme.junit.testrunner.PerformanceTestRunnerJUnit;
 @RunWith(PerformanceTestRunnerJUnit.class)
 public class BaselineTest_NoGC {
    
-   @PerformanceTest(warmupExecutions = 0, executionTimes = Constants.EXECUTIONS, 
+   @PerformanceTest(warmup = 0, iterations = Constants.EXECUTIONS, 
          logFullData = true, useKieker = false, redirectToNull=Constants.REDIRECT, 
          timeout = 0, dataCollectors = "ONLYTIME_NOGC")  
 	@Test

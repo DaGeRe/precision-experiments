@@ -51,6 +51,7 @@ function runRepetition(){
 	executions=$(echo "10000000/$repetitions" | bc)
 	echo "Setting executions to $executions, basesize=$basesize"
 	sed -i "s/EXECUTIONS = [0-9]\+/EXECUTIONS = $executions/g" ../src/test/java/de/precision/Constants.java
+	sed -i "s/REPETITIONS = [0-9]\+/REPETITIONS = $repetitions/g" ../src/test/java/de/precision/Constants.java
 	export repetitions=$repetitions
 	for testcase in "${testcases[@]}"
 	do

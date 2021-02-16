@@ -17,7 +17,7 @@ public class ComplexTest1 {
 	private static final Random random = new Random(0);
 	private int localVar = 0;
 
-	@PerformanceTest(warmupExecutions = 0, executionTimes = Constants.EXECUTIONS, logFullData = true, timeout = 0, dataCollectors = "ONLYTIME")
+	@PerformanceTest(warmup = 0, iterations = Constants.EXECUTIONS,  logFullData = true, timeout = 0, dataCollectors = "ONLYTIME")
 	@Test
 	public void complexStuff(){
 		int val1 = addInts();

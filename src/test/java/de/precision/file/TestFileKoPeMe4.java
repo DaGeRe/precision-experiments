@@ -15,7 +15,7 @@ import de.precision.Constants;
 @RunWith(PerformanceTestRunnerJUnit.class)
 public class TestFileKoPeMe4 {
 
-   @PerformanceTest(warmupExecutions = 0, executionTimes = Constants.EXECUTIONS, repetitions=100, logFullData = true, timeout = 0, dataCollectors = "ONLYTIME")
+   @PerformanceTest(warmup = 0, iterations = Constants.EXECUTIONS, repetitions=100, logFullData = true, timeout = 0, dataCollectors = "ONLYTIME")
    @Test
    public void add() throws IOException {
       try {

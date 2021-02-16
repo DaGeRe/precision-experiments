@@ -16,7 +16,7 @@ public class TypeTest2 {
 	
 	private static final Random r = new Random();
 	
-	@PerformanceTest(warmupExecutions = 0, executionTimes = Constants.EXECUTIONS, logFullData = true, timeout = 0, dataCollectors = "ONLYTIME")
+	@PerformanceTest(warmup = 0, iterations = Constants.EXECUTIONS, logFullData = true, timeout = 0, dataCollectors = "ONLYTIME")
 	@Test
 	public void execute() {
 		final int parseInt = System.getenv().containsKey("repetitions") ? Integer.parseInt(System.getenv().get("repetitions")) : 1;

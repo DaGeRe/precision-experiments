@@ -20,7 +20,7 @@ import de.precision.Constants;
 @RunWith(PerformanceTestRunnerJUnit.class)
 public class TestFile2 {
 
-   @PerformanceTest(warmupExecutions = 0, executionTimes = Constants.EXECUTIONS, logFullData = true, timeout = 0, dataCollectors = "ONLYTIME")
+   @PerformanceTest(warmup = 0, iterations = 1, logFullData = true, timeout = 0, dataCollectors = "ONLYTIME")
    @Test
    public void add() {
       final int repetition = System.getenv().containsKey("repetitions") ? Integer.parseInt(System.getenv().get("repetitions")) : 1;

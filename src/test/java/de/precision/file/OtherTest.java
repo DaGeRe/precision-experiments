@@ -19,12 +19,12 @@ public class OtherTest extends KoPeMeTestcase {
 	}
 
 	@Override
-	protected int getWarmupExecutions() {
+	protected int getWarmup() {
 		return 0;
 	}
 
 	@Override
-	protected int getExecutionTimes() {
+	protected int getIterations() {
 		return Constants.EXECUTIONS;
 	}
 
