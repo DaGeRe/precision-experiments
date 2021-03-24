@@ -18,13 +18,13 @@ import org.apache.commons.math3.stat.inference.TTest;
 import de.dagere.kopeme.datastorage.XMLDataLoader;
 import de.dagere.kopeme.generated.Kopemedata;
 import de.dagere.kopeme.generated.Result;
-import de.peass.measurement.analysis.StatisticUtil;
+import de.peass.statistics.StatisticUtil;
 
 public class GetSameMeasurementMeans {
 
    static Map<File, DescriptiveStatistics> data = new LinkedHashMap<>();
 
-   public static void main(String[] args) throws JAXBException {
+   public static void main(final String[] args) throws JAXBException {
 
       GetSameMeasurementMeans getSameMeasurementMeans = new GetSameMeasurementMeans();
       for (File job : new File(args[0]).listFiles()) {
@@ -43,7 +43,7 @@ public class GetSameMeasurementMeans {
       }
    }
 
-   private int getSize(String[] parts) {
+   private int getSize(final String[] parts) {
       int size;
       if (parts.length == 3) {
          size = Integer.parseInt(parts[1]);
@@ -53,7 +53,7 @@ public class GetSameMeasurementMeans {
       return size;
    }
 
-   private void getSizeStatistics(File folder, DescriptiveStatistics stat) throws JAXBException {
+   private void getSizeStatistics(final File folder, final DescriptiveStatistics stat) throws JAXBException {
       File valueCSV = new File(folder.getParentFile(), folder.getName() + ".csv");
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(valueCSV))) {
          for (File file : folder.listFiles()) {
@@ -77,7 +77,7 @@ public class GetSameMeasurementMeans {
 
    }
 
-   private Result readShortenedResult(File file) throws JAXBException {
+   private Result readShortenedResult(final File file) throws JAXBException {
       System.out.println(Arrays.toString(file.listFiles()));
       File measurementFile = file.listFiles((FileFilter) new WildcardFileFilter("*.xml"))[0];
       final Kopemedata loadData = XMLDataLoader.loadData(measurementFile);

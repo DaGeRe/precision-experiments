@@ -2,14 +2,12 @@ package de.precision.analysis.repetitions;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.math3.stat.inference.TTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.dagere.kopeme.generated.Result;
 import de.peass.measurement.analysis.Relation;
 import de.precision.analysis.repetitions.bimodal.CompareData;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
@@ -22,11 +20,11 @@ public class PrecisionComparer {
    private final MethodResult overallResults = new MethodResult(GeneratePrecisionPlot.myTypes);
    private final Map<String, MethodResult> testcaseResults = new HashMap<>();
 
-   public PrecisionComparer(SamplingConfig config) {
+   public PrecisionComparer(final SamplingConfig config) {
       this.config = config;
    }
 
-   public void executeComparisons(CompareData data, final Relation expectedRelation, final String testcaseName) {
+   public void executeComparisons(final CompareData data, final Relation expectedRelation, final String testcaseName) {
       final Map<String, Relation> relations = new LinkedHashMap<>();
 
       boolean ttest = TestExecutors.getTTestRelation(relations, data);
@@ -45,7 +43,7 @@ public class PrecisionComparer {
       }
 
       TestExecutors.getMeanRelation(relations, data);
-//      TestExecutors.getMannWhitneyRelation(relations, data);
+      TestExecutors.getMannWhitneyRelation(relations, data);
       // TestExecutors.getGTestRelation(beforeShortened, afterShortened, relations, data);
 
       manageResults(expectedRelation, testcaseName, relations);
@@ -67,7 +65,7 @@ public class PrecisionComparer {
       }
    }
 
-   private void calculateOverallResult(final Relation expectedRelation, MethodResult myMethodResult, final String testName, final Relation testRelation) {
+   private void calculateOverallResult(final Relation expectedRelation, final MethodResult myMethodResult, final String testName, final Relation testRelation) {
       if (testRelation == Relation.LESS_THAN) {
          overallResults.increment(testName, MethodResult.SELECTED);
          myMethodResult.increment(testName, MethodResult.SELECTED);
@@ -93,7 +91,7 @@ public class PrecisionComparer {
       return overallResults;
    }
 
-   public double getPrecision(String statisticMethod) {
+   public double getPrecision(final String statisticMethod) {
       final Map<String, Integer> methodResults = overallResults.getResults().get(statisticMethod);
       final int selected = methodResults.get(MethodResult.SELECTED);
       final int truepositive = methodResults.get(MethodResult.TRUEPOSITIVE);
@@ -101,7 +99,7 @@ public class PrecisionComparer {
       return precision;
    }
 
-   public double getRecall(String statisticMethod) {
+   public double getRecall(final String statisticMethod) {
       final Map<String, Integer> methodResults = overallResults.getResults().get(statisticMethod);
       final int truepositive = methodResults.get(MethodResult.TRUEPOSITIVE);
       final int falsenegative = methodResults.get(MethodResult.FALSENEGATIVE);
@@ -109,7 +107,7 @@ public class PrecisionComparer {
       return recall;
    }
 
-   public double getFScore(String statisticMethod) {
+   public double getFScore(final String statisticMethod) {
       double precision = getPrecision(statisticMethod);
       double recall = getRecall(statisticMethod);
       final double precisionRecall = precision + recall;

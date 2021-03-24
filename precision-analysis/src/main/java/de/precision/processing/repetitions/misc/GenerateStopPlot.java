@@ -30,12 +30,12 @@ import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.Result.Fulldata;
 import de.dagere.kopeme.generated.Result.Fulldata.Value;
 import de.dagere.kopeme.generated.TestcaseType;
-import de.peass.analysis.statistics.ConfidenceIntervalInterpretion;
 import de.peass.measurement.analysis.MultipleVMTestUtil;
 import de.peass.measurement.analysis.Relation;
-import de.precision.processing.util.RepetitionFolderHandler;
+import de.peass.statistics.ConfidenceIntervalInterpretion;
 import de.precision.analysis.repetitions.bimodal.CompareData;
 import de.precision.processing.util.PrecisionFolderUtil;
+import de.precision.processing.util.RepetitionFolderHandler;
 
 /**
  * Takes a folder with sequence-executions and a precision-level as input. Tells, how many sequence-executions are needed in order to achieve the precision-level.
@@ -98,7 +98,7 @@ public class GenerateStopPlot extends RepetitionFolderHandler {
 				"plot 'precision.csv' u 1:6 w lines title 'Precision Mean', 'precision.csv' u 1:9 w lines title 'Precision Confidence', 'precision.csv' u 1:12 w lines title 'Precision TTest', 'precision.csv' u 1:15 w lines title 'Precision GTest'");
 	}
 
-	private static void writeHeader(BufferedWriter writer) throws IOException {
+	private static void writeHeader(final BufferedWriter writer) throws IOException {
 		writer.write("#repetitions ; vms ; warmup ; overhead ; ");
 		for (final String method : new MethodResult().results.keySet()) {
 			writer.write(method + ";" + ";" + ";");
@@ -144,7 +144,7 @@ public class GenerateStopPlot extends RepetitionFolderHandler {
 			return result;
 		}
 
-		public void increment(final String method, String type) {
+		public void increment(final String method, final String type) {
 			Map<String, Integer> methodMap = results.get(method);
 			final int increment = methodMap.get(type).intValue() + 1;
 			methodMap.put(type, increment);
@@ -195,7 +195,7 @@ public class GenerateStopPlot extends RepetitionFolderHandler {
 		}
 	}
 
-	private void writeData(final Map.Entry<String, Map<String, Integer>> methodResult, BufferedWriter writer) throws IOException {
+	private void writeData(final Map.Entry<String, Map<String, Integer>> methodResult, final BufferedWriter writer) throws IOException {
 		int selected = methodResult.getValue().get(SELECTED);
 		int truepositive = methodResult.getValue().get(TRUEPOSITIVE);
 		int falsenegative = methodResult.getValue().get(FALSENEGATIVE);
@@ -414,7 +414,7 @@ public class GenerateStopPlot extends RepetitionFolderHandler {
 
 		final long min = (long) stat.getMin();
 		final long max = (long) stat.getPercentile(95);
-		long stepSize = (long) (1 + ((max - min) / (SIZE - 1)));
+		long stepSize = 1 + ((max - min) / (SIZE - 1));
 
 		final long histogramValues[][] = new long[2][SIZE];
 

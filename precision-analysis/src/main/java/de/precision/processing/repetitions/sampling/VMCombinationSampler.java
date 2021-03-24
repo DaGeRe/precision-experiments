@@ -1,17 +1,14 @@
 package de.precision.processing.repetitions.sampling;
 
 import java.util.List;
-import java.util.Random;
 
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.TestcaseType;
 import de.peass.measurement.analysis.Relation;
-import de.peass.measurement.analysis.StatisticUtil;
+import de.peass.statistics.StatisticUtil;
 import de.precision.analysis.repetitions.PrecisionComparer;
 import de.precision.analysis.repetitions.bimodal.CompareData;
 import de.precision.processing.repetitions.misc.DetermineAverageTime;
@@ -24,7 +21,7 @@ public class VMCombinationSampler {
    private final PrecisionComparer comparer;
    private final SamplingConfig config;
 
-   public VMCombinationSampler(int warmup, int allExecutions, PrecisionComparer comparer, SamplingConfig config) {
+   public VMCombinationSampler(final int warmup, final int allExecutions, final PrecisionComparer comparer, final SamplingConfig config) {
       this.warmup = warmup;
       this.allExecutions = allExecutions;
       this.comparer = comparer;
@@ -62,7 +59,7 @@ public class VMCombinationSampler {
       return calculatedDuration / 1000;
    }
 
-   private void executeComparisons(final SamplingConfig config, CompareData data) {
+   private void executeComparisons(final SamplingConfig config, final CompareData data) {
       final SamplingExecutor samplingExecutor = new SamplingExecutor(config, data, comparer);
       samplingExecutor.executeComparisons(Relation.LESS_THAN);
       CompareData equalData = new CompareData(data.getBefore(), data.getBefore());

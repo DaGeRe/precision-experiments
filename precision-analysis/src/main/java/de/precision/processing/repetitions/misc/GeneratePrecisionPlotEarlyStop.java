@@ -27,10 +27,10 @@ import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.TestcaseType;
 import de.peass.measurement.analysis.MultipleVMTestUtil;
 import de.peass.measurement.analysis.Relation;
-import de.peass.measurement.analysis.StatisticUtil;
+import de.peass.statistics.StatisticUtil;
 import de.precision.analysis.repetitions.MethodResult;
-import de.precision.processing.util.RepetitionFolderHandler;
 import de.precision.processing.util.PrecisionFolderUtil;
+import de.precision.processing.util.RepetitionFolderHandler;
 
 /**
  * Takes a folder with sequence-executions and a precision-level as input. Tells, how many sequence-executions are needed in order to achieve the precision-level.
@@ -73,7 +73,7 @@ public class GeneratePrecisionPlotEarlyStop extends RepetitionFolderHandler {
 				"plot 'precision.csv' u 1:6 w lines title 'Precision Mean', 'precision.csv' u 1:9 w lines title 'Precision Confidence', 'precision.csv' u 1:12 w lines title 'Precision TTest', 'precision.csv' u 1:15 w lines title 'Precision GTest'");
 	}
 
-	private static void writeHeader(BufferedWriter writer) throws IOException {
+	private static void writeHeader(final BufferedWriter writer) throws IOException {
 		writer.write("#repetitions ; vms ; warmup ; overhead ; duration ;");
 		for (final String method : new MethodResult(myTypes).getResults().keySet()) {
 			writer.write(method + ";" + ";" + ";");
@@ -161,7 +161,7 @@ public class GeneratePrecisionPlotEarlyStop extends RepetitionFolderHandler {
 		}
 	}
 
-	private void writeData(final Map.Entry<String, Map<String, Integer>> methodResult, BufferedWriter writer) throws IOException {
+	private void writeData(final Map.Entry<String, Map<String, Integer>> methodResult, final BufferedWriter writer) throws IOException {
 		final int selected = methodResult.getValue().get(MethodResult.SELECTED);
 		final int truepositive = methodResult.getValue().get(MethodResult.TRUEPOSITIVE);
 		final int falsenegative = methodResult.getValue().get(MethodResult.FALSENEGATIVE);
@@ -306,7 +306,7 @@ public class GeneratePrecisionPlotEarlyStop extends RepetitionFolderHandler {
 		}
 	}
 
-	private double getTValueBreak(final List<double[]> values, int breakVMs) {
+	private double getTValueBreak(final List<double[]> values, final int breakVMs) {
 		final double[] earlyBreak1 = new double[breakVMs];
 		final double[] earlyBreak2 = new double[breakVMs];
 		System.arraycopy(values.get(0), 0, earlyBreak1, 0, breakVMs);

@@ -13,8 +13,8 @@ import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Longs;
 
 import de.dagere.kopeme.generated.Result;
-import de.peass.analysis.statistics.ConfidenceIntervalInterpretion;
 import de.peass.measurement.analysis.Relation;
+import de.peass.statistics.ConfidenceIntervalInterpretion;
 import de.precision.analysis.repetitions.bimodal.BimodalityTester;
 import de.precision.analysis.repetitions.bimodal.CompareData;
 import de.precision.processing.repetitions.misc.HistogramCreator;
@@ -22,7 +22,7 @@ import de.precision.processing.repetitions.misc.HistogramCreator;
 public class TestExecutors {
    private static final Logger LOG = LogManager.getLogger(TestExecutors.class);
 
-   public static void getMeanRelation(final Map<String, Relation> relations, CompareData data) {
+   public static void getMeanRelation(final Map<String, Relation> relations, final CompareData data) {
       final double minChange = 0.997;
       if (data.getAvgBefore() < data.getAvgAfter() * minChange) {
          relations.put(GeneratePrecisionPlot.MEAN, Relation.LESS_THAN);
@@ -35,7 +35,7 @@ public class TestExecutors {
       }
    }
 
-   public static boolean getTTestRelation(final Map<String, Relation> relations, CompareData data) {
+   public static boolean getTTestRelation(final Map<String, Relation> relations, final CompareData data) {
       final boolean tchange = new TTest().homoscedasticTTest(data.getBefore(), data.getAfter(), 0.001);
       // final boolean tchange = new TTest().homoscedasticTTest(values.get(0), values.get(1), 0.01);
       if (tchange) {
@@ -46,7 +46,7 @@ public class TestExecutors {
       return tchange;
    }
 
-   public static boolean getTTestRelationBimodal(final Map<String, Relation> relations, CompareData data) {
+   public static boolean getTTestRelationBimodal(final Map<String, Relation> relations, final CompareData data) {
       final BimodalityTester tester = new BimodalityTester(data);
       final boolean tchange = tester.isTChange(0.001);
       if (tchange) {
@@ -58,7 +58,7 @@ public class TestExecutors {
       return tchange;
    }
 
-   public static void getGTestRelation(final List<Result> beforeShortened, final List<Result> afterShortened, final Map<String, Relation> relations, CompareData data) {
+   public static void getGTestRelation(final List<Result> beforeShortened, final List<Result> afterShortened, final Map<String, Relation> relations, final CompareData data) {
       final long[][] histogramValues = HistogramCreator.createCommonHistogram(beforeShortened, afterShortened);
       final double[] histExpected = Doubles.toArray(Longs.asList(histogramValues[0]));
       final boolean gchange = new GTest().gTest(histExpected, histogramValues[1], 0.01);
@@ -69,7 +69,7 @@ public class TestExecutors {
       }
    }
 
-   public static void getMannWhitneyRelation(final Map<String, Relation> relations, CompareData data) {
+   public static void getMannWhitneyRelation(final Map<String, Relation> relations, final CompareData data) {
       final double statistic = new MannWhitneyUTest().mannWhitneyUTest(data.getBefore(), data.getAfter());
       LOG.trace(statistic);
       final boolean mannchange = statistic < 0.01; // 2.33 - critical value for confidence level 0.99

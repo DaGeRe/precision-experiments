@@ -20,10 +20,10 @@ import com.google.common.primitives.Doubles;
 
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
-import de.peass.measurement.analysis.StatisticUtil;
+import de.peass.statistics.StatisticUtil;
 import de.precision.processing.ProcessConstants;
-import de.precision.processing.util.RepetitionFolderHandler;
 import de.precision.processing.util.PrecisionFolderUtil;
+import de.precision.processing.util.RepetitionFolderHandler;
 
 /**
  * Generates the csv-file for a plot showing how the differences change with growing repetition count. Therefore, confidence intervals are shown.
@@ -35,7 +35,7 @@ public class GenerateConfidenceDiffPlot extends RepetitionFolderHandler {
 
    private String nameOfAll;
 
-   public GenerateConfidenceDiffPlot(final File sequenceFolder, String nameOfAll) {
+   public GenerateConfidenceDiffPlot(final File sequenceFolder, final String nameOfAll) {
       super(sequenceFolder);
       this.nameOfAll = nameOfAll;
    }
@@ -90,7 +90,7 @@ public class GenerateConfidenceDiffPlot extends RepetitionFolderHandler {
       }
    }
 
-   private void writeTValue(BufferedWriter writer2, final List<Double> slowL, final List<Double> fastL) throws IOException {
+   private void writeTValue(final BufferedWriter writer2, final List<Double> slowL, final List<Double> fastL) throws IOException {
       DescriptiveStatistics statSlow = new DescriptiveStatistics(Doubles.toArray(slowL));
       DescriptiveStatistics statFast = new DescriptiveStatistics(Doubles.toArray(fastL));
       writer2.write(repetitions + " " + new TTest().t(statSlow, statFast) + " " + statSlow.getMean() + " " + statSlow.getStandardDeviation() 
@@ -98,7 +98,7 @@ public class GenerateConfidenceDiffPlot extends RepetitionFolderHandler {
       writer2.flush();
    }
 
-   private void writeAdditionalAverages(BufferedWriter writer, final List<Double> slowL, final List<Double> fastL) throws IOException {
+   private void writeAdditionalAverages(final BufferedWriter writer, final List<Double> slowL, final List<Double> fastL) throws IOException {
       for (int i = 0; i < 5; i++) {
          final DescriptiveStatistics slowS = new DescriptiveStatistics();
          final DescriptiveStatistics fastS = new DescriptiveStatistics();
@@ -112,7 +112,7 @@ public class GenerateConfidenceDiffPlot extends RepetitionFolderHandler {
       }
    }
 
-   private void buildShortenedValues(final Testcases versionFast, final Testcases versionSlow, BufferedWriter writer, final List<Double> slowL, final List<Double> fastL)
+   private void buildShortenedValues(final Testcases versionFast, final Testcases versionSlow, final BufferedWriter writer, final List<Double> slowL, final List<Double> fastL)
          throws IOException {
       final Iterator<Result> slowIt = versionSlow.getTestcase().get(0).getDatacollector().get(0).getResult().iterator();
       for (final Iterator<Result> fastIt = versionFast.getTestcase().get(0).getDatacollector().get(0).getResult().iterator(); fastIt.hasNext();) {
@@ -125,7 +125,7 @@ public class GenerateConfidenceDiffPlot extends RepetitionFolderHandler {
       }
    }
 
-   private void writeHistogramValues(BufferedWriter writer, final List<Double> slowL, final List<Double> fastL) throws IOException {
+   private void writeHistogramValues(final BufferedWriter writer, final List<Double> slowL, final List<Double> fastL) throws IOException {
       final Iterator<Double> slowIt = slowL.iterator();
       for (final Iterator<Double> fastIt = fastL.iterator(); fastIt.hasNext();) {
          final Double fast = fastIt.next();
