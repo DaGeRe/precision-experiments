@@ -13,6 +13,7 @@ import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Longs;
 
 import de.dagere.kopeme.generated.Result;
+import de.peass.config.StatisticsConfiguration;
 import de.peass.measurement.analysis.Relation;
 import de.peass.statistics.ConfidenceIntervalInterpretion;
 import de.precision.analysis.repetitions.bimodal.BimodalityTester;
@@ -35,8 +36,8 @@ public class TestExecutors {
       }
    }
 
-   public static boolean getTTestRelation(final Map<String, Relation> relations, final CompareData data) {
-      final boolean tchange = new TTest().homoscedasticTTest(data.getBefore(), data.getAfter(), 0.001);
+   public static boolean getTTestRelation(final Map<String, Relation> relations, final CompareData data, final StatisticsConfiguration config) {
+      final boolean tchange = new TTest().homoscedasticTTest(data.getBefore(), data.getAfter(), config.getType1error());
       // final boolean tchange = new TTest().homoscedasticTTest(values.get(0), values.get(1), 0.01);
       if (tchange) {
          relations.put(GeneratePrecisionPlot.TTEST, data.getAvgBefore() < data.getAvgAfter() ? Relation.LESS_THAN : Relation.GREATER_THAN);
@@ -46,9 +47,9 @@ public class TestExecutors {
       return tchange;
    }
 
-   public static boolean getTTestRelationBimodal(final Map<String, Relation> relations, final CompareData data) {
+   public static boolean getTTestRelationBimodal(final Map<String, Relation> relations, final CompareData data, final StatisticsConfiguration statisticsConfig) {
       final BimodalityTester tester = new BimodalityTester(data);
-      final boolean tchange = tester.isTChange(0.001);
+      final boolean tchange = tester.isTChange(statisticsConfig.getType1error());
       if (tchange) {
          final Relation relation = tester.getRelation();
          relations.put(GeneratePrecisionPlot.TTEST2, relation);
@@ -69,10 +70,10 @@ public class TestExecutors {
       }
    }
 
-   public static void getMannWhitneyRelation(final Map<String, Relation> relations, final CompareData data) {
+   public static void getMannWhitneyRelation(final Map<String, Relation> relations, final CompareData data, final StatisticsConfiguration config) {
       final double statistic = new MannWhitneyUTest().mannWhitneyUTest(data.getBefore(), data.getAfter());
       LOG.trace(statistic);
-      final boolean mannchange = statistic < 0.01; // 2.33 - critical value for confidence level 0.99
+      final boolean mannchange = statistic < config.getType1error(); // 2.33 - critical value for confidence level 0.99
       if (mannchange) {
          relations.put(GeneratePrecisionPlot.MANNWHITNEY, data.getAvgBefore() < data.getAvgAfter() ? Relation.LESS_THAN : Relation.GREATER_THAN);
       } else {

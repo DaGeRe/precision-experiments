@@ -8,6 +8,7 @@ import org.apache.commons.math3.stat.inference.TTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.peass.config.StatisticsConfiguration;
 import de.peass.measurement.analysis.Relation;
 import de.precision.analysis.repetitions.bimodal.CompareData;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
@@ -19,15 +20,17 @@ public class PrecisionComparer {
    private final SamplingConfig config;
    private final MethodResult overallResults = new MethodResult(GeneratePrecisionPlot.myTypes);
    private final Map<String, MethodResult> testcaseResults = new HashMap<>();
+   private final StatisticsConfiguration statisticsConfig;
 
-   public PrecisionComparer(final SamplingConfig config) {
+   public PrecisionComparer(final SamplingConfig config, final StatisticsConfiguration statisticsConfig) {
       this.config = config;
+      this.statisticsConfig = statisticsConfig;
    }
 
    public void executeComparisons(final CompareData data, final Relation expectedRelation, final String testcaseName) {
       final Map<String, Relation> relations = new LinkedHashMap<>();
 
-      boolean ttest = TestExecutors.getTTestRelation(relations, data);
+      boolean ttest = TestExecutors.getTTestRelation(relations, data, statisticsConfig);
       if (config.isPrintPicks()) {
          LOG.debug(data.getAvgBefore() + " " + data.getAvgAfter() + " " +
                data.getBeforeStat().getVariance() + " " + data.getAfterStat().getVariance()
@@ -36,14 +39,14 @@ public class PrecisionComparer {
                + " " + data.getBefore().length + " " + data.getAfter().length);
       }
 
-      TestExecutors.getTTestRelationBimodal(relations, data);
+      TestExecutors.getTTestRelationBimodal(relations, data, statisticsConfig);
       
       if (config.isUseConfidenceInterval()) {
          TestExecutors.getConfidenceRelation(data, relations);
       }
 
       TestExecutors.getMeanRelation(relations, data);
-      TestExecutors.getMannWhitneyRelation(relations, data);
+      TestExecutors.getMannWhitneyRelation(relations, data, statisticsConfig);
       // TestExecutors.getGTestRelation(beforeShortened, afterShortened, relations, data);
 
       manageResults(expectedRelation, testcaseName, relations);

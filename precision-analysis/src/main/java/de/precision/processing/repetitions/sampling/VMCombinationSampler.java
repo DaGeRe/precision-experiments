@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.TestcaseType;
+import de.peass.config.StatisticsConfiguration;
 import de.peass.measurement.analysis.Relation;
 import de.peass.statistics.StatisticUtil;
 import de.precision.analysis.repetitions.PrecisionComparer;
@@ -20,12 +21,14 @@ public class VMCombinationSampler {
    private final int warmup, allExecutions;
    private final PrecisionComparer comparer;
    private final SamplingConfig config;
+   private final StatisticsConfiguration statisticsConfig;
 
-   public VMCombinationSampler(final int warmup, final int allExecutions, final PrecisionComparer comparer, final SamplingConfig config) {
+   public VMCombinationSampler(final int warmup, final int allExecutions, final PrecisionComparer comparer, final SamplingConfig config, final StatisticsConfiguration statisticConfig) {
       this.warmup = warmup;
       this.allExecutions = allExecutions;
       this.comparer = comparer;
       this.config = config;
+      this.statisticsConfig = statisticConfig;
    }
 
    /**
@@ -60,10 +63,10 @@ public class VMCombinationSampler {
    }
 
    private void executeComparisons(final SamplingConfig config, final CompareData data) {
-      final SamplingExecutor samplingExecutor = new SamplingExecutor(config, data, comparer);
+      final SamplingExecutor samplingExecutor = new SamplingExecutor(config, statisticsConfig, data, comparer);
       samplingExecutor.executeComparisons(Relation.LESS_THAN);
       CompareData equalData = new CompareData(data.getBefore(), data.getBefore());
-      final SamplingExecutor samplingExecutor2 = new SamplingExecutor(config, equalData, comparer);
+      final SamplingExecutor samplingExecutor2 = new SamplingExecutor(config, statisticsConfig, equalData, comparer);
       samplingExecutor2.executeComparisons(Relation.EQUAL);
    }
 

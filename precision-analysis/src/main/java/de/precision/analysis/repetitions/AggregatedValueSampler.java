@@ -16,6 +16,7 @@ import de.dagere.kopeme.generated.Result.Fulldata;
 import de.dagere.kopeme.generated.Result.Fulldata.Value;
 import de.dagere.kopeme.generated.TestcaseType;
 import de.dagere.kopeme.generated.TestcaseType.Datacollector;
+import de.peass.config.StatisticsConfiguration;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
 import de.precision.processing.repetitions.sampling.VMCombinationSampler;
 import picocli.CommandLine;
@@ -40,7 +41,7 @@ public class AggregatedValueSampler implements Callable<Void> {
 
    private BufferedWriter precisionRecallWriter;
 
-   public static void main(String[] args) throws FileNotFoundException, IOException {
+   public static void main(final String[] args) throws FileNotFoundException, IOException {
 
       final AggregatedValueSampler command = new AggregatedValueSampler();
       final CommandLine commandLine = new CommandLine(command);
@@ -73,12 +74,14 @@ public class AggregatedValueSampler implements Callable<Void> {
       return null;
    }
 
-   private void executeSampling(TestcaseType versionSlow, TestcaseType versionFast, Testcases testclazz, PrintStream out, int vms) throws FileNotFoundException {
+   private void executeSampling(final TestcaseType versionSlow, final TestcaseType versionFast, final Testcases testclazz, final PrintStream out, final int vms) throws FileNotFoundException {
       System.setOut(new PrintStream(new File("results", "vals_" + vms + ".csv")));
 
-      final SamplingConfig config = new SamplingConfig(vms, true, "Test", true, false);
-      PrecisionComparer comparer = new PrecisionComparer(config);
-      VMCombinationSampler sampler = new VMCombinationSampler(0, 1, comparer, config);
+      final SamplingConfig config = new SamplingConfig(vms, "Test", true, false);
+      StatisticsConfiguration statisticsConfig = new StatisticsConfiguration();
+      statisticsConfig.setOutlierFactor(StatisticsConfiguration.DEFAULT_OUTLIER_FACTOR);
+      PrecisionComparer comparer = new PrecisionComparer(config, statisticsConfig);
+      VMCombinationSampler sampler = new VMCombinationSampler(0, 1, comparer, config, statisticsConfig);
 
       sampler.sampleArtificialVMCombinations(versionFast, versionSlow);
 
@@ -95,7 +98,7 @@ public class AggregatedValueSampler implements Callable<Void> {
       }
    }
 
-   private static TestcaseType readFile(File file) throws IOException, FileNotFoundException {
+   private static TestcaseType readFile(final File file) throws IOException, FileNotFoundException {
       TestcaseType versionSlow = new TestcaseType();
       final Datacollector datacollector = new Datacollector();
       try (BufferedReader reader = new BufferedReader(new FileReader(file))) {

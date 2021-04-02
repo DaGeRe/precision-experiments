@@ -2,6 +2,7 @@ package de.precision.processing.repetitions.sampling;
 
 import java.util.Random;
 
+import de.peass.config.StatisticsConfiguration;
 import de.peass.measurement.analysis.Relation;
 import de.precision.analysis.repetitions.PrecisionComparer;
 import de.precision.analysis.repetitions.bimodal.CompareData;
@@ -17,31 +18,31 @@ public class SamplingExecutor {
    private final CompareData data;
 
 
-   public SamplingExecutor(SamplingConfig config, CompareData origin, PrecisionComparer comparer) {
+   public SamplingExecutor(final SamplingConfig config, final StatisticsConfiguration statisticsConfig, final CompareData origin, final PrecisionComparer comparer) {
       this.comparer = comparer;
       this.config = config;
 
       CompareData withOutliers = selectPart(origin, config.getVms());
 
-      if (config.isRemoveOutliers()) {
-         data = OutlierRemoverBimodal.removeOutliers(withOutliers);
+      if (statisticsConfig.getOutlierFactor() != 0) {
+         data = OutlierRemoverBimodal.removeOutliers(withOutliers, statisticsConfig.getOutlierFactor());
       } else {
          data = withOutliers;
       }
    }
 
-   public void executeComparisons(Relation expected) {
+   public void executeComparisons(final Relation expected) {
       comparer.executeComparisons(data, expected, config.getTestclazz());
    }
 
-   public CompareData selectPart(CompareData origin, int vms) {
+   public CompareData selectPart(final CompareData origin, final int vms) {
       double[] valuesPredecessor = pickValues(origin.getBefore(), vms);
       double[] valuesCurrent = pickValues(origin.getAfter(), vms);
       CompareData result = new CompareData(valuesPredecessor, valuesCurrent);
       return result;
    }
 
-   private double[] pickValues(double[] pickableValues, int vms) {
+   private double[] pickValues(final double[] pickableValues, final int vms) {
       double[] values = new double[vms];
       for (int insertion = 0; insertion < vms; insertion++) {
          final int randomVMIndex = RANDOM.nextInt(pickableValues.length);

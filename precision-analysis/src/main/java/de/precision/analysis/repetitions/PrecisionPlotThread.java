@@ -13,27 +13,28 @@ import org.apache.logging.log4j.Logger;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.TestcaseType;
+import de.peass.config.StatisticsConfiguration;
 import de.peass.statistics.StatisticUtil;
 import de.precision.processing.repetitions.misc.DetermineAverageTime;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
 import de.precision.processing.repetitions.sampling.VMCombinationSampler;
 
 public class PrecisionPlotThread {
-   
+
    private static final Logger LOG = LogManager.getLogger(PrecisionPlotThread.class);
-   
+
    private final ExecutionData executionData;
    private WritingData writingData;
    private SamplingConfig config;
    private PrecisionComparer comparer;
    private final PrecisionConfig precisionConfig;
    private long overhead = 0, duration = 0;
-   
-   
+
    protected Map<String, Testcases> testcasesV1 = null;
    protected Map<String, Testcases> testcasesV2 = null;
 
-   public PrecisionPlotThread(final ExecutionData executionData, final WritingData writinData, final PrecisionConfig precisionConfig, final Map<String, Testcases> testcasesV1, final Map<String, Testcases> testcasesV2) {
+   public PrecisionPlotThread(final ExecutionData executionData, final WritingData writinData, final PrecisionConfig precisionConfig, final Map<String, Testcases> testcasesV1,
+         final Map<String, Testcases> testcasesV2) {
       this.executionData = executionData;
       this.writingData = writinData;
       this.precisionConfig = precisionConfig;
@@ -45,9 +46,9 @@ public class PrecisionPlotThread {
       for (String testcase : testcasesV1.keySet()) {
          processTestcases(testcasesV1.get(testcase), testcasesV2.get(testcase));
       }
-      
+
       LOG.info("Processing finished {}");
-      
+
       writeOverallPrecision();
 
       writePerTestcasePrecision();
@@ -74,9 +75,15 @@ public class PrecisionPlotThread {
    }
 
    protected void processTestcases(final Testcases testclazz, final Testcases otherPackageTestcase) {
-      config = new SamplingConfig(executionData.getVms(), precisionConfig.isRemoveOutliers(), testclazz.getClazz(), false, precisionConfig.isUseConfidence());
-      comparer = new PrecisionComparer(config);
-      
+      config = new SamplingConfig(executionData.getVms(), testclazz.getClazz(), false, precisionConfig.isUseConfidence());
+      StatisticsConfiguration statisticsConfig = new StatisticsConfiguration();
+      if (precisionConfig.isRemoveOutliers()) {
+         statisticsConfig.setOutlierFactor(StatisticsConfiguration.DEFAULT_OUTLIER_FACTOR);
+      } else {
+         statisticsConfig.setOutlierFactor(0.0);
+      }
+      comparer = new PrecisionComparer(config, statisticsConfig);
+
       final TestcaseType before = testclazz.getTestcase().get(0);
       final TestcaseType after = otherPackageTestcase.getTestcase().get(0);
 
@@ -94,15 +101,15 @@ public class PrecisionPlotThread {
       writeValues(fastShortened, new File(writingData.getResultFolder(), "fast_" + executionData.getRepetitions() + ".csv"));
       writeValues(slowShortened, new File(writingData.getResultFolder(), "slow_" + executionData.getRepetitions() + ".csv"));
 
-      final VMCombinationSampler vmCombinationSampler = new VMCombinationSampler(executionData.getWarmup(), allExecutions, comparer, config);
+      final VMCombinationSampler vmCombinationSampler = new VMCombinationSampler(executionData.getWarmup(), allExecutions, comparer, config, statisticsConfig);
       final double durationInS = (vmCombinationSampler.sampleArtificialVMCombinations(fastShortened, slowShortened)) / 1000;
       duration += durationInS;
       LOG.debug("Duration in s: {}", durationInS);
-      
+
       executionData.setDuration(duration);
       executionData.setOverhead(overhead);
    }
-   
+
    private void writeValues(final List<Result> values, final File destination) {
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(destination))) {
          for (Result r : values) {
