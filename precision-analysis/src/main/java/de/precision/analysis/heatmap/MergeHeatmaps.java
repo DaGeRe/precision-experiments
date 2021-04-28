@@ -77,7 +77,11 @@ public class MergeHeatmaps {
          for (Integer iterationCount : reference.getOneHeatmap().get(VMcount).keySet()) {
             double value = 0.0;
             for (WorkloadHeatmap heatmap : heatmaps) {
-               value += heatmap.getOneHeatmap().get(VMcount).get(iterationCount);
+               Map<Integer, Double> vmValue = findValue(VMcount, heatmap);
+               if (vmValue != null) {
+                  value += vmValue.get(iterationCount);
+               }
+               
             }
             value /= heatmaps.size();
             iterationMap.put(iterationCount, value);
@@ -85,5 +89,15 @@ public class MergeHeatmaps {
       }
 
       return merged;
+   }
+
+   private static Map<Integer, Double> findValue(final Integer VMcount, final WorkloadHeatmap heatmap) {
+      Map<Integer, Double> vmValue = heatmap.getOneHeatmap().get(VMcount);
+      int count = VMcount-1;
+      while (vmValue == null && count > 0) {
+         vmValue = heatmap.getOneHeatmap().get(count);
+         count--;
+      }
+      return vmValue;
    }
 }

@@ -16,7 +16,7 @@ import de.dagere.kopeme.generated.Result.Fulldata;
 import de.dagere.kopeme.generated.Result.Fulldata.Value;
 import de.dagere.kopeme.generated.TestcaseType;
 import de.dagere.kopeme.generated.TestcaseType.Datacollector;
-import de.peass.config.StatisticsConfiguration;
+import de.dagere.peass.config.StatisticsConfiguration;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
 import de.precision.processing.repetitions.sampling.VMCombinationSampler;
 import picocli.CommandLine;

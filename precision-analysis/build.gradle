@@ -20,7 +20,7 @@ task fatJar(type: Jar) {
 	manifest {
         attributes 'Implementation-Title': 'Precision-Experiment',
         	'Implementation-Version': 0.1,
-        	'Main-Class': 'de.precision.analysis.repetitions.GeneratePrecisionPlot'
+        	'Main-Class': 'de.dagere.precision.analysis.repetitions.GeneratePrecisionPlot'
     }
     baseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
@@ -32,7 +32,7 @@ task fatJar(type: Jar) {
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId = 'de.peass'
+            groupId = 'de.dagere.peass'
             artifactId = 'precision-analysis'
             version = '0.1-SNAPSHOT'
 
@@ -53,7 +53,7 @@ repositories {
 
 
 dependencies {
-   compile group: 'de.peass', name: 'analysis', version: '0.1-SNAPSHOT'
+   compile group: 'de.dagere.peass', name: 'analysis', version: '0.1-SNAPSHOT'
    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
    testCompile group: 'de.peass', name: 'measurement', version: '0.1-SNAPSHOT', classifier: 'tests'
 }

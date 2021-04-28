@@ -16,7 +16,7 @@ import de.dagere.kopeme.datastorage.XMLDataLoader;
 import de.dagere.kopeme.generated.Kopemedata;
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.TestcaseType.Datacollector;
-import de.peass.measurement.analysis.MultipleVMTestUtil;
+import de.dagere.peass.measurement.analysis.MultipleVMTestUtil;
 
 public class FindCountOfRightDecissions {
 
@@ -26,7 +26,7 @@ public class FindCountOfRightDecissions {
 
    static class TTest implements StatisticMethod {
       @Override
-      public boolean isDifferent(List<Result> list1, List<Result> list2) {
+      public boolean isDifferent(final List<Result> list1, final List<Result> list2) {
          final SummaryStatistics statistics1 = MultipleVMTestUtil.getStatistic(list1);
          final SummaryStatistics statistics2 = MultipleVMTestUtil.getStatistic(list2);
          
@@ -37,7 +37,7 @@ public class FindCountOfRightDecissions {
    
    static class MyTest implements StatisticMethod {
       @Override
-      public boolean isDifferent(List<Result> list1, List<Result> list2) {
+      public boolean isDifferent(final List<Result> list1, final List<Result> list2) {
          final SummaryStatistics statistics1 = MultipleVMTestUtil.getStatistic(list1);
          final SummaryStatistics statistics2 = MultipleVMTestUtil.getStatistic(list2);
          
@@ -63,7 +63,7 @@ public class FindCountOfRightDecissions {
       }
    }
 
-   public static void main(String[] args) throws JAXBException {
+   public static void main(final String[] args) throws JAXBException {
 
       System.out.println("Files passed: " + args.length);
 
@@ -101,7 +101,7 @@ public class FindCountOfRightDecissions {
       }
    }
 
-   private static int getTrueCount(final Datacollector results, int size, StatisticMethod method) {
+   private static int getTrueCount(final Datacollector results, final int size, final StatisticMethod method) {
       int trueCount = 0;
       final int maxIndex = results.getResult().size() - size - 1;
       for (int firstIndex = 0; firstIndex < maxIndex; firstIndex++) {

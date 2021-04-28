@@ -20,7 +20,7 @@ import com.google.common.primitives.Doubles;
 
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
-import de.peass.statistics.StatisticUtil;
+import de.dagere.peass.statistics.StatisticUtil;
 import de.precision.processing.ProcessConstants;
 import de.precision.processing.util.PrecisionFolderUtil;
 import de.precision.processing.util.RepetitionFolderHandler;

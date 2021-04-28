@@ -18,7 +18,7 @@ import org.apache.commons.math3.stat.inference.TTest;
 import de.dagere.kopeme.datastorage.XMLDataLoader;
 import de.dagere.kopeme.generated.Kopemedata;
 import de.dagere.kopeme.generated.Result;
-import de.peass.statistics.StatisticUtil;
+import de.dagere.peass.statistics.StatisticUtil;
 
 public class GetSameMeasurementMeans {
 

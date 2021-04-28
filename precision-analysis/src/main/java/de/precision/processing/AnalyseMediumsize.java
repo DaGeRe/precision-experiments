@@ -9,9 +9,9 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.inference.TTest;
 
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.peass.measurement.analysis.MultipleVMTestUtil;
-import de.precision.processing.util.RepetitionFolderHandler;
+import de.dagere.peass.measurement.analysis.MultipleVMTestUtil;
 import de.precision.processing.util.PrecisionFolderUtil;
+import de.precision.processing.util.RepetitionFolderHandler;
 
 public class AnalyseMediumsize extends RepetitionFolderHandler {
 	public final static File RESULTFOLDER = new File("results/mediumsize/");
@@ -20,18 +20,18 @@ public class AnalyseMediumsize extends RepetitionFolderHandler {
 		RepetitionFolderHandler.clearResultFolder(RESULTFOLDER);
 	}
 
-	public AnalyseMediumsize(File repetitionFolder) {
+	public AnalyseMediumsize(final File repetitionFolder) {
 		super(repetitionFolder);
 	}
 
-	public static void main(String[] args) throws JAXBException, IOException {
+	public static void main(final String[] args) throws JAXBException, IOException {
 		final File folder = new File(args[0]);
 
 		PrecisionFolderUtil.processFolder(folder, (repetition_folder) -> new AnalyseMediumsize(repetition_folder));
 	}
 
 	@Override
-	protected void processTestcases(Testcases versionFast, Testcases versionSlow) {
+	protected void processTestcases(final Testcases versionFast, final Testcases versionSlow) {
 		final SummaryStatistics statisticsFast = MultipleVMTestUtil.getStatistic(versionFast.getTestcase().get(0).getDatacollector().get(0).getResult());
 		final SummaryStatistics statisticsSlow = MultipleVMTestUtil.getStatistic(versionSlow.getTestcase().get(0).getDatacollector().get(0).getResult());
 		

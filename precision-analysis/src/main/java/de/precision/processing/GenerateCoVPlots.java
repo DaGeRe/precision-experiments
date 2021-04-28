@@ -18,9 +18,9 @@ import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.Result.Fulldata.Value;
 import de.dagere.kopeme.generated.TestcaseType;
+import de.dagere.peass.measurement.analysis.statistics.OutlierRemover;
 import de.peass.measurement.analysis.statistics.MeanCoVData;
 import de.peass.measurement.analysis.statistics.MeanCoVDataContinous;
-import de.peass.measurement.analysis.statistics.OutlierRemover;
 import de.precision.processing.util.PrecisionFolderUtil;
 
 /**
@@ -59,7 +59,7 @@ public final class GenerateCoVPlots {
       }
    }
 
-   private static int handleFile(int index, GenerateCoVPlots generator, final File dataFile) throws JAXBException, IOException {
+   private static int handleFile(int index, final GenerateCoVPlots generator, final File dataFile) throws JAXBException, IOException {
       final Kopemedata data = XMLDataLoader.loadData(dataFile, 0);
       final Testcases testclazz = data.getTestcases();
       final String parentFileName = dataFile.getParentFile().getName();
@@ -72,7 +72,7 @@ public final class GenerateCoVPlots {
    private final File aggregationFolder;
    private final FileWriter vmInformationWriter;
 
-   public GenerateCoVPlots(int avg_count, File aggregationFolder, FileWriter vmInformationWriter) {
+   public GenerateCoVPlots(final int avg_count, final File aggregationFolder, final FileWriter vmInformationWriter) {
       super();
       this.avg_count = avg_count;
       this.aggregationFolder = aggregationFolder;
@@ -89,7 +89,7 @@ public final class GenerateCoVPlots {
       System.out.println("set ylabel 'Zeit / {/Symbol m}'");
    }
 
-   public void handleTestcase(final String clazzname, final TestcaseType testcase, String type, int index) throws IOException {
+   public void handleTestcase(final String clazzname, final TestcaseType testcase, final String type, final int index) throws IOException {
       final MeanCoVData data = useFullData ? new MeanCoVDataContinous(testcase, avg_count) : new MeanCoVData(testcase, avg_count);
       // data.printTestcaseData(GenerateCoVPlots.RESULTFOLDER);
 

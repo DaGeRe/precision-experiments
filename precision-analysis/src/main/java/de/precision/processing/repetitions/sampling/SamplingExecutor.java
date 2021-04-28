@@ -2,8 +2,8 @@ package de.precision.processing.repetitions.sampling;
 
 import java.util.Random;
 
-import de.peass.config.StatisticsConfiguration;
-import de.peass.measurement.analysis.Relation;
+import de.dagere.peass.config.StatisticsConfiguration;
+import de.dagere.peass.measurement.analysis.Relation;
 import de.precision.analysis.repetitions.PrecisionComparer;
 import de.precision.analysis.repetitions.bimodal.CompareData;
 import de.precision.analysis.repetitions.bimodal.OutlierRemoverBimodal;

@@ -13,9 +13,9 @@ import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Longs;
 
 import de.dagere.kopeme.generated.Result;
-import de.peass.config.StatisticsConfiguration;
-import de.peass.measurement.analysis.Relation;
-import de.peass.statistics.ConfidenceIntervalInterpretion;
+import de.dagere.peass.config.StatisticsConfiguration;
+import de.dagere.peass.measurement.analysis.Relation;
+import de.dagere.peass.statistics.ConfidenceIntervalInterpretion;
 import de.precision.analysis.repetitions.bimodal.BimodalityTester;
 import de.precision.analysis.repetitions.bimodal.CompareData;
 import de.precision.processing.repetitions.misc.HistogramCreator;

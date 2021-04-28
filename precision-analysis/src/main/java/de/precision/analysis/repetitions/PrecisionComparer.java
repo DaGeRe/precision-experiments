@@ -8,8 +8,8 @@ import org.apache.commons.math3.stat.inference.TTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.peass.config.StatisticsConfiguration;
-import de.peass.measurement.analysis.Relation;
+import de.dagere.peass.config.StatisticsConfiguration;
+import de.dagere.peass.measurement.analysis.Relation;
 import de.precision.analysis.repetitions.bimodal.CompareData;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
 
