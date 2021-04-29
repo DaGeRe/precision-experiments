@@ -22,7 +22,7 @@ import de.dagere.kopeme.generated.Kopemedata;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.TestcaseType;
-import de.peass.measurement.analysis.statistics.MeanCoVData;
+import de.dagere.peass.measurement.analysis.statistics.MeanCoVData;
 
 /**
  * Generates csv-files and gnuplot-commands for printing an graph of the values and the coefficient of variation of all result files in one folder

@@ -9,7 +9,7 @@ import java.util.Map;
 import javax.xml.bind.JAXBException;
 
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.peass.measurement.analysis.statistics.MeanCoVData;
+import de.dagere.peass.measurement.analysis.statistics.MeanCoVData;
 
 /**
  * Helps comparing equal executions on different servers, including temperature analysis.

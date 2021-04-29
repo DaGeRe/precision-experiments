@@ -23,8 +23,8 @@ import de.dagere.kopeme.generated.Kopemedata;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.TestcaseType;
-import de.peass.measurement.analysis.statistics.MeanCoVData;
-import de.peass.measurement.analysis.statistics.MeanCoVDataContinous;
+import de.dagere.peass.measurement.analysis.statistics.MeanCoVData;
+import de.dagere.peass.measurement.analysis.statistics.MeanCoVDataContinous;
 
 /**
  * Generates csv-files and gnuplot-commands for printing an graph of the values and the coefficient of variation of all result files in one folder
@@ -88,7 +88,7 @@ public final class GenerateMeanPlots {
       System.out.println("set ylabel 'Zeit / {/Symbol m}'");
    }
 
-   public static void handleTestcase(final String clazzname, final TestcaseType testcase, String type) throws IOException {
+   public static void handleTestcase(final String clazzname, final TestcaseType testcase, final String type) throws IOException {
       final MeanCoVData data = useFullData ? new MeanCoVDataContinous(testcase, AVG_COUNT) : new MeanCoVData(testcase, AVG_COUNT);
 //      data.printTestcaseData(GenerateCoVPlots.RESULTFOLDER);
 

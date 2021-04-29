@@ -15,7 +15,7 @@ import de.dagere.kopeme.datastorage.XMLDataLoader;
 import de.dagere.kopeme.generated.Kopemedata;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.TestcaseType;
-import de.peass.measurement.analysis.statistics.MeanCoVData;
+import de.dagere.peass.measurement.analysis.statistics.MeanCoVData;
 
 public class PlotOne {
 
@@ -29,7 +29,7 @@ public class PlotOne {
 
 	private static final NumberFormat FORMAT = NumberFormat.getInstance();
 
-	public static void main(String[] args) throws JAXBException, IOException {
+	public static void main(final String[] args) throws JAXBException, IOException {
 		final File folder = new File(args[0]);
 		final Kopemedata data = new XMLDataLoader(folder).getFullData();
 		final Testcases testclazz = data.getTestcases();
