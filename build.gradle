@@ -12,7 +12,7 @@ buildscript {
 apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: 'checkstyle'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 group = "de.peass"
 version = "0.1-SNAPSHOT"
@@ -29,10 +29,10 @@ repositories {
 
 
 dependencies {
-   compile group: "de.dagere.kopeme", name: "kopeme-junit", version: "0.13"
-   compile group: "de.dagere.kopeme", name: "kopeme-junit3", version: "0.13"
-   compile group: 'commons-io', name: 'commons-io', version: '2.4'
-   compile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.23'
+   implementation group: "de.dagere.kopeme", name: "kopeme-junit", version: "0.13"
+   implementation group: "de.dagere.kopeme", name: "kopeme-junit3", version: "0.13"
+   implementation group: 'commons-io', name: 'commons-io', version: '2.4'
+   implementation group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.23'
 }
 
 test {
