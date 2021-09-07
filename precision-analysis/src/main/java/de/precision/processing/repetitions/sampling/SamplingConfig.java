@@ -12,6 +12,9 @@ public class SamplingConfig{
       this.printPicks = printPicks;
       this.useConfidenceInterval = useConfidenceInterval;
       this.samplingExecutions = samplingExecutions;
+      if (vms == 0) {
+         throw new RuntimeException("VMs must not be 0!");
+      }
    }
 
    public SamplingConfig(final int vms, final String testclazz, final boolean printPicks, final boolean useConfidenceInterval) {
@@ -20,6 +23,9 @@ public class SamplingConfig{
       this.printPicks = printPicks;
       this.useConfidenceInterval = useConfidenceInterval;
       samplingExecutions = 10000;
+      if (vms == 0) {
+         throw new RuntimeException("VMs must not be 0!");
+      }
    }
 
    public int getVms() {

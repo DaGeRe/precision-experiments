@@ -24,19 +24,6 @@ public class PrecisionWriter {
       this.executionData = executionData;
    }
    
-   public static void writeHeader(final BufferedWriter writer) throws IOException{
-      synchronized (writer) {
-         writer.write("repetitions" + ProcessConstants.DATAFILE_SEPARATOR +
-               "vms" + ProcessConstants.DATAFILE_SEPARATOR +
-               "executions" + ProcessConstants.DATAFILE_SEPARATOR +
-               "warmup" + ProcessConstants.DATAFILE_SEPARATOR +
-               "overhead" + ProcessConstants.DATAFILE_SEPARATOR +
-               "duration" + ProcessConstants.DATAFILE_SEPARATOR);
-         writer.write("\n");
-         writer.flush();
-      }
-   }
-   
    public static void writeHeader(final BufferedWriter writer, final String[] types) throws IOException {
       writer.write("repetitions" + ProcessConstants.DATAFILE_SEPARATOR +
             "vms" + ProcessConstants.DATAFILE_SEPARATOR +
@@ -44,7 +31,7 @@ public class PrecisionWriter {
             "warmup" + ProcessConstants.DATAFILE_SEPARATOR +
             "overhead" + ProcessConstants.DATAFILE_SEPARATOR +
             "duration" + ProcessConstants.DATAFILE_SEPARATOR);
-      for (final String method : new MethodResult(GeneratePrecisionPlot.myTypes).getResults().keySet()) {
+      for (final String method : new MethodResult(types).getResults().keySet()) {
          writer.write(method + ProcessConstants.DATAFILE_SEPARATOR + ProcessConstants.DATAFILE_SEPARATOR + ProcessConstants.DATAFILE_SEPARATOR);
       }
       writer.write("\n");

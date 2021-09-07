@@ -5,9 +5,9 @@ import java.util.HashMap;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.peass.config.StatisticsConfiguration;
-import de.peass.measurement.analysis.Relation;
-import de.precision.analysis.repetitions.bimodal.BimodalTestUtil;
+import de.dagere.peass.config.StatisticsConfiguration;
+import de.dagere.peass.measurement.analysis.Relation;
+import de.dagere.precision.analysis.repetitions.bimodal.BimodalTestUtil;
 import de.precision.analysis.repetitions.bimodal.CompareData;
 
 public class TryTests {
