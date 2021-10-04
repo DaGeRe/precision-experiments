@@ -8,12 +8,14 @@ import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.TDistribution;
 
 public class GetType2ErrorGraph {
-   public static void main(String[] args) {
+   public static void main(final String[] args) {
 
       File folder = new File("results/type2error");
       folder.mkdirs();
       writeErrors(0.01, new File(folder, "error_001.csv"));
       writeErrors(0.1, new File(folder, "error_01.csv"));
+      writeErrors(0.15, new File(folder, "error_015.csv"));
+      writeErrors(0.2, new File(folder, "error_02.csv"));
       writeErrors(0.25, new File(folder, "error_025.csv"));
       writeErrors(0.5, new File(folder, "error_05.csv"));
       writeErrors(0.75, new File(folder, "error_75.csv"));
@@ -44,7 +46,7 @@ public class GetType2ErrorGraph {
 
    private static void writeErrors(final double factor, final File file) {
       try (FileWriter fw = new FileWriter(file)) {
-         for (int n = 10; n <= 2000; n += 10) {
+         for (int n = 10; n <= 2000; n += 1) {
             TDistribution t = new TDistribution(n * 2 - 2);
             final double t_crit = t.inverseCumulativeProbability(0.995);
 

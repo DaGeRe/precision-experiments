@@ -32,8 +32,8 @@ import de.dagere.kopeme.generated.Result.Fulldata.Value;
 import de.dagere.kopeme.generated.TestcaseType;
 import de.dagere.peass.measurement.analysis.MultipleVMTestUtil;
 import de.dagere.peass.measurement.analysis.Relation;
+import de.dagere.peass.precision.analysis.repetitions.bimodal.CompareData;
 import de.dagere.peass.statistics.ConfidenceIntervalInterpretion;
-import de.precision.analysis.repetitions.bimodal.CompareData;
 import de.precision.processing.util.PrecisionFolderUtil;
 import de.precision.processing.util.RepetitionFolderHandler;
 

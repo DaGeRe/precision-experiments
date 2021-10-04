@@ -9,9 +9,9 @@ import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.TestcaseType;
 import de.dagere.peass.config.StatisticsConfiguration;
 import de.dagere.peass.measurement.analysis.Relation;
+import de.dagere.peass.precision.analysis.repetitions.bimodal.CompareData;
 import de.dagere.peass.statistics.StatisticUtil;
 import de.precision.analysis.repetitions.PrecisionComparer;
-import de.precision.analysis.repetitions.bimodal.CompareData;
 import de.precision.processing.repetitions.misc.DetermineAverageTime;
 
 public class VMCombinationSampler {

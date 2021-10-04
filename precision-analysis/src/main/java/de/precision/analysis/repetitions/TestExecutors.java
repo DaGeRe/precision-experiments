@@ -15,9 +15,9 @@ import com.google.common.primitives.Longs;
 import de.dagere.kopeme.generated.Result;
 import de.dagere.peass.config.StatisticsConfiguration;
 import de.dagere.peass.measurement.analysis.Relation;
+import de.dagere.peass.precision.analysis.repetitions.bimodal.BimodalityTester;
+import de.dagere.peass.precision.analysis.repetitions.bimodal.CompareData;
 import de.dagere.peass.statistics.ConfidenceIntervalInterpretion;
-import de.precision.analysis.repetitions.bimodal.BimodalityTester;
-import de.precision.analysis.repetitions.bimodal.CompareData;
 import de.precision.processing.repetitions.misc.HistogramCreator;
 
 public class TestExecutors {

@@ -5,8 +5,8 @@ import java.util.Random;
 import de.dagere.peass.config.StatisticsConfiguration;
 import de.dagere.peass.measurement.analysis.Relation;
 import de.precision.analysis.repetitions.PrecisionComparer;
-import de.precision.analysis.repetitions.bimodal.CompareData;
-import de.precision.analysis.repetitions.bimodal.OutlierRemoverBimodal;
+import de.dagere.peass.precision.analysis.repetitions.bimodal.CompareData;
+import de.dagere.peass.precision.analysis.repetitions.bimodal.OutlierRemoverBimodal;
 
 public class SamplingExecutor {
 
