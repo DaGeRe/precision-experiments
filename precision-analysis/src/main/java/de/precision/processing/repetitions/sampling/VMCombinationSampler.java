@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.TestcaseType;
-import de.dagere.peass.config.StatisticsConfiguration;
+import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.analysis.Relation;
 import de.dagere.peass.precision.analysis.repetitions.bimodal.CompareData;
 import de.dagere.peass.statistics.StatisticUtil;
@@ -21,9 +21,9 @@ public class VMCombinationSampler {
    private final int warmup, allExecutions;
    private final PrecisionComparer comparer;
    private final SamplingConfig config;
-   private final StatisticsConfiguration statisticsConfig;
+   private final StatisticsConfig statisticsConfig;
 
-   public VMCombinationSampler(final int warmup, final int allExecutions, final PrecisionComparer comparer, final SamplingConfig config, final StatisticsConfiguration statisticConfig) {
+   public VMCombinationSampler(final int warmup, final int allExecutions, final PrecisionComparer comparer, final SamplingConfig config, final StatisticsConfig statisticConfig) {
       this.warmup = warmup;
       this.allExecutions = allExecutions;
       this.comparer = comparer;

@@ -13,10 +13,9 @@ import java.util.concurrent.Callable;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.Result.Fulldata;
-import de.dagere.kopeme.generated.Result.Fulldata.Value;
 import de.dagere.kopeme.generated.TestcaseType;
 import de.dagere.kopeme.generated.TestcaseType.Datacollector;
-import de.dagere.peass.config.StatisticsConfiguration;
+import de.dagere.peass.config.StatisticsConfig;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
 import de.precision.processing.repetitions.sampling.VMCombinationSampler;
 import picocli.CommandLine;
@@ -78,8 +77,8 @@ public class AggregatedValueSampler implements Callable<Void> {
       System.setOut(new PrintStream(new File("results", "vals_" + vms + ".csv")));
 
       final SamplingConfig config = new SamplingConfig(vms, "Test", true, false);
-      StatisticsConfiguration statisticsConfig = new StatisticsConfiguration();
-      statisticsConfig.setOutlierFactor(StatisticsConfiguration.DEFAULT_OUTLIER_FACTOR);
+      StatisticsConfig statisticsConfig = new StatisticsConfig();
+      statisticsConfig.setOutlierFactor(StatisticsConfig.DEFAULT_OUTLIER_FACTOR);
       PrecisionComparer comparer = new PrecisionComparer(config, statisticsConfig);
       VMCombinationSampler sampler = new VMCombinationSampler(0, 1, comparer, config, statisticsConfig);
 
@@ -117,7 +116,7 @@ public class AggregatedValueSampler implements Callable<Void> {
    private static void buildResult(final Datacollector datacollector, final double thisVMValue) {
       final Result result = new Result();
       result.setDate(0l);
-      final Value value = new Value();
+      final Result.Fulldata.Value value = new Result.Fulldata.Value();
       value.setStart(0l);
       value.setValue((long) thisVMValue);
 

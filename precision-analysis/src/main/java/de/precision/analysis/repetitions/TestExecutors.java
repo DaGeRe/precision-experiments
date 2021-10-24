@@ -13,7 +13,7 @@ import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Longs;
 
 import de.dagere.kopeme.generated.Result;
-import de.dagere.peass.config.StatisticsConfiguration;
+import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.analysis.Relation;
 import de.dagere.peass.precision.analysis.repetitions.bimodal.BimodalityTester;
 import de.dagere.peass.precision.analysis.repetitions.bimodal.CompareData;
@@ -36,7 +36,7 @@ public class TestExecutors {
       }
    }
 
-   public static boolean getTTestRelation(final Map<String, Relation> relations, final CompareData data, final StatisticsConfiguration config) {
+   public static boolean getTTestRelation(final Map<String, Relation> relations, final CompareData data, final StatisticsConfig config) {
       final boolean tchange = new TTest().homoscedasticTTest(data.getBefore(), data.getAfter(), config.getType1error());
       // final boolean tchange = new TTest().homoscedasticTTest(values.get(0), values.get(1), 0.01);
       if (tchange) {
@@ -47,7 +47,7 @@ public class TestExecutors {
       return tchange;
    }
 
-   public static boolean getTTestRelationBimodal(final Map<String, Relation> relations, final CompareData data, final StatisticsConfiguration statisticsConfig) {
+   public static boolean getTTestRelationBimodal(final Map<String, Relation> relations, final CompareData data, final StatisticsConfig statisticsConfig) {
       final BimodalityTester tester = new BimodalityTester(data);
       final boolean tchange = tester.isTChange(statisticsConfig.getType1error());
       if (tchange) {
@@ -70,7 +70,7 @@ public class TestExecutors {
       }
    }
 
-   public static void getMannWhitneyRelation(final Map<String, Relation> relations, final CompareData data, final StatisticsConfiguration config) {
+   public static void getMannWhitneyRelation(final Map<String, Relation> relations, final CompareData data, final StatisticsConfig config) {
       final double statistic = new MannWhitneyUTest().mannWhitneyUTest(data.getBefore(), data.getAfter());
       LOG.trace(statistic);
       final boolean mannchange = statistic < config.getType1error(); // 2.33 - critical value for confidence level 0.99

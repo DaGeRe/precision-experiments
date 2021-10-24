@@ -2,11 +2,11 @@ package de.precision.processing.repetitions.sampling;
 
 import java.util.Random;
 
-import de.dagere.peass.config.StatisticsConfiguration;
+import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.analysis.Relation;
-import de.precision.analysis.repetitions.PrecisionComparer;
 import de.dagere.peass.precision.analysis.repetitions.bimodal.CompareData;
 import de.dagere.peass.precision.analysis.repetitions.bimodal.OutlierRemoverBimodal;
+import de.precision.analysis.repetitions.PrecisionComparer;
 
 public class SamplingExecutor {
 
@@ -18,7 +18,7 @@ public class SamplingExecutor {
    private final CompareData data;
 
 
-   public SamplingExecutor(final SamplingConfig config, final StatisticsConfiguration statisticsConfig, final CompareData origin, final PrecisionComparer comparer) {
+   public SamplingExecutor(final SamplingConfig config, final StatisticsConfig statisticsConfig, final CompareData origin, final PrecisionComparer comparer) {
       this.comparer = comparer;
       this.config = config;
 

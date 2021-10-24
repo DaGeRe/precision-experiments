@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.TestcaseType;
-import de.dagere.peass.config.StatisticsConfiguration;
+import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.statistics.StatisticUtil;
 import de.precision.processing.repetitions.misc.DetermineAverageTime;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
@@ -76,9 +76,9 @@ public class PrecisionPlotThread {
 
    protected void processTestcases(final Testcases testclazz, final Testcases otherPackageTestcase) {
       config = new SamplingConfig(executionData.getVms(), testclazz.getClazz(), false, precisionConfig.isUseConfidence());
-      StatisticsConfiguration statisticsConfig = new StatisticsConfiguration();
+      StatisticsConfig statisticsConfig = new StatisticsConfig();
       if (precisionConfig.isRemoveOutliers()) {
-         statisticsConfig.setOutlierFactor(StatisticsConfiguration.DEFAULT_OUTLIER_FACTOR);
+         statisticsConfig.setOutlierFactor(StatisticsConfig.DEFAULT_OUTLIER_FACTOR);
       } else {
          statisticsConfig.setOutlierFactor(0.0);
       }

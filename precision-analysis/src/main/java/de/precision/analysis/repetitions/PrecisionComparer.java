@@ -8,7 +8,7 @@ import org.apache.commons.math3.stat.inference.TTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.dagere.peass.config.StatisticsConfiguration;
+import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.analysis.Relation;
 import de.dagere.peass.precision.analysis.repetitions.bimodal.CompareData;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
@@ -20,9 +20,9 @@ public class PrecisionComparer {
    private final SamplingConfig config;
    private final MethodResult overallResults = new MethodResult(GeneratePrecisionPlot.myTypes);
    private final Map<String, MethodResult> testcaseResults = new HashMap<>();
-   private final StatisticsConfiguration statisticsConfig;
+   private final StatisticsConfig statisticsConfig;
 
-   public PrecisionComparer(final SamplingConfig config, final StatisticsConfiguration statisticsConfig) {
+   public PrecisionComparer(final SamplingConfig config, final StatisticsConfig statisticsConfig) {
       this.config = config;
       this.statisticsConfig = statisticsConfig;
    }
