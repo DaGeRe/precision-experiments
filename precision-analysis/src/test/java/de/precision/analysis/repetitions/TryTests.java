@@ -5,10 +5,10 @@ import java.util.HashMap;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.dagere.peass.config.StatisticsConfiguration;
-import de.dagere.peass.measurement.analysis.Relation;
+import de.dagere.peass.config.StatisticsConfig;
+import de.dagere.peass.measurement.statistics.Relation;
+import de.dagere.peass.measurement.statistics.bimodal.CompareData;
 import de.dagere.precision.analysis.repetitions.bimodal.BimodalTestUtil;
-import de.precision.analysis.repetitions.bimodal.CompareData;
 
 public class TryTests {
    
@@ -16,7 +16,7 @@ public class TryTests {
    public void tryMannWhitneyLess() {
       final HashMap<String, Relation> relations = new HashMap<>();
       final CompareData data = new CompareData(BimodalTestUtil.buildValues(10, 10), BimodalTestUtil.buildValues(12, 12));
-      TestExecutors.getMannWhitneyRelation(relations, data, new StatisticsConfiguration());
+      TestExecutors.getMannWhitneyRelation(relations, data, new StatisticsConfig());
       
       Assert.assertEquals(Relation.LESS_THAN, relations.get("MANNWHITNEY"));
    }
@@ -25,7 +25,7 @@ public class TryTests {
    public void tryMannWhitneyEqual() {
       final HashMap<String, Relation> relations = new HashMap<>();
       final CompareData data = new CompareData(BimodalTestUtil.buildValues(10, 10), BimodalTestUtil.buildValues(10, 10));
-      TestExecutors.getMannWhitneyRelation(relations, data, new StatisticsConfiguration());
+      TestExecutors.getMannWhitneyRelation(relations, data, new StatisticsConfig());
       
       Assert.assertEquals(Relation.EQUAL, relations.get("MANNWHITNEY"));
    }

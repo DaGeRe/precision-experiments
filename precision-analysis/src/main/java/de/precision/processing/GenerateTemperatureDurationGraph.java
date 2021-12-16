@@ -21,7 +21,7 @@ import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.Result.Fulldata.Value;
 import de.dagere.kopeme.generated.TestcaseType;
-import de.dagere.peass.statistics.StatisticUtil;
+import de.dagere.peass.measurement.statistics.StatisticUtil;
 
 /**
  * Plots a graph of execution time and cpu temperature. Unfortunately, no correlation could be detected.

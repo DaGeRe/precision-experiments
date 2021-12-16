@@ -3,9 +3,9 @@ package de.precision.processing.repetitions.sampling;
 import java.util.Random;
 
 import de.dagere.peass.config.StatisticsConfig;
-import de.dagere.peass.measurement.analysis.Relation;
-import de.dagere.peass.precision.analysis.repetitions.bimodal.CompareData;
-import de.dagere.peass.precision.analysis.repetitions.bimodal.OutlierRemoverBimodal;
+import de.dagere.peass.measurement.statistics.Relation;
+import de.dagere.peass.measurement.statistics.bimodal.CompareData;
+import de.dagere.peass.measurement.statistics.bimodal.OutlierRemoverBimodal;
 import de.precision.analysis.repetitions.PrecisionComparer;
 
 public class SamplingExecutor {

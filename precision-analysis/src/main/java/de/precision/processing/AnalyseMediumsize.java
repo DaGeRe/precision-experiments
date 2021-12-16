@@ -9,7 +9,7 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.inference.TTest;
 
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.dagere.peass.measurement.analysis.MultipleVMTestUtil;
+import de.dagere.peass.measurement.dataloading.MultipleVMTestUtil;
 import de.precision.processing.util.PrecisionFolderUtil;
 import de.precision.processing.util.RepetitionFolderHandler;
 

@@ -30,10 +30,10 @@ import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.Result.Fulldata;
 import de.dagere.kopeme.generated.Result.Fulldata.Value;
 import de.dagere.kopeme.generated.TestcaseType;
-import de.dagere.peass.measurement.analysis.MultipleVMTestUtil;
-import de.dagere.peass.measurement.analysis.Relation;
-import de.dagere.peass.precision.analysis.repetitions.bimodal.CompareData;
-import de.dagere.peass.statistics.ConfidenceIntervalInterpretion;
+import de.dagere.peass.measurement.dataloading.MultipleVMTestUtil;
+import de.dagere.peass.measurement.statistics.ConfidenceIntervalInterpretion;
+import de.dagere.peass.measurement.statistics.Relation;
+import de.dagere.peass.measurement.statistics.bimodal.CompareData;
 import de.precision.processing.util.PrecisionFolderUtil;
 import de.precision.processing.util.RepetitionFolderHandler;
 

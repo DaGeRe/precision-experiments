@@ -14,7 +14,7 @@ import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.TestcaseType;
 import de.dagere.peass.config.StatisticsConfig;
-import de.dagere.peass.statistics.StatisticUtil;
+import de.dagere.peass.measurement.statistics.StatisticUtil;
 import de.precision.processing.repetitions.misc.DetermineAverageTime;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
 import de.precision.processing.repetitions.sampling.VMCombinationSampler;
