@@ -40,7 +40,7 @@ function runWorkload {
                 else
                         ../gradlew -p .. clean test --tests $testcase &> "$workloadsize"_$i.txt
                 fi
-                mv  ~/.KoPeMe/de.peass/precision-experiment/$testcase $resultfolder/wl_"$workloadsize"_$i
+                mv  ~/.KoPeMe/de.peass/precision-experiments/$testcase $resultfolder/wl_"$workloadsize"_$i
                 
                 end=$(date +%s%N)
 				duration=$(echo "($end-$start)/1000000" | bc)
