@@ -20,10 +20,11 @@ task fatJar(type: Jar) {
 	manifest {
         attributes 'Implementation-Title': 'Precision-Experiment',
         	'Implementation-Version': 0.1,
-        	'Main-Class': 'de.dagere.precision.analysis.repetitions.GeneratePrecisionPlot'
+        	'Main-Class': 'de.precision.analysis.repetitions.GeneratePrecisionPlot'
     }
+    duplicatesStrategy = 'exclude'
     baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
 
