@@ -54,7 +54,7 @@ function runWorkload {
 			$resultfolder
 	mv $resultfolder"_result" $resultfolder/aggregated_$workloadsize
 	(cd $resultfolder && \
-		tar -I pxz -cf wl_$workloadsize.tar wl_$workloadsize"_"* &&
+		tar -I xz -cf wl_$workloadsize.tar wl_$workloadsize"_"* &&
 		rm wl_$workloadsize"_"* -r)
 	(cd $resultfolder && \
 		files=$(ls | grep aggregated | awk -F_ '{print $2}' | sort -n) && \
