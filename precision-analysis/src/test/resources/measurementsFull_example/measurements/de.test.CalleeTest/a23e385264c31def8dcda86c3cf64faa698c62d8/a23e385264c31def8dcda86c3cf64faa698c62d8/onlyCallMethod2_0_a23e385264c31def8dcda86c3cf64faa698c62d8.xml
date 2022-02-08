@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<kopemedata>
+ <testcases class="de.test.CalleeTest">
+  <testcase name="onlyCallMethod2">
+   <datacollector name="de.dagere.kopeme.datacollection.TimeDataCollectorNoGC">
+    <result cpu="model name : AMD Ryzen 3 3100 4-Core Processor" memory="MemTotal: 32868064 kB" date="1644253912399">
+     <value>4.8512834E7</value>
+     <deviation>0.004666339946011468</deviation>
+     <warmup>0</warmup>
+     <iterations>6</iterations>
+     <repetitions>2</repetitions>
+     <min>4.8405436E7</min>
+     <max>4.8973783E7</max>
+     <showStart>true</showStart>
+     <executeBeforeClassInMeasurement>false</executeBeforeClassInMeasurement>
+     <redirectToTemp>false</redirectToTemp>
+     <redirectToNull>false</redirectToNull>
+     <javaVersion>11.0.13</javaVersion>
+     <fulldata>
+      <value start="1644253911980">48973783</value>
+      <value start="1644253912030">48405436</value>
+      <value start="1644253912079">48406256</value>
+      <value start="1644253912129">48449137</value>
+      <value start="1644253912178">48423846</value>
+      <value start="1644253912227">48418546</value>
+     </fulldata>
+    </result>
+   </datacollector>
+  </testcase>
+ </testcases>
+</kopemedata>

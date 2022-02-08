@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<kopemedata>
+ <testcases class="de.test.CalleeTest">
+  <testcase name="onlyCallMethod1">
+   <datacollector name="de.dagere.kopeme.datacollection.TimeDataCollectorNoGC">
+    <chunk chunkStartTime="1644253848661">
+     <result date="1644253857772">
+      <value>4311713.333333333</value>
+      <deviation>285522.5453610741</deviation>
+      <warmup>0</warmup>
+      <iterations>6</iterations>
+      <repetitions>2</repetitions>
+      <version>
+       <gitversion>33ce17c04b5218c25c40137d4d09f40fbb3e4f0f</gitversion>
+      </version>
+      <min>4180712.0</min>
+      <max>4894298.0</max>
+     </result>
+     <result date="1644253865332">
+      <value>2.4386176833333332E7</value>
+      <deviation>244555.89243068054</deviation>
+      <warmup>0</warmup>
+      <iterations>6</iterations>
+      <repetitions>2</repetitions>
+      <version>
+       <gitversion>a23e385264c31def8dcda86c3cf64faa698c62d8</gitversion>
+      </version>
+      <min>2.4270971E7</min>
+      <max>2.4884597E7</max>
+     </result>
+     <result date="1644253873701">
+      <value>4290740.0</value>
+      <deviation>199051.84089879695</deviation>
+      <warmup>0</warmup>
+      <iterations>6</iterations>
+      <repetitions>2</repetitions>
+      <version>
+       <gitversion>33ce17c04b5218c25c40137d4d09f40fbb3e4f0f</gitversion>
+      </version>
+      <min>4175663.0</min>
+      <max>4692589.0</max>
+     </result>
+     <result date="1644253881123">
+      <value>2.43860725E7</value>
+      <deviation>304953.1734150343</deviation>
+      <warmup>0</warmup>
+      <iterations>6</iterations>
+      <repetitions>2</repetitions>
+      <version>
+       <gitversion>a23e385264c31def8dcda86c3cf64faa698c62d8</gitversion>
+      </version>
+      <min>2.422789E7</min>
+      <max>2.5006936E7</max>
+     </result>
+     <result date="1644253889406">
+      <value>4302116.333333334</value>
+      <deviation>224817.48829899036</deviation>
+      <warmup>0</warmup>
+      <iterations>6</iterations>
+      <repetitions>2</repetitions>
+      <version>
+       <gitversion>33ce17c04b5218c25c40137d4d09f40fbb3e4f0f</gitversion>
+      </version>
+      <min>4171833.0</min>
+      <max>4755378.0</max>
+     </result>
+     <result date="1644253896680">
+      <value>2.43499535E7</value>
+      <deviation>207628.5117547683</deviation>
+      <warmup>0</warmup>
+      <iterations>6</iterations>
+      <repetitions>2</repetitions>
+      <version>
+       <gitversion>a23e385264c31def8dcda86c3cf64faa698c62d8</gitversion>
+      </version>
+      <min>2.4254559E7</min>
+      <max>2.4773466E7</max>
+     </result>
+    </chunk>
+   </datacollector>
+  </testcase>
+ </testcases>
+</kopemedata>
