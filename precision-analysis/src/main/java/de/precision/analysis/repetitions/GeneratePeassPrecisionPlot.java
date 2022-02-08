@@ -27,6 +27,9 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
 
    @Option(names = { "-data", "--data" }, description = "Data-Folder for analysis", required = true)
    private File[] data;
+   
+   @Option(names = { "-slowVersionName", "--slowVersionName" }, description = "Version that is assumed to be slower", required = true)
+   private String slowVersionName;
 
    public static void main(final String[] args) {
       GeneratePeassPrecisionPlot plot = new GeneratePeassPrecisionPlot();
@@ -61,7 +64,7 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
          for (File versionFile : testclazzFile.listFiles()) {
             if (!versionFile.getName().equals("results")) {
                RegularPeassdataReader reader = new RegularPeassdataReader();
-               reader.read(versionFile, testclazzFile);
+               reader.read(slowVersionName, versionFile, testclazzFile);
                
                Map<String, Testcases> testcasesV1 = reader.getTestcasesV1();
                Map<String, Testcases> testcasesV2 = reader.getTestcasesV2();

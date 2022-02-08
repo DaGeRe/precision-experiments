@@ -20,7 +20,7 @@ public class TestRegularPeassdataReader {
       RegularPeassdataReader regularPeassdataReader = new RegularPeassdataReader();
       File testcaseFolder = new File(exampleData, "measurements/de.test.CalleeTest");
       File versionFolder = new File(testcaseFolder, "a23e385264c31def8dcda86c3cf64faa698c62d8");
-      regularPeassdataReader.read(versionFolder, testcaseFolder);
+      regularPeassdataReader.read("a23e385264c31def8dcda86c3cf64faa698c62d8", versionFolder, testcaseFolder);
       
       Testcases testcasesV1 = regularPeassdataReader.getTestcasesV1().get("de.test.CalleeTest#onlyCallMethod1");
       MatcherAssert.assertThat(testcasesV1.getTestcase().get(0).getDatacollector().get(0).getResult(), IsIterableWithSize.iterableWithSize(3));

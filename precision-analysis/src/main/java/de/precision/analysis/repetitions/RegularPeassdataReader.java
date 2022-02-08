@@ -19,10 +19,10 @@ public class RegularPeassdataReader {
    private final Map<String, Testcases> testcasesV1 = new LinkedHashMap<>();
    private final Map<String, Testcases> testcasesV2 = new LinkedHashMap<>();
 
-   public void read(final File versionFile, final File testclazzFile) throws JAXBException {
+   public void read(final String slowVersionName, final File versionFile, final File testclazzFile) throws JAXBException {
       for (File subversionFile : versionFile.listFiles()) {
          for (File vmRun : subversionFile.listFiles((FileFilter) new WildcardFileFilter("*xml"))) {
-            Testcases current = getTestcases(versionFile, testclazzFile, subversionFile, vmRun);
+            Testcases current = getTestcases(slowVersionName, testclazzFile, subversionFile, vmRun);
             
             Kopemedata data = XMLDataLoader.loadData(vmRun);
             Testcases internalData = data.getTestcases();
@@ -36,11 +36,11 @@ public class RegularPeassdataReader {
       }
    }
 
-   private Testcases getTestcases(final File versionFile, final File testclazzFile, final File subversionFile, final File vmRun) {
+   private Testcases getTestcases(final String slowVersionName, final File testclazzFile, final File subversionFile, final File vmRun) {
       String testMethodName = vmRun.getName().substring(0, vmRun.getName().indexOf("_"));
       Testcases current;
       String testcaseName = testclazzFile.getName() + "#" + testMethodName;
-      if (subversionFile.getName().equals(versionFile.getName())) {
+      if (subversionFile.getName().equals(slowVersionName)) {
          current = testcasesV1.get(testcaseName);
          if (current == null) {
             current = new Testcases();
