@@ -21,10 +21,8 @@ public class RegularPeassdataReader {
 
    public void read(final File versionFile, final File testclazzFile) throws JAXBException {
       for (File subversionFile : versionFile.listFiles()) {
-//         Testcases current = new Testcases();
          for (File vmRun : subversionFile.listFiles((FileFilter) new WildcardFileFilter("*xml"))) {
             Testcases current = getTestcases(versionFile, testclazzFile, subversionFile, vmRun);
-            
             
             Kopemedata data = XMLDataLoader.loadData(vmRun);
             Testcases internalData = data.getTestcases();
@@ -38,7 +36,7 @@ public class RegularPeassdataReader {
       }
    }
 
-   private Testcases getTestcases(final File versionFile, final File testclazzFile, File subversionFile, File vmRun) {
+   private Testcases getTestcases(final File versionFile, final File testclazzFile, final File subversionFile, final File vmRun) {
       String testMethodName = vmRun.getName().substring(0, vmRun.getName().indexOf("_"));
       Testcases current;
       String testcaseName = testclazzFile.getName() + "#" + testMethodName;
