@@ -33,7 +33,7 @@ public class GeneratePrecisionPlot implements Callable<Void> {
    private static final Logger LOG = LogManager.getLogger(GeneratePrecisionPlot.class);
 
    @Option(names = { "-only100k", "--only100k" }, description = "Only analyse 100.000 repetitions - for test comparison")
-   private boolean only100k;
+   private boolean only100k = false;
    
    @Option(names = { "-useConfidence", "--useConfidence" }, description = "Use confidence-interval-test (time-consuming, off by default)")
    private boolean useConfidence = false;
@@ -50,7 +50,7 @@ public class GeneratePrecisionPlot implements Callable<Void> {
       commandLine.execute(args);
    }
 
-   private void createTasks(final String[] folders, PrecisionConfig config, String suffix) throws IOException, JAXBException, InterruptedException {
+   private void createTasks(final String[] folders, final PrecisionConfig config, final String suffix) throws IOException, JAXBException, InterruptedException {
       for (final String inputFolderName : folders) {
          final File inputFolder = new File(inputFolderName);
          

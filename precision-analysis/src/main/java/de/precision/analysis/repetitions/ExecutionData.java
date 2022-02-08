@@ -1,15 +1,16 @@
 package de.precision.analysis.repetitions;
 
 public class ExecutionData {
-   private final int vms, warmup, executions, repetitions;
-
+   private final int vms, iterations, warmup;
+   private final long repetitions;
+   
    private long overhead = 0;
    private long duration = 0;
 
-   public ExecutionData(int vms, int warmup, int executions, int repetitions) {
+   public ExecutionData(final int vms, final int warmup, final int iterations, final long repetitions) {
       this.vms = vms;
       this.warmup = warmup;
-      this.executions = executions;
+      this.iterations = iterations;
       this.repetitions = repetitions;
    }
 
@@ -17,7 +18,7 @@ public class ExecutionData {
       return overhead;
    }
 
-   public void setOverhead(long overhead) {
+   public void setOverhead(final long overhead) {
       this.overhead = overhead;
    }
 
@@ -25,7 +26,7 @@ public class ExecutionData {
       return duration;
    }
 
-   public void setDuration(long duration) {
+   public void setDuration(final long duration) {
       this.duration = duration;
    }
 
@@ -38,10 +39,10 @@ public class ExecutionData {
    }
 
    public int getExecutions() {
-      return executions;
+      return iterations;
    }
 
-   public int getRepetitions() {
+   public long getRepetitions() {
       return repetitions;
    }
 

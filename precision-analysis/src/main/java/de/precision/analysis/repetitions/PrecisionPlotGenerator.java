@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.xml.bind.JAXBException;
 
@@ -25,8 +24,8 @@ public class PrecisionPlotGenerator extends RepetitionFolderHandler {
    private WritingData writingData;
    private boolean finished = false;
    private final PrecisionConfig precisionConfig;
-
-   public PrecisionPlotGenerator(final File sequenceFolder, PrecisionConfig precisionConfig, WritingData writingData, ExecutorService pool) {
+   
+   public PrecisionPlotGenerator(final File sequenceFolder, final PrecisionConfig precisionConfig, final WritingData writingData, final ExecutorService pool) {
       super(sequenceFolder);
       this.handleOnlyVMS = false;
       this.precisionConfig = precisionConfig;
@@ -62,78 +61,17 @@ public class PrecisionPlotGenerator extends RepetitionFolderHandler {
       int maxExecutions = results.get(0).getFulldata().getValue().size();
       LOG.debug("Max Executions: {} Max VMs: {}", maxExecutions, maxVMs);
 
+      PrecisionPlotHandler handler = new PrecisionPlotHandler(testcasesV1, testcasesV2, pool, repetitions, precisionConfig, writingData);
+      
       if (handleOnlyVMS) {
-         handleOnlyVMs(maxVMs, maxExecutions);
+         handler.handleOnlyVMs(maxVMs, maxExecutions);
       } else {
-         handleAllParameters(maxVMs, maxExecutions);
-      }
-   }
-
-   private void handleAllParameters(int maxVMs, int maxExecutions) throws JAXBException, IOException {
-      // final int maxWarmup = maxExecutions / 2;
-      final int executionStepSize = Math.max(maxExecutions / 50, 1);
-      LOG.debug("Step size: {}", executionStepSize);
-      // for (int warmup = 0; warmup <= maxWarmup; warmup += executionStepSize) {
-      // this.warmup = warmup;
-      // this.executions = maxExecutions - warmup;
-      for (int executions = executionStepSize; executions <= maxExecutions / 2; executions += executionStepSize) {
-         final int vmStepSize = maxVMs / 20;
-         for (int vms = vmStepSize; vms <= maxVMs; vms += vmStepSize) {
-            LOG.info("Warmup: {} Executions: {} VMs: {}", executions, executions, vms);
-            executeVersionHandling(new ExecutionData(vms, executions, executions, repetitions));
-         }
-         // }
-      }
-   }
-
-   private void handleOnlyVMs(int maxVMs, int maxExecutions) throws JAXBException, IOException {
-      int warmup = maxExecutions / 2;
-      // this.executions = maxExecutions - warmup;
-      int executions = maxExecutions - warmup;
-      // maxVMs = 100;
-      LOG.info("Max VMs: " + maxVMs);
-      for (int vms = 5; vms <= 50; vms += 5) {
-         LOG.info("Warmup: {} Executions: {} VMs: {}", warmup, executions, vms);
-         executeVersionHandling(new ExecutionData(vms, warmup, executions, repetitions));
-      }
-      if (maxVMs > 50) {
-         for (int vms = 60; vms <= Math.min(500, maxVMs); vms += 10) {
-            LOG.info("Warmup: {} Executions: {} VMs: {}", warmup, executions, vms);
-            executeVersionHandling(new ExecutionData(vms, warmup, executions, repetitions));
-         }
-         if (maxVMs > 500) {
-            for (int vms = 600; vms <= Math.min(1000, maxVMs); vms += 50) {
-               LOG.info("Warmup: {} Executions: {} VMs: {}", warmup, executions, vms);
-               executeVersionHandling(new ExecutionData(vms, warmup, executions, repetitions));
-            }
-         }
-      }
-   }
-
-   private void executeVersionHandling(final ExecutionData config) throws JAXBException, IOException {
-      pool.submit(() -> {
-         try {
-            LOG.info("Starting processing: {}", repetitions);
-            final PrecisionPlotThread thread = new PrecisionPlotThread(config, writingData, precisionConfig, testcasesV1, testcasesV2);
-            thread.execute();
-            LOG.debug("Leaving thread");
-         } catch (Throwable e) {
-            e.printStackTrace();
-         }
-      });
-      
-      LOG.info("Submitting " + repetitions + " " + config.getVms());
-      
-      if (pool instanceof ThreadPoolExecutor) {
-         final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) pool;
-         LOG.info("Active Threads: " + threadPool.getActiveCount() + " Overall size: " + threadPool.getQueue().size());
-      } else {
-         LOG.info("Pool type: {}", pool.getClass());
+         handler.handleAllParameters(maxVMs, maxExecutions);
       }
    }
 
    @Override
-   protected void processTestcases(Testcases versionFast, Testcases versionSlow) {
+   protected void processTestcases(final Testcases versionFast, final Testcases versionSlow) {
       throw new RuntimeException("Old interface; should never be run");
    }
    
