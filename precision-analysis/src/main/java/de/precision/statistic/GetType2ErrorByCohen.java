@@ -21,6 +21,8 @@ public class GetType2ErrorByCohen {
       writeErrors(0.15, significance,new File(folder, "error_015.csv"));
       writeErrors(0.2, significance,new File(folder, "error_02.csv"));
       writeErrors(0.25, significance,new File(folder, "error_025.csv"));
+      writeErrors(0.2, significance,new File(folder, "error_033.csv"));
+      writeErrors(0.25, significance,new File(folder, "error_025.csv"));
       writeErrors(0.5, significance,new File(folder, "error_05.csv"));
       writeErrors(0.75, significance,new File(folder, "error_75.csv"));
       writeErrors(1, significance,new File(folder, "error_1.csv"));
@@ -56,7 +58,7 @@ public class GetType2ErrorByCohen {
 
    public static void writeErrors(final double effectSize, final double significance, final File file) {
       try (FileWriter fw = new FileWriter(file)) {
-         for (int n = 10; n <= 2000; n += 1) {
+         for (int n = 10; n <= 5000; n += 1) {
             double type2error = 1 - getType2error(effectSize, significance, n);
             fw.write(n + " " + type2error + "\n");
          }
