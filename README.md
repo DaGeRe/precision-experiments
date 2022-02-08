@@ -11,6 +11,10 @@ If you got existing measurement results from a Peass run, you can use these to c
 
 The data folder needs to be the `measurementsFull` folder of a peass execution. Afterwards, you will find precision data in each testcase folder, e.g. `$DATAFOLDER/measurements/$TESTCASE/results`. To plot these data, execute `cd scripts` and run `./createPeassHeatmap.sh $DATAFOLDER/measurements/$TESTCASE/results` for the `$TESTCASE` you want to visualize. Afterwards, you'll find heatmaps of your measurement in `peass_$TESTCASE`.
 
+The result for the mean value comparison and T-Test might look like this: (converted with `convert -density 150 result_meanTTest.pdf -quality 90 result_meanTTest.png`)
+
+![image](img/result_meanTTest.png)
+
 # Test Execution
 
 ## Before all tests
