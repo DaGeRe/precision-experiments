@@ -3,6 +3,7 @@ precision-analysis/scripts/repetitionHeatmap/results_*
 precision-analysis/scripts/histograms/histogramData/
 precision-analysis/scripts/histograms/histogram_*pdf
 precision-analysis/scripts/repetitionHeatmap/sizes/
+precision-analysis/scripts/peass_*
 jmh-test/scripts/exponential_2er/
 precision-analysis/scripts/repetitionHeatmap/*pdf
 precision-analysis/scripts/repetitionHeatmap/*csv
