@@ -15,7 +15,7 @@ import de.dagere.kopeme.datastorage.XMLDataLoader;
 import de.dagere.kopeme.generated.Kopemedata;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.TestcaseType;
-import de.dagere.peass.measurement.analysis.statistics.MeanCoVData;
+import de.dagere.peass.analysis.measurement.statistics.MeanCoVData;
 
 public class PlotOne {
 

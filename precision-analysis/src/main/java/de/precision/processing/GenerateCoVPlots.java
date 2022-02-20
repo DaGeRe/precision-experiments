@@ -18,8 +18,8 @@ import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.Result.Fulldata.Value;
 import de.dagere.kopeme.generated.TestcaseType;
-import de.dagere.peass.measurement.analysis.statistics.MeanCoVData;
-import de.dagere.peass.measurement.analysis.statistics.MeanCoVDataContinous;
+import de.dagere.peass.analysis.measurement.statistics.MeanCoVData;
+import de.dagere.peass.analysis.measurement.statistics.MeanCoVDataContinous;
 import de.dagere.peass.measurement.statistics.data.OutlierRemover;
 import de.precision.processing.util.PrecisionFolderUtil;
 
