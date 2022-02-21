@@ -75,7 +75,7 @@ public class PrecisionPlotThread {
    }
 
    protected void processTestcases(final Testcases testclazz, final Testcases otherPackageTestcase) {
-      config = new SamplingConfig(executionData.getVms(), testclazz.getClazz(), true, precisionConfig.isUseConfidence());
+      config = new SamplingConfig(executionData.getVms(), testclazz.getClazz(), precisionConfig.isPrintPicks(), precisionConfig.isUseConfidence());
       StatisticsConfig statisticsConfig = new StatisticsConfig();
       if (precisionConfig.isRemoveOutliers()) {
          statisticsConfig.setOutlierFactor(StatisticsConfig.DEFAULT_OUTLIER_FACTOR);

@@ -24,12 +24,20 @@ import picocli.CommandLine.Option;
 public class GeneratePeassPrecisionPlot implements Callable<Void> {
 
    private static final Logger LOG = LogManager.getLogger(GeneratePeassPrecisionPlot.class);
+   
+   public final static String[] myTypes = new String[] { GeneratePrecisionPlot.MEAN, 
+         GeneratePrecisionPlot.TTEST, 
+         GeneratePrecisionPlot.CONFIDENCE, 
+         GeneratePrecisionPlot.MANNWHITNEY };
 
    @Option(names = { "-data", "--data" }, description = "Data-Folder for analysis", required = true)
    private File[] data;
    
    @Option(names = { "-slowVersionName", "--slowVersionName" }, description = "Version that is assumed to be slower", required = true)
    private String slowVersionName;
+   
+   @Option(names = { "-printPicks", "--printPicks" }, description = "Print the picked values summaries (for debugging)")
+   private boolean printPicks;
 
    public static void main(final String[] args) {
       GeneratePeassPrecisionPlot plot = new GeneratePeassPrecisionPlot();
@@ -59,7 +67,7 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
          File resultFolder = new File(testclazzFile, "results");
          resultFolder.mkdir();
          BufferedWriter precisionRecallWriter = new BufferedWriter(new FileWriter(new File(resultFolder, "precision.csv")));
-         PrecisionWriter.writeHeader(precisionRecallWriter, GeneratePrecisionPlot.myTypes);
+         PrecisionWriter.writeHeader(precisionRecallWriter, myTypes);
          WritingData writingData = new WritingData(resultFolder, precisionRecallWriter, testcaseWriters);
          for (File versionFile : testclazzFile.listFiles()) {
             if (!versionFile.getName().equals("results")) {
@@ -72,7 +80,8 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
                int maxIterations = reader.getIterations();
 
                boolean removeOutliers = true;
-               PrecisionPlotHandler handler = new PrecisionPlotHandler(testcasesV1, testcasesV2, pool, repetitions, new PrecisionConfig(false, false, removeOutliers), writingData);
+               PrecisionConfig precisionConfig = new PrecisionConfig(false, false, removeOutliers, printPicks, myTypes);
+               PrecisionPlotHandler handler = new PrecisionPlotHandler(testcasesV1, testcasesV2, pool, repetitions, precisionConfig, writingData);
                handler.handleAllParameters(100, maxIterations);
             }
          }

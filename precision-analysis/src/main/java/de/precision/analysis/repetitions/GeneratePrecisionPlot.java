@@ -41,6 +41,9 @@ public class GeneratePrecisionPlot implements Callable<Void> {
    @Option(names = { "-data", "--data" }, description = "Data-Folder for analysis", required = true)
    private String[] data;
    
+   @Option(names = { "-printPicks", "--printPicks" }, description = "Print the picked values summaries (for debugging)")
+   private boolean printPicks;
+   
    public static void main(final String[] args) throws JAXBException, IOException, InterruptedException {
       // System.setOut(new PrintStream(new File("/dev/null")));
       Configurator.setLevel("de.peass.measurement.analysis.statistics.ConfidenceIntervalInterpretion", Level.INFO);
@@ -62,8 +65,8 @@ public class GeneratePrecisionPlot implements Callable<Void> {
 
    @Override
    public Void call() throws Exception {
-      createTasks(data, new PrecisionConfig(useConfidence, only100k, false), "results_noOutlierRemoval");
-      createTasks(data, new PrecisionConfig(useConfidence, only100k, true), "results_outlierRemoval");
+      createTasks(data, new PrecisionConfig(useConfidence, only100k, false, printPicks, myTypes), "results_noOutlierRemoval");
+      createTasks(data, new PrecisionConfig(useConfidence, only100k, true, printPicks, myTypes), "results_outlierRemoval");
 
       SingleFileGenerator.createSingleFiles(data);
       return null;

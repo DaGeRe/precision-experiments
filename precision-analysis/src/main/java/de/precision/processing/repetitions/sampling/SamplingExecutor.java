@@ -25,7 +25,7 @@ public class SamplingExecutor {
       CompareData withOutliers = selectPart(origin, config.getVms());
 
       if (statisticsConfig.getOutlierFactor() != 0) {
-         data = OutlierRemoverBimodal.removeOutliers(withOutliers, statisticsConfig.getOutlierFactor());
+         data = OutlierRemoverBimodal.removeOutliersSimple(withOutliers, statisticsConfig.getOutlierFactor());
       } else {
          data = withOutliers;
       }

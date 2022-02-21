@@ -40,7 +40,7 @@ public class PrecisionComparer {
       }
 
       TestExecutors.getTTestRelationBimodal(relations, data, statisticsConfig);
-      
+
       if (config.isUseConfidenceInterval()) {
          TestExecutors.getConfidenceRelation(data, relations);
       }
