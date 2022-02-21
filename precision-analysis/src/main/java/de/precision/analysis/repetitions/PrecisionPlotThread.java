@@ -61,7 +61,7 @@ public class PrecisionPlotThread {
             if (testcaseWriter == null) {
                testcaseWriter = new BufferedWriter(new FileWriter(new File(writingData.getResultFolder(), entry.getKey() + ".csv")));
                writingData.getTestcaseWriters().put(entry.getKey(), testcaseWriter);
-               PrecisionWriter.writeHeader(testcaseWriter, GeneratePrecisionPlot.myTypes);
+               PrecisionWriter.writeHeader(testcaseWriter, precisionConfig.getTypes());
             }
             new PrecisionWriter(comparer, executionData).writeTestcase(testcaseWriter, entry.getValue().getResults().entrySet());
          } catch (final IOException e) {
@@ -75,14 +75,14 @@ public class PrecisionPlotThread {
    }
 
    protected void processTestcases(final Testcases testclazz, final Testcases otherPackageTestcase) {
-      config = new SamplingConfig(executionData.getVms(), testclazz.getClazz(), precisionConfig.isPrintPicks(), precisionConfig.isUseConfidence());
+      config = new SamplingConfig(executionData.getVms(), testclazz.getClazz(), precisionConfig.isUseConfidence());
       StatisticsConfig statisticsConfig = new StatisticsConfig();
       if (precisionConfig.isRemoveOutliers()) {
          statisticsConfig.setOutlierFactor(StatisticsConfig.DEFAULT_OUTLIER_FACTOR);
       } else {
          statisticsConfig.setOutlierFactor(0.0);
       }
-      comparer = new PrecisionComparer(config, statisticsConfig);
+      comparer = new PrecisionComparer(config, statisticsConfig, precisionConfig);
 
       final TestcaseType before = testclazz.getTestcase().get(0);
       final TestcaseType after = otherPackageTestcase.getTestcase().get(0);

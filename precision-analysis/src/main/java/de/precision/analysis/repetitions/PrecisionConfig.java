@@ -1,6 +1,6 @@
 package de.precision.analysis.repetitions;
 
-class PrecisionConfig {
+public class PrecisionConfig {
    private final boolean useConfidence, only100k, removeOutliers;
    private final boolean printPicks;
    private final String[] types;

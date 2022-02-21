@@ -1,5 +1,6 @@
 package de.precision.analysis.repetitions;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,21 +18,25 @@ public class PrecisionComparer {
 
    private static final Logger LOG = LogManager.getLogger(PrecisionComparer.class);
 
+   private final PrecisionConfig precisionConfig;
    private final SamplingConfig config;
-   private final MethodResult overallResults = new MethodResult(GeneratePrecisionPlot.myTypes);
+   private final MethodResult overallResults;
    private final Map<String, MethodResult> testcaseResults = new HashMap<>();
    private final StatisticsConfig statisticsConfig;
 
-   public PrecisionComparer(final SamplingConfig config, final StatisticsConfig statisticsConfig) {
+   public PrecisionComparer(final SamplingConfig config, final StatisticsConfig statisticsConfig, PrecisionConfig precisionConfig) {
       this.config = config;
       this.statisticsConfig = statisticsConfig;
+      this.precisionConfig = precisionConfig;
+      overallResults = new MethodResult(precisionConfig.getTypes());
+
    }
 
    public void executeComparisons(final CompareData data, final Relation expectedRelation, final String testcaseName) {
       final Map<String, Relation> relations = new LinkedHashMap<>();
 
       boolean ttest = TestExecutors.getTTestRelation(relations, data, statisticsConfig);
-      if (config.isPrintPicks()) {
+      if (precisionConfig.isPrintPicks()) {
          LOG.debug(data.getAvgBefore() + " " + data.getAvgAfter() + " " +
                data.getBeforeStat().getVariance() + " " + data.getAfterStat().getVariance()
                + " " + (ttest ? 1 : 0)
@@ -39,7 +44,10 @@ public class PrecisionComparer {
                + " " + data.getBefore().length + " " + data.getAfter().length);
       }
 
-      TestExecutors.getTTestRelationBimodal(relations, data, statisticsConfig);
+      if (Arrays.asList(precisionConfig.getTypes()).contains(GeneratePrecisionPlot.TTEST2)) {
+         TestExecutors.getTTestRelationBimodal(relations, data, statisticsConfig);
+      }
+      
 
       if (config.isUseConfidenceInterval()) {
          TestExecutors.getConfidenceRelation(data, relations);
@@ -55,7 +63,7 @@ public class PrecisionComparer {
    private void manageResults(final Relation expectedRelation, final String testcaseName, final Map<String, Relation> relations) {
       MethodResult myMethodResult = testcaseResults.get(testcaseName);
       if (myMethodResult == null) {
-         myMethodResult = new MethodResult(GeneratePrecisionPlot.myTypes);
+         myMethodResult = new MethodResult(precisionConfig.getTypes());
          testcaseResults.put(testcaseName, myMethodResult);
       }
 

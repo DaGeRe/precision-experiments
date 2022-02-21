@@ -33,8 +33,8 @@ mkdir -p $start/$base/
 
 getHeatmapData 9 $start/$base/peassExecution_mean.csv
 getHeatmapData 13 $start/$base/peassExecution_ttest.csv
-getHeatmapData 21 $start/$base/peassExecution_confidence.csv
-getHeatmapData 25 $start/$base/peassExecution_mannWhitney.csv
+getHeatmapData 17 $start/$base/peassExecution_confidence.csv
+getHeatmapData 21 $start/$base/peassExecution_mannWhitney.csv
 
 cd $start/$base
 gnuplot -c $start/plotPeassHeatmap.plt

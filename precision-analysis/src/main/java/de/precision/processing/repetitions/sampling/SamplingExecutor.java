@@ -7,12 +7,14 @@ import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
 import de.dagere.peass.measurement.statistics.bimodal.OutlierRemoverBimodal;
 import de.precision.analysis.repetitions.PrecisionComparer;
+import de.precision.analysis.repetitions.PrecisionConfig;
 
 public class SamplingExecutor {
 
    private final static Random RANDOM = new Random();
 
    private SamplingConfig config;
+   private PrecisionConfig precisionConfig;
    private final PrecisionComparer comparer;
 
    private final CompareData data;

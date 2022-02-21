@@ -76,10 +76,10 @@ public class AggregatedValueSampler implements Callable<Void> {
    private void executeSampling(final TestcaseType versionSlow, final TestcaseType versionFast, final Testcases testclazz, final PrintStream out, final int vms) throws FileNotFoundException {
       System.setOut(new PrintStream(new File("results", "vals_" + vms + ".csv")));
 
-      final SamplingConfig config = new SamplingConfig(vms, "Test", true, false);
+      final SamplingConfig config = new SamplingConfig(vms, "Test", false);
       StatisticsConfig statisticsConfig = new StatisticsConfig();
       statisticsConfig.setOutlierFactor(StatisticsConfig.DEFAULT_OUTLIER_FACTOR);
-      PrecisionComparer comparer = new PrecisionComparer(config, statisticsConfig);
+      PrecisionComparer comparer = new PrecisionComparer(config, statisticsConfig, new PrecisionConfig(false, false, true, false, GeneratePrecisionPlot.myTypes));
       VMCombinationSampler sampler = new VMCombinationSampler(0, 1, comparer, config, statisticsConfig);
 
       sampler.sampleArtificialVMCombinations(versionFast, versionSlow);

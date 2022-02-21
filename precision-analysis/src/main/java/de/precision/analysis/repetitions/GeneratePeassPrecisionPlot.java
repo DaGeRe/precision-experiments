@@ -25,7 +25,7 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
 
    private static final Logger LOG = LogManager.getLogger(GeneratePeassPrecisionPlot.class);
    
-   public final static String[] myTypes = new String[] { GeneratePrecisionPlot.MEAN, 
+   private final static String[] myTypes = new String[] { GeneratePrecisionPlot.MEAN, 
          GeneratePrecisionPlot.TTEST, 
          GeneratePrecisionPlot.CONFIDENCE, 
          GeneratePrecisionPlot.MANNWHITNEY };

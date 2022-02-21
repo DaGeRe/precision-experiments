@@ -28,7 +28,7 @@ public class GeneratePrecisionPlot implements Callable<Void> {
    public static final String CONFIDENCE = "CONFIDENCE";
    public static final String MANNWHITNEY = "MANNWHITNEY";
 
-   public final static String[] myTypes = new String[] { MEAN, TTEST, TTEST2, CONFIDENCE, MANNWHITNEY };
+   final static String[] myTypes = new String[] { MEAN, TTEST, TTEST2, CONFIDENCE, MANNWHITNEY };
 
    private static final Logger LOG = LogManager.getLogger(GeneratePrecisionPlot.class);
 
