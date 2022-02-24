@@ -1,14 +1,3 @@
-buildscript {
-    repositories {
-	jcenter()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
-    }
-}
-
-
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'checkstyle'
@@ -23,7 +12,7 @@ task fatJar(type: Jar) {
         	'Main-Class': 'de.precision.analysis.repetitions.GeneratePrecisionPlot'
     }
     duplicatesStrategy = 'exclude'
-    baseName = project.name + '-all'
+    archiveBaseName = project.name + '-all'
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
