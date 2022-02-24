@@ -12,6 +12,12 @@ public class ExecutionData {
       this.warmup = warmup;
       this.iterations = iterations;
       this.repetitions = repetitions;
+      if (vms == 0) {
+         throw new RuntimeException("VMs must not be 0!");
+      }
+      if (repetitions == 0) {
+         throw new RuntimeException("Iterations must not be 0!");
+      }
    }
 
    public long getOverhead() {
