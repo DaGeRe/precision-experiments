@@ -63,5 +63,5 @@ function runMeasurement {
 	
 	export KOPEME_HOME=$(pwd)/temp/$workloadsize"_kopeme"
 	../gradlew -p $workfolder clean test --tests $testcases &> "$i"_"$workloadsize".txt
-	mv $KOPEME_HOME/de.peass/precision-experiment/$testcases $resultfolder/result_"$workloadsize"_"$i"
+	mv $KOPEME_HOME/de.peass/precision-experiments/$testcases $resultfolder/result_"$workloadsize"_"$i"
 }

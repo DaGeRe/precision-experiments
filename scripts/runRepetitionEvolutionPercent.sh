@@ -81,7 +81,7 @@ function runRepetition(){
 	mkdir $resultfolder/precision_$repetitions
 	mv $resultfolder/result_* $resultfolder/precision_$repetitions
 	mv *.txt $resultfolder/precision_$repetitions
-	tar -I pxz -cf $resultfolder/precision_$repetitions.tar -C $resultfolder/precision_$repetitions .
+	(export XZ_DEFAULTS="-T 0" && tar -I xz -cf $resultfolder/precision_$repetitions.tar -C $resultfolder/precision_$repetitions .)
 }
 
 #runRepetition 100000 $vms $tests $diffPercent $basesize
