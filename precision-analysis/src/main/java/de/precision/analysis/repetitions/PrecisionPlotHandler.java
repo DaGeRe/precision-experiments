@@ -43,7 +43,7 @@ public class PrecisionPlotHandler {
       // this.warmup = warmup;
       // this.executions = maxExecutions - warmup;
       for (int iterations = iterationStepSize; iterations <= maxIterations / 2; iterations += iterationStepSize) {
-         final int vmStepSize = maxVMs / 20;
+         final int vmStepSize = Math.max(1, maxVMs / 20);
          for (int vms = vmStepSize; vms <= maxVMs; vms += vmStepSize) {
             LOG.info("Warmup: {} Executions: {} VMs: {}", iterations, iterations, vms);
             executeVersionHandling(new ExecutionData(vms, iterations, iterations, repetitions));
