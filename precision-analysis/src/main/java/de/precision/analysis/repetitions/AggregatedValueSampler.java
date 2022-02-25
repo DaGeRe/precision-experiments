@@ -79,7 +79,7 @@ public class AggregatedValueSampler implements Callable<Void> {
       final SamplingConfig config = new SamplingConfig(vms, "Test", false);
       StatisticsConfig statisticsConfig = new StatisticsConfig();
       statisticsConfig.setOutlierFactor(StatisticsConfig.DEFAULT_OUTLIER_FACTOR);
-      PrecisionComparer comparer = new PrecisionComparer(config, statisticsConfig, new PrecisionConfig(false, false, true, false, GeneratePrecisionPlot.myTypes));
+      PrecisionComparer comparer = new PrecisionComparer(config, statisticsConfig, new PrecisionConfig(false, false, true, false, 2, GeneratePrecisionPlot.myTypes));
       VMCombinationSampler sampler = new VMCombinationSampler(0, 1, comparer, config, statisticsConfig);
 
       sampler.sampleArtificialVMCombinations(versionFast, versionSlow);

@@ -59,12 +59,12 @@ public final class PrecisionFolderUtil {
       }
    }
 
-   public static void processFolderParallel(final File folder, final CreatorParallel creator) throws JAXBException, IOException, InterruptedException {
+   public static void processFolderParallel(final File folder, final CreatorParallel creator, int threads) throws JAXBException, IOException, InterruptedException {
       final File[] repetitionFolders = folder.listFiles();
       final String pattern = buildPattern("precision");
       sortFolders(repetitionFolders, pattern, "precision");
 
-      ExecutorService pool = Executors.newFixedThreadPool(2);
+      ExecutorService pool = Executors.newFixedThreadPool(threads);
 
       for (final File subfolder : repetitionFolders) {
          if (subfolder.getName().matches(pattern)) {

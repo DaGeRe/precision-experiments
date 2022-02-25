@@ -38,6 +38,9 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
    
    @Option(names = { "-printPicks", "--printPicks" }, description = "Print the picked values summaries (for debugging)")
    private boolean printPicks;
+   
+   @Option(names = { "-threads", "--threads" }, description = "Count of threads for analysis")
+   private int threads = 2;
 
    public static void main(final String[] args) {
       GeneratePeassPrecisionPlot plot = new GeneratePeassPrecisionPlot();
@@ -80,7 +83,7 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
                int maxIterations = reader.getIterations();
 
                boolean removeOutliers = true;
-               PrecisionConfig precisionConfig = new PrecisionConfig(false, false, removeOutliers, printPicks, myTypes);
+               PrecisionConfig precisionConfig = new PrecisionConfig(false, false, removeOutliers, printPicks, threads, myTypes);
                PrecisionPlotHandler handler = new PrecisionPlotHandler(testcasesV1, testcasesV2, pool, repetitions, precisionConfig, writingData);
                handler.handleAllParameters(100, maxIterations);
             }

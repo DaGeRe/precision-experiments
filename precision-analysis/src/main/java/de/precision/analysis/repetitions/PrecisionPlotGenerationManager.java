@@ -43,10 +43,10 @@ public class PrecisionPlotGenerationManager {
    private void startProcessing(final File inputFolder, final boolean hasPrecisionChild) throws JAXBException, IOException, InterruptedException {
       final WritingData writingData = new WritingData(resultFolder, precisionRecallWriter, testcaseWriters);
       if (inputFolder.getName().contains("Test") || hasPrecisionChild) {
-         PrecisionFolderUtil.processFolderParallel(inputFolder, creatorFunction(writingData));
+         PrecisionFolderUtil.processFolderParallel(inputFolder, creatorFunction(writingData), config.getThreads());
       } else {
          for (File testFolder : inputFolder.listFiles()) {
-            PrecisionFolderUtil.processFolderParallel(testFolder, creatorFunction(writingData));
+            PrecisionFolderUtil.processFolderParallel(testFolder, creatorFunction(writingData), config.getThreads());
          }
       }
    }
