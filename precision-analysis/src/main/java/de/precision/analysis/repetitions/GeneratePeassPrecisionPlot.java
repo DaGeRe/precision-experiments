@@ -39,7 +39,7 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
    private int threads = 2;
    
    @Option(names = { "-statisticalTests", "--statisticalTests" }, description = "Statistical tests that should be used (either ALL or ALL_NO_BIMODA)")
-   private StatisticalTestList statisticalTestList = StatisticalTestList.ALL_NO_BIMODAL;
+   private StatisticalTestList statisticalTestList = StatisticalTestList.ALL_NO_BIMODAL_NO_CONFIDENCE;
 
    public static void main(final String[] args) {
       GeneratePeassPrecisionPlot plot = new GeneratePeassPrecisionPlot();
@@ -82,7 +82,7 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
                int maxIterations = reader.getIterations();
 
                boolean removeOutliers = true;
-               PrecisionConfig precisionConfig = new PrecisionConfig(false, false, removeOutliers, printPicks, threads, statisticalTestList.getTests());
+               PrecisionConfig precisionConfig = new PrecisionConfig(false, removeOutliers, printPicks, threads, statisticalTestList.getTests());
                PrecisionPlotHandler handler = new PrecisionPlotHandler(testcasesV1, testcasesV2, pool, repetitions, precisionConfig, writingData);
                handler.handleAllParameters(100, maxIterations);
             }

@@ -76,11 +76,11 @@ public class AggregatedValueSampler implements Callable<Void> {
    private void executeSampling(final TestcaseType versionSlow, final TestcaseType versionFast, final Testcases testclazz, final PrintStream out, final int vms) throws FileNotFoundException {
       System.setOut(new PrintStream(new File("results", "vals_" + vms + ".csv")));
 
-      final SamplingConfig config = new SamplingConfig(vms, "Test", false);
+      final SamplingConfig config = new SamplingConfig(vms, "Test");
       StatisticsConfig statisticsConfig = new StatisticsConfig();
       statisticsConfig.setOutlierFactor(StatisticsConfig.DEFAULT_OUTLIER_FACTOR);
-      PrecisionConfig precisionConfig = new PrecisionConfig(false, false, true, false, 2, StatisticalTestList.ALL.getTests());
-      PrecisionComparer comparer = new PrecisionComparer(config, statisticsConfig, precisionConfig);
+      PrecisionConfig precisionConfig = new PrecisionConfig(false, true, false, 2, StatisticalTestList.ALL.getTests());
+      PrecisionComparer comparer = new PrecisionComparer(statisticsConfig, precisionConfig);
       VMCombinationSampler sampler = new VMCombinationSampler(0, 1, comparer, config, statisticsConfig);
 
       sampler.sampleArtificialVMCombinations(versionFast, versionSlow);
@@ -92,7 +92,7 @@ public class AggregatedValueSampler implements Callable<Void> {
             + comparer.getTestcaseResults().get("Test").getResults().get(StatisticalTests.TTEST2));
 
       try {
-         new PrecisionWriter(comparer, new ExecutionData(vms, 5, 5, 10)).writeTestcase(precisionRecallWriter, comparer.getOverallResults().getResults().entrySet());
+         new PrecisionWriter(comparer, new ExecutionData(vms, 5, 5, 10)).writeTestcase(precisionRecallWriter, comparer.getOverallResults().getResults());
       } catch (IOException e) {
          e.printStackTrace();
       }

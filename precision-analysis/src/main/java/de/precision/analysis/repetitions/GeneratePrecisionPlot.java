@@ -28,9 +28,6 @@ public class GeneratePrecisionPlot implements Callable<Void> {
    @Option(names = { "-only100k", "--only100k" }, description = "Only analyse 100.000 repetitions - for test comparison")
    private boolean only100k = false;
    
-   @Option(names = { "-useConfidence", "--useConfidence" }, description = "Use confidence-interval-test (time-consuming, off by default)")
-   private boolean useConfidence = false;
-   
    @Option(names = { "-data", "--data" }, description = "Data-Folder for analysis", required = true)
    private String[] data;
    
@@ -41,7 +38,7 @@ public class GeneratePrecisionPlot implements Callable<Void> {
    private int threads = 2;
    
    @Option(names = { "-statisticalTests", "--statisticalTests" }, description = "Statistical tests that should be used (either ALL or ALL_NO_BIMODA)")
-   private StatisticalTestList statisticalTestList = StatisticalTestList.ALL_NO_BIMODAL;
+   private StatisticalTestList statisticalTestList = StatisticalTestList.ALL_NO_BIMODAL_NO_CONFIDENCE;
    
    public static void main(final String[] args) throws JAXBException, IOException, InterruptedException {
       // System.setOut(new PrintStream(new File("/dev/null")));
@@ -64,8 +61,8 @@ public class GeneratePrecisionPlot implements Callable<Void> {
 
    @Override
    public Void call() throws Exception {
-      createTasks(data, new PrecisionConfig(useConfidence, only100k, false, printPicks, threads, statisticalTestList.getTests()), "results_noOutlierRemoval");
-      createTasks(data, new PrecisionConfig(useConfidence, only100k, true, printPicks, threads, statisticalTestList.getTests()), "results_outlierRemoval");
+      createTasks(data, new PrecisionConfig(only100k, false, printPicks, threads, statisticalTestList.getTests()), "results_noOutlierRemoval");
+      createTasks(data, new PrecisionConfig(only100k, true, printPicks, threads, statisticalTestList.getTests()), "results_outlierRemoval");
 
       SingleFileGenerator.createSingleFiles(data);
       return null;

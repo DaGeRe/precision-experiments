@@ -12,20 +12,17 @@ import org.apache.logging.log4j.Logger;
 import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
-import de.precision.processing.repetitions.sampling.SamplingConfig;
 
 public class PrecisionComparer {
 
    private static final Logger LOG = LogManager.getLogger(PrecisionComparer.class);
 
    private final PrecisionConfig precisionConfig;
-   private final SamplingConfig config;
    private final MethodResult overallResults;
    private final Map<String, MethodResult> testcaseResults = new HashMap<>();
    private final StatisticsConfig statisticsConfig;
 
-   public PrecisionComparer(final SamplingConfig config, final StatisticsConfig statisticsConfig, PrecisionConfig precisionConfig) {
-      this.config = config;
+   public PrecisionComparer(final StatisticsConfig statisticsConfig, PrecisionConfig precisionConfig) {
       this.statisticsConfig = statisticsConfig;
       this.precisionConfig = precisionConfig;
       overallResults = new MethodResult(precisionConfig.getTypes());
@@ -48,7 +45,7 @@ public class PrecisionComparer {
          TestExecutors.getTTestRelationBimodal(relations, data, statisticsConfig);
       }
 
-      if (config.isUseConfidenceInterval()) {
+      if (Arrays.asList(precisionConfig.getTypes()).contains(StatisticalTests.CONFIDENCE)) {
          TestExecutors.getConfidenceRelation(data, relations);
       }
 

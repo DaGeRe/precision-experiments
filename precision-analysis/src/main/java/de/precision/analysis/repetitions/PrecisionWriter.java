@@ -6,24 +6,21 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import de.precision.processing.ProcessConstants;
 
 public class PrecisionWriter {
-   
+
    private static final DecimalFormat df = new DecimalFormat("00.00", DecimalFormatSymbols.getInstance(Locale.US));
-   
+
    private final PrecisionComparer comparer;
    private final ExecutionData executionData;
-   
-   
+
    public PrecisionWriter(final PrecisionComparer comparer, final ExecutionData executionData) {
       this.comparer = comparer;
       this.executionData = executionData;
    }
-   
+
    public static void writeHeader(final BufferedWriter writer, final String[] types) throws IOException {
       writer.write("repetitions" + ProcessConstants.DATAFILE_SEPARATOR +
             "vms" + ProcessConstants.DATAFILE_SEPARATOR +
@@ -38,7 +35,7 @@ public class PrecisionWriter {
       writer.flush();
    }
 
-   public void writeTestcase(final BufferedWriter testcaseWriter, final Set<Entry<String, Map<String, Integer>>> statisticMethodResults) throws IOException {
+   public void writeTestcase(final BufferedWriter testcaseWriter, final Map<String, Map<String, Integer>> statisticMethodResults) throws IOException {
       synchronized (testcaseWriter) {
          testcaseWriter.write(executionData.getRepetitions() + ProcessConstants.DATAFILE_SEPARATOR +
                executionData.getVms() + ProcessConstants.DATAFILE_SEPARATOR +
@@ -46,27 +43,37 @@ public class PrecisionWriter {
                executionData.getWarmup() + ProcessConstants.DATAFILE_SEPARATOR +
                executionData.getOverhead() + ProcessConstants.DATAFILE_SEPARATOR +
                executionData.getDuration() + ProcessConstants.DATAFILE_SEPARATOR);
-         for (final Map.Entry<String, Map<String, Integer>> methodResult : statisticMethodResults) {
-            writeData(methodResult, testcaseWriter);
+         for (String statisticalTest : StatisticalTestList.ALL.getTests()) {
+            Map<String, Integer> methodResult = statisticMethodResults.get(statisticalTest);
+            writeData(statisticalTest, methodResult, testcaseWriter);
          }
+         // for (final Map.Entry<String, Map<String, Integer>> methodResult : statisticMethodResults) {
+         // writeData(methodResult, testcaseWriter);
+         // }
          testcaseWriter.write("\n");
          testcaseWriter.flush();
       }
    }
-   
-   private void writeData(final Map.Entry<String, Map<String, Integer>> methodResult, final BufferedWriter writer) throws IOException {
 
-      final int selected = methodResult.getValue().get(MethodResult.SELECTED);
-      // final int truepositive = methodResult.getValue().get(MethodResult.TRUEPOSITIVE);
-      // final int falsenegative = methodResult.getValue().get(MethodResult.FALSENEGATIVE);
-      final int wronggreater = methodResult.getValue().get(MethodResult.WRONGGREATER);
-      final double precision = comparer.getPrecision(methodResult.getKey());
-      final double recall = comparer.getRecall(methodResult.getKey());
-      final double fscore = comparer.getFScore(methodResult.getKey());
-      final double wrongGreaterSelectionRate = (selected > 0) ? ((double) wronggreater) / selected : 0;
-      writer.write(df.format(precision) + ProcessConstants.DATAFILE_SEPARATOR +
-            df.format(recall) + ProcessConstants.DATAFILE_SEPARATOR +
-            df.format(fscore) + ProcessConstants.DATAFILE_SEPARATOR +
-            df.format(wrongGreaterSelectionRate) + ProcessConstants.DATAFILE_SEPARATOR);
+   private void writeData(String staticalMethod, final Map<String, Integer> methodResult, final BufferedWriter writer) throws IOException {
+
+      if (methodResult != null) {
+         final int selected = methodResult.get(MethodResult.SELECTED);
+         final int wronggreater = methodResult.get(MethodResult.WRONGGREATER);
+         final double precision = comparer.getPrecision(staticalMethod);
+         final double recall = comparer.getRecall(staticalMethod);
+         final double fscore = comparer.getFScore(staticalMethod);
+         final double wrongGreaterSelectionRate = (selected > 0) ? ((double) wronggreater) / selected : 0;
+         writer.write(df.format(precision) + ProcessConstants.DATAFILE_SEPARATOR +
+               df.format(recall) + ProcessConstants.DATAFILE_SEPARATOR +
+               df.format(fscore) + ProcessConstants.DATAFILE_SEPARATOR +
+               df.format(wrongGreaterSelectionRate) + ProcessConstants.DATAFILE_SEPARATOR);
+      } else {
+         writer.write(0.0 + ProcessConstants.DATAFILE_SEPARATOR +
+               0.0 + ProcessConstants.DATAFILE_SEPARATOR +
+               0.0 + ProcessConstants.DATAFILE_SEPARATOR +
+               0.0 + ProcessConstants.DATAFILE_SEPARATOR);
+      }
+
    }
 }

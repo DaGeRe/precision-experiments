@@ -2,7 +2,8 @@ package de.precision.analysis.repetitions;
 
 public enum StatisticalTestList {
    ALL(new String[] { StatisticalTests.MEAN, StatisticalTests.TTEST, StatisticalTests.TTEST2, StatisticalTests.CONFIDENCE, StatisticalTests.MANNWHITNEY }), 
-      ALL_NO_BIMODAL(new String[] { StatisticalTests.MEAN, StatisticalTests.TTEST, StatisticalTests.CONFIDENCE, StatisticalTests.MANNWHITNEY });
+      ALL_NO_BIMODAL(new String[] { StatisticalTests.MEAN, StatisticalTests.TTEST, StatisticalTests.CONFIDENCE, StatisticalTests.MANNWHITNEY }),
+      ALL_NO_BIMODAL_NO_CONFIDENCE(new String[] { StatisticalTests.MEAN, StatisticalTests.TTEST, StatisticalTests.MANNWHITNEY });
 
    private String[] tests;
 
