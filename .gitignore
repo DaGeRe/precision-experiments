@@ -38,3 +38,8 @@ cpu-cycles/*.swp
 cpu-cycles/java/Main.class
 jmh-test/scripts/comparison_sizes.pdf
 jmh-test/scripts/averages/
+
+# Do not save result data
+precision-analysis/scripts/icsoft/outlier_AddTest_basic-parameter-comparison/
+precision-analysis/scripts/icsoft/parallel_AddTest_results_outlierRemoval/
+precision-analysis/scripts/icsoft/repetitionHeatmap/
