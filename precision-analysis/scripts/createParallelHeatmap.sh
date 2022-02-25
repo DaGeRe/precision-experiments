@@ -32,25 +32,25 @@ mkdir -p $base
 cd $1
 
 mkdir -p $start/$base/bimodal/
-for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#")
+for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
 do
-        echo "Creating heatmap for $repetitions repetitions"
+	echo "Creating heatmap for $repetitions repetitions"
 	getHeatmapData 13 $start/$base/sequential_$repetitions.csv $repetitions
 	getHeatmapData 17 $start/$base/bimodal/sequential_$repetitions.csv $repetitions
 done
 
 cd $2
-for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#")
+for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
 do
-        echo "Creating heatmap for $repetitions repetitions"
+	echo "Creating heatmap for $repetitions repetitions"
 	getHeatmapData 13 $start/$base/parallel_$repetitions.csv $repetitions
 	getHeatmapData 17 $start/$base/bimodal/parallel_$repetitions.csv $repetitions
 done
 
 cd $3
-for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#")
+for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
 do
-        echo "Creating heatmap for $repetitions repetitions"
+	echo "Creating heatmap for $repetitions repetitions"
 	getHeatmapData 13 $start/$base/noise_$repetitions.csv $repetitions
 	getHeatmapData 17 $start/$base/bimodal/noise_$repetitions.csv $repetitions
 done

@@ -16,22 +16,22 @@ set cblabel 'F1-Ma{\337}'
 
 unset colorbox
 
-set yrange [0:500]
+set yrange [0:50]
 set title 'Sequentiell'
-plot 'sequential_10000.csv' u 1:2:3 with image notitle
+plot 'sequential_100000.csv' u 1:2:3 with image notitle
 
 unset ylabel
 unset ytics
 
-set yrange [0:500]
+set yrange [0:50]
 set title 'Parallel'
-plot 'parallel_10000.csv' u 1:2:3 with image notitle
+plot 'parallel_100000.csv' u 1:2:3 with image notitle
 
 set colorbox
 
-set yrange [0:500]
+set yrange [0:50]
 set title 'Mit St{\366}rung'
-plot 'noise_10000.csv' u 1:2:3 with image notitle
+plot 'noise_100000.csv' u 1:2:3 with image notitle
 
 unset multiplot
 unset output
