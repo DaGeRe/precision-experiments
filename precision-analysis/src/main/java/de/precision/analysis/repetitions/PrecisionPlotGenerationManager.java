@@ -28,7 +28,7 @@ public class PrecisionPlotGenerationManager {
    }
 
    void handleFolder(final File inputFolder) throws IOException, JAXBException, InterruptedException {
-      PrecisionWriter.writeHeader(precisionRecallWriter, config.getTypes());
+      PrecisionWriter.writeHeader(precisionRecallWriter, StatisticalTestList.ALL.getTests());
 
       boolean hasPrecisionChild = false;
       for (File child : inputFolder.listFiles()) {
