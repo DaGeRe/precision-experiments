@@ -79,16 +79,17 @@ public class AggregatedValueSampler implements Callable<Void> {
       final SamplingConfig config = new SamplingConfig(vms, "Test", false);
       StatisticsConfig statisticsConfig = new StatisticsConfig();
       statisticsConfig.setOutlierFactor(StatisticsConfig.DEFAULT_OUTLIER_FACTOR);
-      PrecisionComparer comparer = new PrecisionComparer(config, statisticsConfig, new PrecisionConfig(false, false, true, false, 2, GeneratePrecisionPlot.myTypes));
+      PrecisionConfig precisionConfig = new PrecisionConfig(false, false, true, false, 2, StatisticalTestList.ALL.getTests());
+      PrecisionComparer comparer = new PrecisionComparer(config, statisticsConfig, precisionConfig);
       VMCombinationSampler sampler = new VMCombinationSampler(0, 1, comparer, config, statisticsConfig);
 
       sampler.sampleArtificialVMCombinations(versionFast, versionSlow);
 
       System.setOut(out);
 
-      System.out.println(vms + " " + comparer.getPrecision(GeneratePrecisionPlot.TTEST2)
-            + " " + comparer.getRecall(GeneratePrecisionPlot.TTEST2)
-            + comparer.getTestcaseResults().get("Test").getResults().get(GeneratePrecisionPlot.TTEST2));
+      System.out.println(vms + " " + comparer.getPrecision(StatisticalTests.TTEST2)
+            + " " + comparer.getRecall(StatisticalTests.TTEST2)
+            + comparer.getTestcaseResults().get("Test").getResults().get(StatisticalTests.TTEST2));
 
       try {
          new PrecisionWriter(comparer, new ExecutionData(vms, 5, 5, 10)).writeTestcase(precisionRecallWriter, comparer.getOverallResults().getResults().entrySet());

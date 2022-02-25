@@ -25,10 +25,6 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
 
    private static final Logger LOG = LogManager.getLogger(GeneratePeassPrecisionPlot.class);
    
-   private final static String[] myTypes = new String[] { GeneratePrecisionPlot.MEAN, 
-         GeneratePrecisionPlot.TTEST, 
-         GeneratePrecisionPlot.CONFIDENCE, 
-         GeneratePrecisionPlot.MANNWHITNEY };
 
    @Option(names = { "-data", "--data" }, description = "Data-Folder for analysis", required = true)
    private File[] data;
@@ -41,6 +37,9 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
    
    @Option(names = { "-threads", "--threads" }, description = "Count of threads for analysis")
    private int threads = 2;
+   
+   @Option(names = { "-statisticalTests", "--statisticalTests" }, description = "Statistical tests that should be used (either ALL or ALL_NO_BIMODA)")
+   private StatisticalTestList statisticalTestList = StatisticalTestList.ALL_NO_BIMODAL;
 
    public static void main(final String[] args) {
       GeneratePeassPrecisionPlot plot = new GeneratePeassPrecisionPlot();
@@ -70,7 +69,7 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
          File resultFolder = new File(testclazzFile, "results");
          resultFolder.mkdir();
          BufferedWriter precisionRecallWriter = new BufferedWriter(new FileWriter(new File(resultFolder, "precision.csv")));
-         PrecisionWriter.writeHeader(precisionRecallWriter, myTypes);
+         PrecisionWriter.writeHeader(precisionRecallWriter, StatisticalTestList.ALL.getTests());
          WritingData writingData = new WritingData(resultFolder, precisionRecallWriter, testcaseWriters);
          for (File versionFile : testclazzFile.listFiles()) {
             if (!versionFile.getName().equals("results")) {
@@ -83,7 +82,7 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
                int maxIterations = reader.getIterations();
 
                boolean removeOutliers = true;
-               PrecisionConfig precisionConfig = new PrecisionConfig(false, false, removeOutliers, printPicks, threads, myTypes);
+               PrecisionConfig precisionConfig = new PrecisionConfig(false, false, removeOutliers, printPicks, threads, statisticalTestList.getTests());
                PrecisionPlotHandler handler = new PrecisionPlotHandler(testcasesV1, testcasesV2, pool, repetitions, precisionConfig, writingData);
                handler.handleAllParameters(100, maxIterations);
             }

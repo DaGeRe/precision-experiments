@@ -26,12 +26,12 @@ public class TestExecutors {
    public static void getMeanRelation(final Map<String, Relation> relations, final CompareData data) {
       final double minChange = 0.997;
       if (data.getAvgBefore() < data.getAvgAfter() * minChange) {
-         relations.put(GeneratePrecisionPlot.MEAN, Relation.LESS_THAN);
+         relations.put(StatisticalTests.MEAN, Relation.LESS_THAN);
       } else {
          if (data.getAvgAfter() * 0.99 > data.getAvgBefore()) {
-            relations.put(GeneratePrecisionPlot.MEAN, Relation.GREATER_THAN);
+            relations.put(StatisticalTests.MEAN, Relation.GREATER_THAN);
          } else {
-            relations.put(GeneratePrecisionPlot.MEAN, Relation.EQUAL);
+            relations.put(StatisticalTests.MEAN, Relation.EQUAL);
          }
       }
    }
@@ -40,9 +40,9 @@ public class TestExecutors {
       final boolean tchange = new TTest().homoscedasticTTest(data.getBefore(), data.getAfter(), config.getType1error());
       // final boolean tchange = new TTest().homoscedasticTTest(values.get(0), values.get(1), 0.01);
       if (tchange) {
-         relations.put(GeneratePrecisionPlot.TTEST, data.getAvgBefore() < data.getAvgAfter() ? Relation.LESS_THAN : Relation.GREATER_THAN);
+         relations.put(StatisticalTests.TTEST, data.getAvgBefore() < data.getAvgAfter() ? Relation.LESS_THAN : Relation.GREATER_THAN);
       } else {
-         relations.put(GeneratePrecisionPlot.TTEST, Relation.EQUAL);
+         relations.put(StatisticalTests.TTEST, Relation.EQUAL);
       }
       return tchange;
    }
@@ -52,9 +52,9 @@ public class TestExecutors {
       final boolean tchange = tester.isTChange(statisticsConfig.getType1error());
       if (tchange) {
          final Relation relation = tester.getRelation();
-         relations.put(GeneratePrecisionPlot.TTEST2, relation);
+         relations.put(StatisticalTests.TTEST2, relation);
       } else {
-         relations.put(GeneratePrecisionPlot.TTEST2, Relation.EQUAL);
+         relations.put(StatisticalTests.TTEST2, Relation.EQUAL);
       }
       return tchange;
    }
@@ -75,15 +75,15 @@ public class TestExecutors {
       LOG.trace(statistic);
       final boolean mannchange = statistic < config.getType1error(); // 2.33 - critical value for confidence level 0.99
       if (mannchange) {
-         relations.put(GeneratePrecisionPlot.MANNWHITNEY, data.getAvgBefore() < data.getAvgAfter() ? Relation.LESS_THAN : Relation.GREATER_THAN);
+         relations.put(StatisticalTests.MANNWHITNEY, data.getAvgBefore() < data.getAvgAfter() ? Relation.LESS_THAN : Relation.GREATER_THAN);
       } else {
-         relations.put(GeneratePrecisionPlot.MANNWHITNEY, Relation.EQUAL);
+         relations.put(StatisticalTests.MANNWHITNEY, Relation.EQUAL);
       }
    }
 
    public static void getConfidenceRelation(final CompareData cd, final Map<String, Relation> relations) {
       final Relation confidence = ConfidenceIntervalInterpretion.compare(cd, 90);
-      relations.put(GeneratePrecisionPlot.CONFIDENCE, confidence);
+      relations.put(StatisticalTests.CONFIDENCE, confidence);
       LOG.trace("Confidence: " + confidence);
    }
 }

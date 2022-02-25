@@ -44,10 +44,9 @@ public class PrecisionComparer {
                + " " + data.getBefore().length + " " + data.getAfter().length);
       }
 
-      if (Arrays.asList(precisionConfig.getTypes()).contains(GeneratePrecisionPlot.TTEST2)) {
+      if (Arrays.asList(precisionConfig.getTypes()).contains(StatisticalTests.TTEST2)) {
          TestExecutors.getTTestRelationBimodal(relations, data, statisticsConfig);
       }
-      
 
       if (config.isUseConfidenceInterval()) {
          TestExecutors.getConfidenceRelation(data, relations);

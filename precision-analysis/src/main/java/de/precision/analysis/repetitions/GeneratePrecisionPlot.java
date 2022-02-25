@@ -22,13 +22,6 @@ import picocli.CommandLine.Option;
  */
 public class GeneratePrecisionPlot implements Callable<Void> {
    
-   public static final String MEAN = "MEAN";
-   public static final String TTEST = "TTEST";
-   public static final String TTEST2 = "TTEST2";
-   public static final String CONFIDENCE = "CONFIDENCE";
-   public static final String MANNWHITNEY = "MANNWHITNEY";
-
-   final static String[] myTypes = new String[] { MEAN, TTEST, TTEST2, CONFIDENCE, MANNWHITNEY };
 
    private static final Logger LOG = LogManager.getLogger(GeneratePrecisionPlot.class);
 
@@ -46,6 +39,9 @@ public class GeneratePrecisionPlot implements Callable<Void> {
    
    @Option(names = { "-threads", "--threads" }, description = "Count of threads for analysis")
    private int threads = 2;
+   
+   @Option(names = { "-statisticalTests", "--statisticalTests" }, description = "Statistical tests that should be used (either ALL or ALL_NO_BIMODA)")
+   private StatisticalTestList statisticalTestList = StatisticalTestList.ALL_NO_BIMODAL;
    
    public static void main(final String[] args) throws JAXBException, IOException, InterruptedException {
       // System.setOut(new PrintStream(new File("/dev/null")));
@@ -68,8 +64,8 @@ public class GeneratePrecisionPlot implements Callable<Void> {
 
    @Override
    public Void call() throws Exception {
-      createTasks(data, new PrecisionConfig(useConfidence, only100k, false, printPicks, threads, myTypes), "results_noOutlierRemoval");
-      createTasks(data, new PrecisionConfig(useConfidence, only100k, true, printPicks, threads, myTypes), "results_outlierRemoval");
+      createTasks(data, new PrecisionConfig(useConfidence, only100k, false, printPicks, threads, statisticalTestList.getTests()), "results_noOutlierRemoval");
+      createTasks(data, new PrecisionConfig(useConfidence, only100k, true, printPicks, threads, statisticalTestList.getTests()), "results_outlierRemoval");
 
       SingleFileGenerator.createSingleFiles(data);
       return null;
