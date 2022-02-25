@@ -16,7 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Since heatmaps are
+ * Since heatmaps are created for one test case, this provides the option to merge them
  * 
  * @author DaGeRe
  *
