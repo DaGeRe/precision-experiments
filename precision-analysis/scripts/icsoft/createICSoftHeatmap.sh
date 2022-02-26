@@ -55,43 +55,9 @@ function createParallelNonParallelHeatmap {
 }
 
 function createOutlierRemovalHeatmap {
-	outlierRemoval=$1/results_outlierRemoval
-	noOutlierRemvoal=$1/results_noOutlierRemoval
-	
 	start=$(pwd)
-
-	test=$(echo $1 | awk -F'/' '{print $(NF-1)}')
-	base=$(basename $1)
-
-	base="outlier_"$base"_"$test
-
-	type=$(echo $base | awk -F'_' '{print $2}')
-
-	echo "Basefolder: $base Test: $test"
-
-	mkdir -p $base
-
-	cd $outlierRemoval
-	mkdir -p $start/$base/bimodal/
-	for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
-	do
-		echo "Creating heatmap for $repetitions repetitions"
-		getHeatmapData 13 $start/$base/noOutlierRemoval_$repetitions.csv $repetitions
-	done
-
-	cd $noOutlierRemvoal
-	for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
-	do
-		echo "Creating heatmap for $repetitions repetitions"
-		getHeatmapData 13 $start/$base/outlierRemoval_$repetitions.csv $repetitions
-	done
-
-	cd $start/$base
+	cd repetitionHeatmap
 	gnuplot -c $start/plotOutlierRemovalHeatmap.plt
-
-	mv heatmap_outlierRemoval_de.pdf "$test"_heatmap_outlierRemoval_de.pdf
-	mv heatmap_outlierRemoval_en.pdf "$test"_heatmap_outlierRemoval_en.pdf
-	
 	cd $start
 }
 
@@ -103,8 +69,16 @@ function createRepetitionHeatmaps {
 		cd $1/$testcase/results_noOutlierRemoval
 		for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
 		do
-			echo "Creating heatmap for $repetitions repetitions"
+			echo "Creating heatmap for $repetitions repetitions $testcase"
 			getHeatmapData 13 $start/repetitionHeatmap/noOutlierRemoval_"$testcase"_"$repetitions".csv $repetitions
+		done
+		cd $start
+		
+		cd $1/$testcase/results_outlierRemoval
+		for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
+		do
+			echo "Creating heatmap for $repetitions repetitions $testcase"
+			getHeatmapData 13 $start/repetitionHeatmap/outlierRemoval_"$testcase"_"$repetitions".csv $repetitions
 		done
 		cd $start
 	done
@@ -112,16 +86,22 @@ function createRepetitionHeatmaps {
 
 function createMergedHeatmaps {
 	start=$(pwd)
+	cd repetitionHeatmap
 	for size in 100 1000 10000 100000 1000000
 	do
-		cd repetitionHeatmap
 		heatmapFiles=$(ls noOutlierRemoval_*_"$size.csv")
 		echo $heatmapFiles
 		java -cp ../../../build/libs/precision-analysis-all-2.13.jar \
 			de.precision.analysis.heatmap.MergeHeatmaps \
 			noOutlierRemoval_*_"$size.csv"
-		mv result.csv $size.csv
+		mv result.csv noOutlierRemoval_$size.csv
+		
+		java -cp ../../../build/libs/precision-analysis-all-2.13.jar \
+			de.precision.analysis.heatmap.MergeHeatmaps \
+			outlierRemoval_*_"$size.csv"
+		mv result.csv outlierRemoval_$size.csv
 	done
+	
 	cd $start
 }
 
@@ -131,17 +111,23 @@ then
 	exit 1
 fi
 
+start=$(pwd)
+
+echo "--- Creating parallel / non parallel heatmap"
 createParallelNonParallelHeatmap $1/results_outlierRemoval/AddTest $2/results_outlierRemoval/AddTest
 
-createOutlierRemovalHeatmap $1/AddTest
-
+echo "--- Create repetition heatmap"
 createRepetitionHeatmaps $1
 createMergedHeatmaps
 
+echo "--- Creating outlier removal heatmap"
+createOutlierRemovalHeatmap
+
+echo "--- Creating all heatmap"
 cd repetitionHeatmap
 gnuplot -c ../../plotAllHeatmap.plt
 
-start=$(pwd)
+echo "--- Creating histogram"
 cd $1/AddTest/results_noOutlierRemoval
 gnuplot -c $start/plotOutlierHistogram.plt
 mv histogram_outliers_en.pdf $start
