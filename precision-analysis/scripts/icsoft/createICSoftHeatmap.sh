@@ -140,3 +140,8 @@ createMergedHeatmaps
 
 cd repetitionHeatmap
 gnuplot -c ../../plotAllHeatmap.plt
+
+start=$(pwd)
+cd $1/AddTest/results_noOutlierRemoval
+gnuplot -c $start/plotOutlierHistogram.plt
+mv histogram_outliers_en.pdf $start
