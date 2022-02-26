@@ -47,9 +47,6 @@ public class PrecisionWriter {
             Map<String, Integer> methodResult = statisticMethodResults.get(statisticalTest);
             writeData(statisticalTest, methodResult, testcaseWriter);
          }
-         // for (final Map.Entry<String, Map<String, Integer>> methodResult : statisticMethodResults) {
-         // writeData(methodResult, testcaseWriter);
-         // }
          testcaseWriter.write("\n");
          testcaseWriter.flush();
       }

@@ -41,7 +41,6 @@ public class GeneratePrecisionPlot implements Callable<Void> {
    private StatisticalTestList statisticalTestList = StatisticalTestList.ALL_NO_BIMODAL_NO_CONFIDENCE;
    
    public static void main(final String[] args) throws JAXBException, IOException, InterruptedException {
-      // System.setOut(new PrintStream(new File("/dev/null")));
       Configurator.setLevel("de.peass.measurement.analysis.statistics.ConfidenceIntervalInterpretion", Level.INFO);
 
       final GeneratePrecisionPlot command = new GeneratePrecisionPlot();
