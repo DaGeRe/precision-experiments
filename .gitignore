@@ -43,3 +43,7 @@ jmh-test/scripts/averages/
 precision-analysis/scripts/icsoft/outlier_AddTest_basic-parameter-comparison/
 precision-analysis/scripts/icsoft/parallel_AddTest_results_outlierRemoval/
 precision-analysis/scripts/icsoft/repetitionHeatmap/
+precision-analysis/scripts/icsoft/histogram_outliers_en.pdf
+precision-analysis/AddTest_analysis.txt
+precision-analysis/RAMTest_analysis.txt
+precision-analysis/SysoutTest_analysis.txt
