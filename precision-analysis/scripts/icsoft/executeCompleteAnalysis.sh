@@ -3,6 +3,7 @@ function extractAll {
 	cd $1
 	for file in AddTest RAMTest SysoutTest
 	do
+		echo "Extracting data from $file"
 		cd $file
 		for repetitionCount in 100 1000 10000 100000 1000000
 		do
@@ -20,6 +21,7 @@ function extractAll {
 function analyze {
 	start=$(pwd)
 	cd $1
+	echo "Starting analysis (will take at least 30 minutes)"
 	for file in AddTest RAMTest SysoutTest
 	do
 		echo "Analyzing $file"
