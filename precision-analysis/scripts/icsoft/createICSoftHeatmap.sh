@@ -92,6 +92,7 @@ createOutlierRemovalHeatmap
 echo "--- Creating all heatmap"
 cd repetitionHeatmaps
 gnuplot -c ../../plotAllHeatmap.plt
+cd $start
 
 echo "--- Creating histogram"
 cd $1/AddTest/results_noOutlierRemoval

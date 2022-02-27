@@ -1,3 +1,7 @@
+bin(x,width)=width*floor(x/width) + width/2.0
+binwidth=5
+set boxwidth binwidth
+
 set encoding iso_8859_1
 set terminal pdf size 5,2
 
