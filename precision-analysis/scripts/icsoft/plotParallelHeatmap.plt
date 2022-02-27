@@ -17,11 +17,11 @@ set cblabel 'F1-Ma{\337}'
 
 set yrange [0:50]
 set title 'Sequentiell'
-plot 'sequential_100000.csv' u 1:2:3 with image notitle
+plot 'repetitionHeatmaps/noOutlierRemoval_100000.csv' u 1:2:3 with image notitle
 
 set yrange [0:50]
 set title 'Parallel'
-plot 'parallel_100000.csv' u 1:2:3 with image notitle
+plot 'repetitionHeatmapsParallel/noOutlierRemoval_100000.csv' u 1:2:3 with image notitle
 
 unset multiplot
 unset output
@@ -44,11 +44,11 @@ set cblabel 'F1-Score'
 
 set yrange [0:50]
 set title 'Sequential'
-plot 'sequential_100000.csv' u 1:2:3 with image notitle
+plot 'repetitionHeatmaps/noOutlierRemoval_100000.csv' u 1:2:3 with image notitle
 
 set yrange [0:50]
 set title 'Parallel'
-plot 'parallel_100000.csv' u 1:2:3 with image notitle
+plot 'repetitionHeatmapsParallel/noOutlierRemoval_100000.csv' u 1:2:3 with image notitle
 
 unset multiplot
 unset output

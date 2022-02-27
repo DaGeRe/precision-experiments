@@ -10,96 +10,60 @@ function getHeatmapData {
 		> $outname
 }
 
-function createParallelNonParallelHeatmap {
-	sequentialFolder=$1
-	parallelFolder=$2
-
-	start=$(pwd)
-
-	test=$(echo $1 | awk -F'/' '{print $(NF-1)}')
-	base=$(basename $1)
-
-	base="parallel_"$base"_"$test
-
-	type=$(echo $base | awk -F'_' '{print $2}')
-
-	echo "Basefolder: $base Test: $test"
-
-	mkdir -p $base
-
-	cd $sequentialFolder
-
-	mkdir -p $start/$base/bimodal/
-	for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
-	do
-		echo "Creating heatmap for $repetitions repetitions"
-		getHeatmapData 13 $start/$base/sequential_$repetitions.csv $repetitions
-		getHeatmapData 17 $start/$base/bimodal/sequential_$repetitions.csv $repetitions
-	done
-
-	cd $parallelFolder
-	for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
-	do
-		echo "Creating heatmap for $repetitions repetitions"
-		getHeatmapData 13 $start/$base/parallel_$repetitions.csv $repetitions
-		getHeatmapData 17 $start/$base/bimodal/parallel_$repetitions.csv $repetitions
-	done
-
-	cd $start/$base
-	gnuplot -c $start/plotParallelHeatmap.plt
-
-	mv heatmap_parallel_de.pdf "$test"_heatmap_parallel_de.pdf
-	mv heatmap_parallel_en.pdf "$test"_heatmap_parallel_en.pdf
-	
-	cd $start
-}
-
 function createOutlierRemovalHeatmap {
 	start=$(pwd)
-	cd repetitionHeatmap
+	cd repetitionHeatmaps
 	gnuplot -c $start/plotOutlierRemovalHeatmap.plt
 	cd $start
 }
 
 function createRepetitionHeatmaps {
+	sourceFolder=$1
+	goalFolder=$2
 	start=$(pwd)
-	mkdir repetitionHeatmap
+	
+	mkdir $goalFolder
 	for testcase in AddTest RAMTest SysoutTest
 	do
-		cd $1/$testcase/results_noOutlierRemoval
+		cd $sourceFolder/$testcase/results_noOutlierRemoval
 		for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
 		do
 			echo "Creating heatmap for $repetitions repetitions $testcase"
-			getHeatmapData 13 $start/repetitionHeatmap/noOutlierRemoval_"$testcase"_"$repetitions".csv $repetitions
+			getHeatmapData 13 $start/$goalFolder/noOutlierRemoval_"$testcase"_"$repetitions".csv $repetitions
 		done
 		cd $start
 		
-		cd $1/$testcase/results_outlierRemoval
+		cd $sourceFolder/$testcase/results_outlierRemoval
 		for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
 		do
 			echo "Creating heatmap for $repetitions repetitions $testcase"
-			getHeatmapData 13 $start/repetitionHeatmap/outlierRemoval_"$testcase"_"$repetitions".csv $repetitions
+			getHeatmapData 13 $start/$goalFolder/outlierRemoval_"$testcase"_"$repetitions".csv $repetitions
 		done
 		cd $start
 	done
 }
 
 function createMergedHeatmaps {
+	mergeFolder=$1
 	start=$(pwd)
-	cd repetitionHeatmap
+	cd $mergeFolder
 	for size in 100 1000 10000 100000 1000000
 	do
-		heatmapFiles=$(ls noOutlierRemoval_*_"$size.csv")
-		echo $heatmapFiles
-		java -cp ../../../build/libs/precision-analysis-all-2.13.jar \
-			de.precision.analysis.heatmap.MergeHeatmaps \
-			noOutlierRemoval_*_"$size.csv"
-		mv result.csv noOutlierRemoval_$size.csv
-		
-		java -cp ../../../build/libs/precision-analysis-all-2.13.jar \
-			de.precision.analysis.heatmap.MergeHeatmaps \
-			outlierRemoval_*_"$size.csv"
-		mv result.csv outlierRemoval_$size.csv
+		heatmapFiles=( noOutlierRemoval_*_"$size.csv" )
+		if [ -f ${heatmapFiles[0]} ]
+		then
+			echo $heatmapFiles
+			
+			java -cp ../../../build/libs/precision-analysis-all-2.13.jar \
+				de.precision.analysis.heatmap.MergeHeatmaps \
+				noOutlierRemoval_*_"$size.csv"
+			mv result.csv noOutlierRemoval_$size.csv
+			
+			java -cp ../../../build/libs/precision-analysis-all-2.13.jar \
+				de.precision.analysis.heatmap.MergeHeatmaps \
+				outlierRemoval_*_"$size.csv"
+			mv result.csv outlierRemoval_$size.csv
+		fi
 	done
 	
 	cd $start
@@ -113,18 +77,20 @@ fi
 
 start=$(pwd)
 
-echo "--- Creating parallel / non parallel heatmap"
-createParallelNonParallelHeatmap $1/results_outlierRemoval/AddTest $2/results_outlierRemoval/AddTest
+echo "--- Creating basic heatmaps"
+createRepetitionHeatmaps $1 repetitionHeatmaps
+createMergedHeatmaps repetitionHeatmaps
+createRepetitionHeatmaps $2 repetitionHeatmapsParallel
+createMergedHeatmaps repetitionHeatmapsParallel
 
-echo "--- Create repetition heatmap"
-createRepetitionHeatmaps $1
-createMergedHeatmaps
+echo "--- Creating parallel / non parallel heatmap"
+gnuplot -c plotParallelHeatmap.plt
 
 echo "--- Creating outlier removal heatmap"
 createOutlierRemovalHeatmap
 
 echo "--- Creating all heatmap"
-cd repetitionHeatmap
+cd repetitionHeatmaps
 gnuplot -c ../../plotAllHeatmap.plt
 
 echo "--- Creating histogram"
