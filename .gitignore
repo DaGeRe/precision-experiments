@@ -42,7 +42,10 @@ jmh-test/scripts/averages/
 # Do not save result data
 precision-analysis/scripts/icsoft/outlier_AddTest_basic-parameter-comparison/
 precision-analysis/scripts/icsoft/parallel_AddTest_results_outlierRemoval/
-precision-analysis/scripts/icsoft/repetitionHeatmap/
+precision-analysis/scripts/icsoft/heatmap_parallel_de.pdf
+precision-analysis/scripts/icsoft/heatmap_parallel_en.pdf
+precision-analysis/scripts/icsoft/repetitionHeatmaps/
+precision-analysis/scripts/icsoft/repetitionHeatmapsParallel/
 precision-analysis/scripts/icsoft/histogram_outliers_en.pdf
 precision-analysis/AddTest_analysis.txt
 precision-analysis/RAMTest_analysis.txt
