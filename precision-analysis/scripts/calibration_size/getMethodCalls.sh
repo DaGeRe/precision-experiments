@@ -1,3 +1,11 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]
+then
+	echo "Please provide folder with trace data for determination of method call count of each test case"
+	exit 1
+fi
+
 cd $1/views_*
 for file in view_*; 
 do
