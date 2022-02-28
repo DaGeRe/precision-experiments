@@ -55,6 +55,3 @@ To start this experiment, go to `scripts` and run `./runSizeEvolution.sh $testNa
 
 Afterwards, results are in `~/.KoPeMe/sizeEvolution_"$REDIRECT"_"$testName"_"$id"`.
 
-# Funding
-
-The creation of this project was funded by Hanns-Seidel-Stiftung (https://www.hss.de/).
