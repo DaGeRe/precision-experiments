@@ -26,9 +26,10 @@ function analyze {
 	do
 		echo "Analyzing $file"
 		java -Xmx20g \
-			-cp ../precision-experiments/precision-analysis/build/libs/precision-analysis-all-2.13.jar \
+			-cp $start/../../build/libs/precision-analysis-all-2.13.jar \
 			de.precision.analysis.repetitions.GeneratePrecisionPlot \
 			-threads 16 \
+			--statisticalTests ALL_NO_BIMODAL \
 			-data $file > "$file"_analysis.txt 2>&1 &
 	done
 	wait
