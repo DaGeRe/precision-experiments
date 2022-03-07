@@ -38,6 +38,12 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
    @Option(names = { "-threads", "--threads" }, description = "Count of threads for analysis")
    private int threads = 2;
    
+   @Option(names = { "-iterationResolution", "--iterationResolution" }, description = "Resolution for iteration count analysis (by default: 50 steps for iteration count)")
+   private int iterationResolution = 50;
+
+   @Option(names = { "-vmResolution", "--vmResolution" }, description = "Resolution for VM count analysis (by default: 50 steps for VM count)")
+   private int vmResolution = 20;
+   
    @Option(names = { "-statisticalTests", "--statisticalTests" }, description = "Statistical tests that should be used (either ALL or ALL_NO_BIMODA)")
    private StatisticalTestList statisticalTestList = StatisticalTestList.ALL_NO_BIMODAL_NO_CONFIDENCE;
 
@@ -82,7 +88,7 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
                int maxIterations = reader.getIterations();
 
                boolean removeOutliers = true;
-               PrecisionConfig precisionConfig = new PrecisionConfig(false, removeOutliers, printPicks, threads, statisticalTestList.getTests());
+               PrecisionConfig precisionConfig = new PrecisionConfig(false, removeOutliers, printPicks, threads, statisticalTestList.getTests(), iterationResolution, vmResolution);
                PrecisionPlotHandler handler = new PrecisionPlotHandler(testcasesV1, testcasesV2, pool, repetitions, precisionConfig, writingData);
                handler.handleAllParameters(100, maxIterations);
             }

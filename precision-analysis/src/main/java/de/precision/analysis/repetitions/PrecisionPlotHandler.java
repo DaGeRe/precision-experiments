@@ -36,14 +36,14 @@ public class PrecisionPlotHandler {
    }
 
    public void handleAllParameters(final int maxVMs, final int maxIterations) throws JAXBException, IOException {
-      // final int maxWarmup = maxExecutions / 2;
-      final int iterationStepSize = Math.max(maxIterations / 50, 1);
+      final int iterationStepSize = Math.max(maxIterations / precisionConfig.getIterationResolution(), 1);
       LOG.debug("Step size: {}", iterationStepSize);
       // for (int warmup = 0; warmup <= maxWarmup; warmup += executionStepSize) {
       // this.warmup = warmup;
       // this.executions = maxExecutions - warmup;
       for (int iterations = iterationStepSize; iterations <= maxIterations / 2; iterations += iterationStepSize) {
-         final int vmStepSize = Math.max(1, maxVMs / 20);
+         
+         final int vmStepSize = Math.max(1, maxVMs / precisionConfig.getVmResolution());
          for (int vms = vmStepSize; vms <= maxVMs; vms += vmStepSize) {
             LOG.info("Warmup: {} Executions: {} VMs: {}", iterations, iterations, vms);
             executeVersionHandling(new ExecutionData(vms, iterations, iterations, repetitions));
