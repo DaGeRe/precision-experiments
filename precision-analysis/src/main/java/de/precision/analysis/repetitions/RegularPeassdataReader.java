@@ -40,7 +40,7 @@ public class RegularPeassdataReader {
       String testMethodName = vmRun.getName().substring(0, vmRun.getName().indexOf("_"));
       Testcases current;
       String testcaseName = testclazzFile.getName() + "#" + testMethodName;
-      if (subversionFile.getName().equals(slowVersionName)) {
+      if (!subversionFile.getName().equals(slowVersionName)) {
          current = testcasesV1.get(testcaseName);
          if (current == null) {
             current = new Testcases();
