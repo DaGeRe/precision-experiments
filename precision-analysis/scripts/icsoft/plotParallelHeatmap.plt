@@ -16,7 +16,7 @@ set cblabel 'F1-Ma{\337}'
 
 
 set yrange [0:50]
-set title 'Sequentiell'
+set title 'Sequenziell'
 plot 'repetitionHeatmaps/noOutlierRemoval_100000.csv' u 1:2:3 with image notitle
 
 set yrange [0:50]
