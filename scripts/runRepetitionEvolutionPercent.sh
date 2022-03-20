@@ -110,7 +110,7 @@ java -Xmx14g \
 	-cp ../precision-analysis/build/libs/precision-analysis-all-2.13.jar \
 	de.precision.analysis.repetitions.GeneratePrecisionPlot -data $resultfolder
 
-cat $resultfolder/results/$tests.csv | grep " $VMS "
+cat $resultfolder/results_outlierRemoval/$tests.csv | grep " $VMS "
 
 #folder_test="${tests##*.}"
 #folder="$folder_test"_"$basesize"
