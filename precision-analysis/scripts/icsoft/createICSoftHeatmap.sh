@@ -17,29 +17,53 @@ function createOutlierRemovalHeatmap {
 	cd $start
 }
 
+function getTestIndex {
+	statisticalTest=$1
+	case "$statisticalTest" in
+		"MEAN")
+			index=9
+			;;
+		"TTEST")
+			index=13
+			;;
+		"CONFIDENCE")
+			index=17
+			;;
+		"MANNWHITNEY")
+			index=21
+			;;
+	esac
+	echo $index
+}
+
 function createRepetitionHeatmaps {
 	sourceFolder=$1
 	goalFolder=$2
 	start=$(pwd)
 	
 	mkdir $goalFolder
-	for testcase in AddTest RAMTest SysoutTest
+	
+	for statisticalTest in MEAN TTEST CONFIDENCE MANNWHITNEY
 	do
-		cd $sourceFolder/$testcase/results_noOutlierRemoval
-		for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
+		index=$(getTestIndex $statisticalTest)
+		for testcase in AddTest RAMTest SysoutTest
 		do
-			echo "Creating heatmap for $repetitions repetitions $testcase"
-			getHeatmapData 13 $start/$goalFolder/noOutlierRemoval_"$testcase"_"$repetitions".csv $repetitions
+			cd $sourceFolder/$testcase/results_noOutlierRemoval
+			for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
+			do
+				echo "Creating heatmap for $repetitions repetitions $testcase $statisticalTest $index"
+				getHeatmapData $index $start/$goalFolder/noOutlierRemoval_"$testcase"_"$repetitions"_"$statisticalTest".csv $repetitions
+			done
+			cd $start
+			
+			cd $sourceFolder/$testcase/results_outlierRemoval
+			for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
+			do
+				echo "Creating heatmap for $repetitions repetitions $testcase"
+				getHeatmapData $index $start/$goalFolder/outlierRemoval_"$testcase"_"$repetitions"_"$statisticalTest".csv $repetitions
+			done
+			cd $start
 		done
-		cd $start
-		
-		cd $sourceFolder/$testcase/results_outlierRemoval
-		for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
-		do
-			echo "Creating heatmap for $repetitions repetitions $testcase"
-			getHeatmapData 13 $start/$goalFolder/outlierRemoval_"$testcase"_"$repetitions".csv $repetitions
-		done
-		cd $start
 	done
 }
 
@@ -47,23 +71,26 @@ function createMergedHeatmaps {
 	mergeFolder=$1
 	start=$(pwd)
 	cd $mergeFolder
-	for size in 100 1000 10000 100000 1000000
+	for statisticalTest in MEAN TTEST CONFIDENCE MANNWHITNEY
 	do
-		heatmapFiles=( noOutlierRemoval_*_"$size.csv" )
-		if [ -f ${heatmapFiles[0]} ]
-		then
-			echo $heatmapFiles
-			
-			java -cp ../../../build/libs/precision-analysis-all-2.13.jar \
-				de.precision.analysis.heatmap.MergeHeatmaps \
-				noOutlierRemoval_*_"$size.csv"
-			mv result.csv noOutlierRemoval_$size.csv
-			
-			java -cp ../../../build/libs/precision-analysis-all-2.13.jar \
-				de.precision.analysis.heatmap.MergeHeatmaps \
-				outlierRemoval_*_"$size.csv"
-			mv result.csv outlierRemoval_$size.csv
-		fi
+		for size in 100 1000 10000 100000 1000000
+		do
+			heatmapFiles=( noOutlierRemoval_*_"$size"_"$statisticalTest.csv" )
+			if [ -f ${heatmapFiles[0]} ]
+			then
+				echo $heatmapFiles
+				
+				java -cp ../../../build/libs/precision-analysis-all-2.13.jar \
+					de.precision.analysis.heatmap.MergeHeatmaps \
+					noOutlierRemoval_*_"$size"_"$statisticalTest.csv"
+				mv result.csv noOutlierRemoval_"$size"_"$statisticalTest.csv"
+				
+				java -cp ../../../build/libs/precision-analysis-all-2.13.jar \
+					de.precision.analysis.heatmap.MergeHeatmaps \
+					outlierRemoval_*_"$size"_"$statisticalTest.csv"
+				mv result.csv outlierRemoval_"$size"_"$statisticalTest.csv"
+			fi
+		done
 	done
 	
 	cd $start
@@ -75,12 +102,15 @@ then
 	exit 1
 fi
 
+sequentialFolder=$1
+parallelFolder=$2
+
 start=$(pwd)
 
 echo "--- Creating basic heatmaps"
-createRepetitionHeatmaps $1 repetitionHeatmaps
+createRepetitionHeatmaps $sequentialFolder repetitionHeatmaps
 createMergedHeatmaps repetitionHeatmaps
-createRepetitionHeatmaps $2 repetitionHeatmapsParallel
+createRepetitionHeatmaps $parallelFolder repetitionHeatmapsParallel
 createMergedHeatmaps repetitionHeatmapsParallel
 
 echo "--- Creating parallel / non parallel heatmap"

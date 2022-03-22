@@ -1,7 +1,7 @@
 function extractAll {
 	start=$(pwd)
 	cd $1
-	for file in AddTest RAMTest SysoutTest
+	for file in AddTest #RAMTest SysoutTest
 	do
 		echo "Extracting data from $file"
 		cd $file
@@ -22,15 +22,17 @@ function analyze {
 	start=$(pwd)
 	cd $1
 	echo "Starting analysis (will take at least 30 minutes)"
-	for file in AddTest RAMTest SysoutTest
+	for file in AddTest #RAMTest SysoutTest
 	do
 		echo "Analyzing $file"
-		java -Xmx20g \
+		java -Xmx22g \
 			-cp $start/../../build/libs/precision-analysis-all-2.13.jar \
 			de.precision.analysis.repetitions.GeneratePrecisionPlot \
-			-threads 16 \
+			-threads 8 \
 			--statisticalTests ALL_NO_BIMODAL \
-			-data $file > "$file"_analysis.txt 2>&1 &
+			--iterationResolution 100 \
+			--vmResolution 100 \
+			-data $file > "$file"_analysis.txt 
 	done
 	wait
 	cd $start
