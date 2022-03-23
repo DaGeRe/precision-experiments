@@ -30,7 +30,7 @@ function analyzeNoOutlierRemoval {
 		-threads $THREADS \
 		--statisticalTests ALL_NO_BIMODAL \
 		--iterationResolution 100 \
-		--vmResolution 100 \
+		--vmResolution $vmResolution \
 		--minVMs $minVMs \
 		--maxVMs $maxVMs \
 		-data $file > "$file"_analysis_noOutlierRemoval_$minVMs.txt 
@@ -48,7 +48,7 @@ function analyzeOutlierRemoval {
 		-threads $THREADS \
 		--statisticalTests ALL_NO_BIMODAL \
 		--iterationResolution 100 \
-		--vmResolution 100 \
+		--vmResolution $vmResolution \
 		--minVMs $minVMs \
 		--maxVMs $maxVMs \
 		--outlierRemoval \
