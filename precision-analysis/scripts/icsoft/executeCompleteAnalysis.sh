@@ -54,14 +54,33 @@ function analyze {
 	cd $start
 }
 
-if [ $# -lt 2 ]
+if [ $# -eq 1 ]
 then
-	echo "Arguments missing, please specify 2 folders (sequentiel, parallel)"
-	exit 1
+	echo "Assuming that the passed parameter $1 contains the default folders basic-parameter-comparison and parallel-sequential-comparison"
+	basicParameterComparison=$1/basic-parameter-comparison
+	parallelSequentialComparison=$1/parallel-sequential-comparison
+else
+	if [ $# -lt 2 ]
+	then
+		echo "Arguments missing, please specify 2 folders (sequentiel, parallel)"
+		exit 1
+	else
+		basicParameterComparison=$1
+		parallelSequentialComparison=$2
+	fi
 fi
 
-basicParameterComparison=$1
-parallelSequentialComparison=$2
+if [ ! -d $basicParameterComparison ]
+then
+	echo "Assumed $basicParameterComparison is a directory, but wasn't"
+	exit 1
+fi
+if [ ! -d $parallelSequentialComparison ]
+then
+	echo "Assumed $parallelSequentialComparison is a directory, but wasn't"
+	exit 1 
+fi
+
 
 extractAll $basicParameterComparison
 analyze $basicParameterComparison
