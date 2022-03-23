@@ -1,6 +1,6 @@
 package de.precision.processing.repetitions.sampling;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.Relation;
@@ -10,7 +10,7 @@ import de.precision.analysis.repetitions.PrecisionComparer;
 
 public class SamplingExecutor {
 
-   private final static Random RANDOM = new Random();
+   private final static ThreadLocalRandom RANDOM = ThreadLocalRandom.current();
 
    private SamplingConfig config;
    private final PrecisionComparer comparer;
@@ -31,7 +31,7 @@ public class SamplingExecutor {
       }
    }
    
-   public SamplingExecutor(final SamplingConfig config, final StatisticsConfig statisticsConfig, final double[] beforeData, double[] afterData, final PrecisionComparer comparer) {
+   public SamplingExecutor(final SamplingConfig config, final StatisticsConfig statisticsConfig, final double[] beforeData, final double[] afterData, final PrecisionComparer comparer) {
       this.comparer = comparer;
       this.config = config;
 
@@ -48,7 +48,7 @@ public class SamplingExecutor {
       comparer.executeComparisons(data, expected, config.getTestclazz());
    }
 
-   public CompareData selectPart(final double[] beforeData, double[] afterData, final int vms) {
+   public CompareData selectPart(final double[] beforeData, final double[] afterData, final int vms) {
       double[] valuesPredecessor = pickValues(beforeData, vms);
       double[] valuesCurrent = pickValues(afterData, vms);
       CompareData result = new CompareData(valuesPredecessor, valuesCurrent);
