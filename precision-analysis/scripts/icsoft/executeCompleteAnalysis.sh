@@ -9,8 +9,11 @@ function extractAll {
 		do
 			if [ -f precision_$repetitionCount.tar ]
 			then
-				mkdir precision_$repetitionCount
-				tar -xvf precision_"$repetitionCount".tar -C precision_$repetitionCount &> extract_"$file".txt
+				if [ ! -d precision_$repetitionCount ]
+				then
+					mkdir precision_$repetitionCount
+					tar -xvf precision_"$repetitionCount".tar -C precision_$repetitionCount &> extract_"$file".txt
+				fi
 			fi
 		done
 		cd ..
