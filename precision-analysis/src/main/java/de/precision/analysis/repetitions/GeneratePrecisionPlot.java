@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
 import picocli.CommandLine;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 /**
@@ -30,23 +31,8 @@ public class GeneratePrecisionPlot implements Callable<Void> {
    @Option(names = { "-data", "--data" }, description = "Data-Folder for analysis", required = true)
    private String[] data;
 
-   @Option(names = { "-printPicks", "--printPicks" }, description = "Print the picked values summaries (for debugging)")
-   private boolean printPicks;
-
-   @Option(names = { "-threads", "--threads" }, description = "Count of threads for analysis")
-   private int threads = 2;
-
-   @Option(names = { "-iterationResolution", "--iterationResolution" }, description = "Resolution for iteration count analysis (by default: 50 steps for iteration count)")
-   private int iterationResolution = 50;
-
-   @Option(names = { "-vmResolution", "--vmResolution" }, description = "Resolution for VM count analysis (by default: 50 steps for VM count)")
-   private int vmResolution = 20;
-   
-   @Option(names = { "-maxVMs", "--maxVMs" }, description = "Maximum amount of VMs that should be analyzed for detailed analysis (default -1, so all VMs are analyzed)")
-   private int maxVMs = -1;
-
-   @Option(names = { "-statisticalTests", "--statisticalTests" }, description = "Statistical tests that should be used (either ALL or ALL_NO_BIMODA)")
-   private StatisticalTestList statisticalTestList = StatisticalTestList.ALL_NO_BIMODAL_NO_CONFIDENCE;
+   @Mixin
+   private PrecisionConfigMixin precisionConfigMixin;
 
    public static void main(final String[] args) throws JAXBException, IOException, InterruptedException {
       Configurator.setLevel("de.peass.measurement.analysis.statistics.ConfidenceIntervalInterpretion", Level.INFO);
@@ -67,9 +53,13 @@ public class GeneratePrecisionPlot implements Callable<Void> {
 
    @Override
    public Void call() throws Exception {
-      PrecisionConfig noOutlierRemovalConfig = new PrecisionConfig(only100k, false, printPicks, threads, statisticalTestList.getTests(), iterationResolution, vmResolution, maxVMs);
+      PrecisionConfig noOutlierRemovalConfig = new PrecisionConfig(only100k, false, precisionConfigMixin.isPrintPicks(),
+            precisionConfigMixin.getThreads(), precisionConfigMixin.getStatisticalTestList().getTests(),
+            precisionConfigMixin.getIterationResolution(), precisionConfigMixin.getVmResolution(), precisionConfigMixin.getMaxVMs());
       createTasks(data, noOutlierRemovalConfig, "results_noOutlierRemoval");
-      PrecisionConfig outlierRemovalConfig = new PrecisionConfig(only100k, true, printPicks, threads, statisticalTestList.getTests(), iterationResolution, vmResolution, maxVMs);
+      PrecisionConfig outlierRemovalConfig = new PrecisionConfig(only100k, true, precisionConfigMixin.isPrintPicks(),
+            precisionConfigMixin.getThreads(), precisionConfigMixin.getStatisticalTestList().getTests(),
+            precisionConfigMixin.getIterationResolution(), precisionConfigMixin.getVmResolution(), precisionConfigMixin.getMaxVMs());
       createTasks(data, outlierRemovalConfig, "results_outlierRemoval");
 
       SingleFileGenerator.createSingleFiles(data);

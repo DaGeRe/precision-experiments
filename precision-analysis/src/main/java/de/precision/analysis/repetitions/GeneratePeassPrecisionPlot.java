@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.peass.folders.PeassFolders;
 import picocli.CommandLine;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 public class GeneratePeassPrecisionPlot implements Callable<Void> {
@@ -32,20 +33,8 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
    @Option(names = { "-slowVersionName", "--slowVersionName" }, description = "Version that is assumed to be slower", required = true)
    private String slowVersionName;
    
-   @Option(names = { "-printPicks", "--printPicks" }, description = "Print the picked values summaries (for debugging)")
-   private boolean printPicks;
-   
-   @Option(names = { "-threads", "--threads" }, description = "Count of threads for analysis")
-   private int threads = 2;
-   
-   @Option(names = { "-iterationResolution", "--iterationResolution" }, description = "Resolution for iteration count analysis (by default: 50 steps for iteration count)")
-   private int iterationResolution = 50;
-
-   @Option(names = { "-vmResolution", "--vmResolution" }, description = "Resolution for VM count analysis (by default: 50 steps for VM count)")
-   private int vmResolution = 20;
-   
-   @Option(names = { "-statisticalTests", "--statisticalTests" }, description = "Statistical tests that should be used (either ALL or ALL_NO_BIMODA)")
-   private StatisticalTestList statisticalTestList = StatisticalTestList.ALL_NO_BIMODAL_NO_CONFIDENCE;
+   @Mixin
+   private PrecisionConfigMixin precisionConfigMixin;
 
    public static void main(final String[] args) {
       GeneratePeassPrecisionPlot plot = new GeneratePeassPrecisionPlot();
@@ -89,7 +78,9 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
                int maxVMsMeasured = reader.getVMs();
                
                boolean removeOutliers = true;
-               PrecisionConfig precisionConfig = new PrecisionConfig(false, removeOutliers, printPicks, threads, statisticalTestList.getTests(), iterationResolution, vmResolution, -1);
+               PrecisionConfig precisionConfig = new PrecisionConfig(false, removeOutliers, precisionConfigMixin.isPrintPicks(),
+                     precisionConfigMixin.getThreads(), precisionConfigMixin.getStatisticalTestList().getTests(),
+                     precisionConfigMixin.getIterationResolution(), precisionConfigMixin.getVmResolution(), precisionConfigMixin.getMaxVMs());
                PrecisionPlotHandler handler = new PrecisionPlotHandler(testcasesV1, testcasesV2, pool, repetitions, precisionConfig, writingData);
                handler.handleAllParameters(maxVMsMeasured, maxIterations);
             }
