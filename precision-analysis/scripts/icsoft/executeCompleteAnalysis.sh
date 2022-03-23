@@ -18,6 +18,43 @@ function extractAll {
 	cd $start
 }
 
+function analyzeNoOutlierRemoval {
+	minVMs=$1
+	maxVMs=$2
+	vmResolution=$3
+	THREADS=$4
+	
+	java -Xmx22g \
+		-cp $start/../../build/libs/precision-analysis-all-2.13.jar \
+		de.precision.analysis.repetitions.GeneratePrecisionPlot \
+		-threads $THREADS \
+		--statisticalTests ALL_NO_BIMODAL \
+		--iterationResolution 100 \
+		--vmResolution 100 \
+		--minVMs $minVMs \
+		--maxVMs $maxVMs \
+		-data $file > "$file"_analysis_noOutlierRemoval_$minVMs.txt 
+}
+
+function analyzeOutlierRemoval {
+	minVMs=$1
+	maxVMs=$2
+	vmResolution=$3
+	THREADS=$4
+	
+	java -Xmx22g \
+		-cp $start/../../build/libs/precision-analysis-all-2.13.jar \
+		de.precision.analysis.repetitions.GeneratePrecisionPlot \
+		-threads $THREADS \
+		--statisticalTests ALL_NO_BIMODAL \
+		--iterationResolution 100 \
+		--vmResolution 100 \
+		--minVMs $minVMs \
+		--maxVMs $maxVMs \
+		--outlierRemoval \
+		-data $file > "$file"_analysis_outlierRemoval_$minVMs.txt 
+}
+
 function analyze {
 	start=$(pwd)
 	cd $1
@@ -28,26 +65,16 @@ function analyze {
 		echo "Analyzing $file"
 		
 		echo "... without outlier removal"
-		java -Xmx22g \
-			-cp $start/../../build/libs/precision-analysis-all-2.13.jar \
-			de.precision.analysis.repetitions.GeneratePrecisionPlot \
-			-threads $THREADS \
-			--statisticalTests ALL_NO_BIMODAL \
-			--iterationResolution 100 \
-			--vmResolution 100 \
-			--maxVMs 20 \
-			-data $file > "$file"_analysis_noOutlierRemoval.txt 
+		analyzeNoOutlierRemoval 0 50 100 $THREADS
+		mv $file/results_noOutlierRemoval/precision.csv mv $file/results_noOutlierRemoval/precision_0.csv 
+		analyzeNoOutlierRemoval 50 -1 20 $THREADS
+		cat $file/results_noOutlierRemoval/precision_0.csv >> $file/results_noOutlierRemoval/precision.csv
 		
 		echo "... with outlier removal"
-		java -Xmx22g \
-			-cp $start/../../build/libs/precision-analysis-all-2.13.jar \
-			de.precision.analysis.repetitions.GeneratePrecisionPlot \
-			-threads $THREADS \
-			--statisticalTests ALL_NO_BIMODAL \
-			--iterationResolution 100 \
-			--vmResolution 100 \
-			--outlierRemoval \
-			-data $file > "$file"_analysis_outlierRemoval.txt 
+		analyzeOutlierRemoval 0 50 100 $THREADS
+		mv $file/results_outlierRemoval/precision.csv mv $file/results_outlierRemoval/precision_0.csv 
+		analyzeOutlierRemoval 50 -1 20 $THREADS
+		cat $file/results_outlierRemoval/precision_0.csv >> $file/results_outlierRemoval/precision.csv
 	done
 	wait
 	cd $start
