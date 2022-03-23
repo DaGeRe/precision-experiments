@@ -1,7 +1,7 @@
 function extractAll {
 	start=$(pwd)
 	cd $1
-	for file in AddTest #RAMTest SysoutTest
+	for file in AddTest RAMTest SysoutTest
 	do
 		echo "Extracting data from $file"
 		cd $file
@@ -22,17 +22,33 @@ function analyze {
 	start=$(pwd)
 	cd $1
 	echo "Starting analysis (will take at least 30 minutes)"
-	for file in AddTest #RAMTest SysoutTest
+	THREADS=8
+	for file in AddTest RAMTest SysoutTest
 	do
 		echo "Analyzing $file"
+		
+		echo "... without outlier removal"
 		java -Xmx22g \
 			-cp $start/../../build/libs/precision-analysis-all-2.13.jar \
 			de.precision.analysis.repetitions.GeneratePrecisionPlot \
-			-threads 8 \
+			-threads $THREADS \
 			--statisticalTests ALL_NO_BIMODAL \
 			--iterationResolution 100 \
 			--vmResolution 100 \
-			-data $file > "$file"_analysis.txt 
+			--maxVMs 20 \
+			-data $file > "$file"_analysis_noOutlierRemoval.txt 
+		
+		echo "... with outlier removal"
+		java -Xmx22g \
+			-cp $start/../../build/libs/precision-analysis-all-2.13.jar \
+			de.precision.analysis.repetitions.GeneratePrecisionPlot \
+			-threads $THREADS \
+			--statisticalTests ALL_NO_BIMODAL \
+			--iterationResolution 100 \
+			--vmResolution 100 \
+			--maxVMs 20 \
+			--outlierRemoval \
+			-data $file > "$file"_analysis_outlierRemoval.txt 
 	done
 	wait
 	cd $start

@@ -1,7 +1,7 @@
 package de.precision.analysis.repetitions;
 
 public class PrecisionConfig {
-   private final boolean only100k, removeOutliers;
+   private final boolean removeOutliers;
    private final boolean printPicks;
    private final int threads;
    private final String[] types;
@@ -9,9 +9,8 @@ public class PrecisionConfig {
    private final int vmResolution;
    private final int maxVMs;
 
-   public PrecisionConfig(final boolean only100k, final boolean removeOutliers, final boolean printPicks, final int threads, final String[] types, 
+   public PrecisionConfig(final boolean removeOutliers, final boolean printPicks, final int threads, final String[] types, 
          final int iterationResolution, final int vmResolution, final int maxVMs) {
-      this.only100k = only100k;
       this.removeOutliers = removeOutliers;
       this.printPicks = printPicks;
       this.threads = threads;
@@ -19,10 +18,6 @@ public class PrecisionConfig {
       this.iterationResolution = iterationResolution;
       this.vmResolution = vmResolution;
       this.maxVMs = maxVMs;
-   }
-
-   public boolean isOnly100k() {
-      return only100k;
    }
 
    public boolean isRemoveOutliers() {

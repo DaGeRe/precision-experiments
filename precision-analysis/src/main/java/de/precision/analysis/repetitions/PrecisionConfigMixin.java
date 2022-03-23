@@ -20,6 +20,9 @@ public class PrecisionConfigMixin {
 
    @Option(names = { "-statisticalTests", "--statisticalTests" }, description = "Statistical tests that should be used (either ALL or ALL_NO_BIMODA)")
    private StatisticalTestList statisticalTestList = StatisticalTestList.ALL_NO_BIMODAL_NO_CONFIDENCE;
+   
+   @Option(names = { "-outlierRemoval", "--outlierRemoval" }, description = "Whether to remove outliers (default: false)")
+   private boolean outlierRemoval = false;
 
    public boolean isPrintPicks() {
       return printPicks;
@@ -67,5 +70,13 @@ public class PrecisionConfigMixin {
 
    public void setStatisticalTestList(final StatisticalTestList statisticalTestList) {
       this.statisticalTestList = statisticalTestList;
+   }
+   
+   public boolean isOutlierRemoval() {
+      return outlierRemoval;
+   }
+   
+   public void setOutlierRemoval(final boolean outlierRemoval) {
+      this.outlierRemoval = outlierRemoval;
    }
 }

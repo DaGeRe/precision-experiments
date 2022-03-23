@@ -53,11 +53,7 @@ public class PrecisionPlotGenerationManager {
 
    private CreatorParallel creatorFunction(final WritingData writingData) {
       return (repetitionFolder, pool) -> {
-         if (!config.isOnly100k() || repetitionFolder.getName().endsWith("100000")) {
-            return new PrecisionPlotGenerator(repetitionFolder, config, writingData, pool);
-         } else {
-            return null;
-         }
+         return new PrecisionPlotGenerator(repetitionFolder, config, writingData, pool);
       };
    }
 }

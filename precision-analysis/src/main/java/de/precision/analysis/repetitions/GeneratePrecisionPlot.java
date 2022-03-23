@@ -25,9 +25,6 @@ public class GeneratePrecisionPlot implements Callable<Void> {
 
    private static final Logger LOG = LogManager.getLogger(GeneratePrecisionPlot.class);
 
-   @Option(names = { "-only100k", "--only100k" }, description = "Only analyse 100.000 repetitions - for test comparison")
-   private boolean only100k = false;
-
    @Option(names = { "-data", "--data" }, description = "Data-Folder for analysis", required = true)
    private String[] data;
 
@@ -53,14 +50,18 @@ public class GeneratePrecisionPlot implements Callable<Void> {
 
    @Override
    public Void call() throws Exception {
-      PrecisionConfig noOutlierRemovalConfig = new PrecisionConfig(only100k, false, precisionConfigMixin.isPrintPicks(),
+      PrecisionConfig noOutlierRemovalConfig = new PrecisionConfig(precisionConfigMixin.isOutlierRemoval(), precisionConfigMixin.isPrintPicks(),
             precisionConfigMixin.getThreads(), precisionConfigMixin.getStatisticalTestList().getTests(),
             precisionConfigMixin.getIterationResolution(), precisionConfigMixin.getVmResolution(), precisionConfigMixin.getMaxVMs());
-      createTasks(data, noOutlierRemovalConfig, "results_noOutlierRemoval");
-      PrecisionConfig outlierRemovalConfig = new PrecisionConfig(only100k, true, precisionConfigMixin.isPrintPicks(),
-            precisionConfigMixin.getThreads(), precisionConfigMixin.getStatisticalTestList().getTests(),
-            precisionConfigMixin.getIterationResolution(), precisionConfigMixin.getVmResolution(), precisionConfigMixin.getMaxVMs());
-      createTasks(data, outlierRemovalConfig, "results_outlierRemoval");
+
+      String resultFolderName;
+      if (precisionConfigMixin.isOutlierRemoval()) {
+         resultFolderName = "results_outlierRemoval";
+      } else {
+         resultFolderName = "results_noOutlierRemoval";
+      }
+
+      createTasks(data, noOutlierRemovalConfig, resultFolderName);
 
       SingleFileGenerator.createSingleFiles(data);
       return null;

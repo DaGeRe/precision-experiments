@@ -25,14 +25,13 @@ import picocli.CommandLine.Option;
 public class GeneratePeassPrecisionPlot implements Callable<Void> {
 
    private static final Logger LOG = LogManager.getLogger(GeneratePeassPrecisionPlot.class);
-   
 
    @Option(names = { "-data", "--data" }, description = "Data-Folder for analysis", required = true)
    private File[] data;
-   
+
    @Option(names = { "-slowVersionName", "--slowVersionName" }, description = "Version that is assumed to be slower", required = true)
    private String slowVersionName;
-   
+
    @Mixin
    private PrecisionConfigMixin precisionConfigMixin;
 
@@ -70,15 +69,15 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
             if (!versionFile.getName().equals("results")) {
                RegularPeassdataReader reader = new RegularPeassdataReader();
                reader.read(slowVersionName, versionFile, testclazzFile);
-               
+
                Map<String, Testcases> testcasesV1 = reader.getTestcasesV1();
                Map<String, Testcases> testcasesV2 = reader.getTestcasesV2();
                int repetitions = reader.getRepetitions();
                int maxIterations = reader.getIterations();
                int maxVMsMeasured = reader.getVMs();
-               
+
                boolean removeOutliers = true;
-               PrecisionConfig precisionConfig = new PrecisionConfig(false, removeOutliers, precisionConfigMixin.isPrintPicks(),
+               PrecisionConfig precisionConfig = new PrecisionConfig(precisionConfigMixin.isOutlierRemoval(), precisionConfigMixin.isPrintPicks(),
                      precisionConfigMixin.getThreads(), precisionConfigMixin.getStatisticalTestList().getTests(),
                      precisionConfigMixin.getIterationResolution(), precisionConfigMixin.getVmResolution(), precisionConfigMixin.getMaxVMs());
                PrecisionPlotHandler handler = new PrecisionPlotHandler(testcasesV1, testcasesV2, pool, repetitions, precisionConfig, writingData);
