@@ -63,7 +63,12 @@ public class GeneratePrecisionPlot implements Callable<Void> {
 
       createTasks(data, noOutlierRemovalConfig, resultFolderName);
 
-      SingleFileGenerator.createSingleFiles(data);
+      for (String datafileName : data) {
+         File inputFolder = new File(datafileName);
+         File resultsFolder = new File(inputFolder, resultFolderName);
+         SingleFileGenerator.getSingleRepetitionFiles(inputFolder, resultsFolder);
+      }
+      
       return null;
    }
 }
