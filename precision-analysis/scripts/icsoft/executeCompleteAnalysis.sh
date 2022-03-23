@@ -46,7 +46,6 @@ function analyze {
 			--statisticalTests ALL_NO_BIMODAL \
 			--iterationResolution 100 \
 			--vmResolution 100 \
-			--maxVMs 20 \
 			--outlierRemoval \
 			-data $file > "$file"_analysis_outlierRemoval.txt 
 	done
