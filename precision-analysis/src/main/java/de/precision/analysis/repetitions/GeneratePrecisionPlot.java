@@ -41,6 +41,9 @@ public class GeneratePrecisionPlot implements Callable<Void> {
 
    @Option(names = { "-vmResolution", "--vmResolution" }, description = "Resolution for VM count analysis (by default: 50 steps for VM count)")
    private int vmResolution = 20;
+   
+   @Option(names = { "-maxVMs", "--maxVMs" }, description = "Maximum amount of VMs that should be analyzed for detailed analysis (default -1, so all VMs are analyzed)")
+   private int maxVMs = -1;
 
    @Option(names = { "-statisticalTests", "--statisticalTests" }, description = "Statistical tests that should be used (either ALL or ALL_NO_BIMODA)")
    private StatisticalTestList statisticalTestList = StatisticalTestList.ALL_NO_BIMODAL_NO_CONFIDENCE;
@@ -64,8 +67,10 @@ public class GeneratePrecisionPlot implements Callable<Void> {
 
    @Override
    public Void call() throws Exception {
-      createTasks(data, new PrecisionConfig(only100k, false, printPicks, threads, statisticalTestList.getTests(), iterationResolution, vmResolution), "results_noOutlierRemoval");
-      createTasks(data, new PrecisionConfig(only100k, true, printPicks, threads, statisticalTestList.getTests(), iterationResolution, vmResolution), "results_outlierRemoval");
+      PrecisionConfig noOutlierRemovalConfig = new PrecisionConfig(only100k, false, printPicks, threads, statisticalTestList.getTests(), iterationResolution, vmResolution, maxVMs);
+      createTasks(data, noOutlierRemovalConfig, "results_noOutlierRemoval");
+      PrecisionConfig outlierRemovalConfig = new PrecisionConfig(only100k, true, printPicks, threads, statisticalTestList.getTests(), iterationResolution, vmResolution, maxVMs);
+      createTasks(data, outlierRemovalConfig, "results_outlierRemoval");
 
       SingleFileGenerator.createSingleFiles(data);
       return null;

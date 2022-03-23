@@ -13,19 +13,19 @@ import org.apache.logging.log4j.Logger;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 
 public class PrecisionPlotHandler {
-   
+
    private static final Logger LOG = LogManager.getLogger(PrecisionPlotHandler.class);
-   
+
    private final Map<String, Testcases> testcasesV1;
    private final Map<String, Testcases> testcasesV2;
-   
+
    private final ExecutorService pool;
    private final long repetitions;
    private final PrecisionConfig precisionConfig;
    private WritingData writingData;
 
-   
-   public PrecisionPlotHandler(final Map<String, Testcases> testcasesV1, final Map<String, Testcases> testcasesV2, final ExecutorService pool, final long repetitions, final PrecisionConfig precisionConfig,
+   public PrecisionPlotHandler(final Map<String, Testcases> testcasesV1, final Map<String, Testcases> testcasesV2, final ExecutorService pool, final long repetitions,
+         final PrecisionConfig precisionConfig,
          final WritingData writingData) {
       this.testcasesV1 = testcasesV1;
       this.testcasesV2 = testcasesV2;
@@ -42,16 +42,28 @@ public class PrecisionPlotHandler {
       // this.warmup = warmup;
       // this.executions = maxExecutions - warmup;
       for (int iterations = iterationStepSize; iterations <= maxIterations / 2; iterations += iterationStepSize) {
-         
+
          final int vmStepSize = Math.max(1, maxVMs / precisionConfig.getVmResolution());
-         for (int vms = vmStepSize; vms <= maxVMs; vms += vmStepSize) {
+         int usedMaxVMs = getUsedMaxVMs(maxVMs);
+
+         for (int vms = vmStepSize; vms <= usedMaxVMs; vms += vmStepSize) {
             LOG.info("Warmup: {} Executions: {} VMs: {}", iterations, iterations, vms);
             executeVersionHandling(new ExecutionData(vms, iterations, iterations, repetitions));
          }
          // }
       }
    }
-   
+
+   private int getUsedMaxVMs(final int maxVMs) {
+      int usedMaxVMs;
+      if (precisionConfig.getMaxVMs() != -1 && precisionConfig.getMaxVMs() < maxVMs) {
+         usedMaxVMs = precisionConfig.getMaxVMs();
+      } else {
+         usedMaxVMs = maxVMs;
+      }
+      return usedMaxVMs;
+   }
+
    public void handleOnlyVMs(final int maxVMs, final int maxExecutions) throws JAXBException, IOException {
       int warmup = maxExecutions / 2;
       // this.executions = maxExecutions - warmup;
@@ -75,7 +87,7 @@ public class PrecisionPlotHandler {
          }
       }
    }
-   
+
    private void executeVersionHandling(final ExecutionData config) throws JAXBException, IOException {
       pool.submit(() -> {
          try {
@@ -87,9 +99,9 @@ public class PrecisionPlotHandler {
             e.printStackTrace();
          }
       });
-      
+
       LOG.info("Submitting " + repetitions + " " + config.getVms());
-      
+
       if (pool instanceof ThreadPoolExecutor) {
          final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) pool;
          LOG.info("Active Threads: " + threadPool.getActiveCount() + " Overall size: " + threadPool.getQueue().size());

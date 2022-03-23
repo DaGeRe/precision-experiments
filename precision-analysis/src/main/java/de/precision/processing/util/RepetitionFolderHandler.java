@@ -33,7 +33,7 @@ public abstract class RepetitionFolderHandler {
 
    private static final Logger LOG = LogManager.getLogger(RepetitionFolderHandler.class);
 
-   public static void clearResultFolder(File folder) {
+   public static void clearResultFolder(final File folder) {
       if (folder.exists()) {
          try {
             for (final File file : folder.listFiles()) {
@@ -105,12 +105,13 @@ public abstract class RepetitionFolderHandler {
       LOG.debug("Files: {}", files.length);
       getWorkloadSizes(files);
       for (final File dataFile : files) {
+         LOG.debug("Loading file: {}", dataFile);
          loadFile(dataFile);
       }
       LOG.debug("Loaded: {} - {}", testcasesV1.size(), testcasesV2.size());
    }
 
-   private void getWorkloadSizes(File[] files) {
+   private void getWorkloadSizes(final File[] files) {
       slowSize = Integer.MIN_VALUE; 
       fastSize = Integer.MAX_VALUE;
       for (final File dataFile : files) {
@@ -128,7 +129,8 @@ public abstract class RepetitionFolderHandler {
    private File[] getSortedFiles() {
       File[] files = FileUtils.listFiles(repetitionFolder, new WildcardFileFilter("*.xml"), TrueFileFilter.INSTANCE).toArray(new File[0]);
       Arrays.sort(files, new Comparator<File>() {
-         public int compare(File f1, File f2) {
+         @Override
+         public int compare(final File f1, final File f2) {
             return Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
          }
       });
@@ -168,7 +170,7 @@ public abstract class RepetitionFolderHandler {
       return resultFileName;
    }
 
-   private void putNewData(final Testcases testclazz, Map<String, Testcases> testcases) {
+   private void putNewData(final Testcases testclazz, final Map<String, Testcases> testcases) {
       if (clearStartDates) {
          LOG.debug("Clearing start dates");
          setValueStartsNull(testclazz);

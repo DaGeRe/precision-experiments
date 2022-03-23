@@ -14,6 +14,7 @@ import de.dagere.kopeme.datastorage.XMLDataLoader;
 import de.dagere.kopeme.generated.Kopemedata;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
+import de.dagere.kopeme.generated.TestcaseType.Datacollector;
 
 public class RegularPeassdataReader {
    private final Map<String, Testcases> testcasesV1 = new LinkedHashMap<>();
@@ -74,5 +75,10 @@ public class RegularPeassdataReader {
       Result exampleResult = testcasesV1.values().iterator().next().getTestcase().get(0).getDatacollector().get(0).getResult().get(0);
       int iterations = (int) exampleResult.getIterations();
       return iterations;
+   }
+   
+   public int getVMs() {
+      Datacollector datacollector = testcasesV1.values().iterator().next().getTestcase().get(0).getDatacollector().get(0);
+      return datacollector.getResult().size();
    }
 }

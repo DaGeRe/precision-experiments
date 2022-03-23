@@ -86,11 +86,12 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
                Map<String, Testcases> testcasesV2 = reader.getTestcasesV2();
                int repetitions = reader.getRepetitions();
                int maxIterations = reader.getIterations();
-
+               int maxVMsMeasured = reader.getVMs();
+               
                boolean removeOutliers = true;
-               PrecisionConfig precisionConfig = new PrecisionConfig(false, removeOutliers, printPicks, threads, statisticalTestList.getTests(), iterationResolution, vmResolution);
+               PrecisionConfig precisionConfig = new PrecisionConfig(false, removeOutliers, printPicks, threads, statisticalTestList.getTests(), iterationResolution, vmResolution, -1);
                PrecisionPlotHandler handler = new PrecisionPlotHandler(testcasesV1, testcasesV2, pool, repetitions, precisionConfig, writingData);
-               handler.handleAllParameters(100, maxIterations);
+               handler.handleAllParameters(maxVMsMeasured, maxIterations);
             }
          }
       }
