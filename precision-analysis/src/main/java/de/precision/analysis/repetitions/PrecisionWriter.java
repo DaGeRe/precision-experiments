@@ -24,7 +24,7 @@ public class PrecisionWriter {
    public static void writeHeader(final BufferedWriter writer, final String[] types) throws IOException {
       writer.write("repetitions" + ProcessConstants.DATAFILE_SEPARATOR +
             "vms" + ProcessConstants.DATAFILE_SEPARATOR +
-            "executions" + ProcessConstants.DATAFILE_SEPARATOR +
+            "iterations" + ProcessConstants.DATAFILE_SEPARATOR +
             "warmup" + ProcessConstants.DATAFILE_SEPARATOR +
             "overhead" + ProcessConstants.DATAFILE_SEPARATOR +
             "duration" + ProcessConstants.DATAFILE_SEPARATOR);
@@ -52,7 +52,7 @@ public class PrecisionWriter {
       }
    }
 
-   private void writeData(String staticalMethod, final Map<String, Integer> methodResult, final BufferedWriter writer) throws IOException {
+   private void writeData(final String staticalMethod, final Map<String, Integer> methodResult, final BufferedWriter writer) throws IOException {
 
       if (methodResult != null) {
          final int selected = methodResult.get(MethodResult.SELECTED);
