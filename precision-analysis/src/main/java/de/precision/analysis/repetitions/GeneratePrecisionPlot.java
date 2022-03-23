@@ -52,7 +52,8 @@ public class GeneratePrecisionPlot implements Callable<Void> {
    public Void call() throws Exception {
       PrecisionConfig noOutlierRemovalConfig = new PrecisionConfig(precisionConfigMixin.isOutlierRemoval(), precisionConfigMixin.isPrintPicks(),
             precisionConfigMixin.getThreads(), precisionConfigMixin.getStatisticalTestList().getTests(),
-            precisionConfigMixin.getIterationResolution(), precisionConfigMixin.getVmResolution(), precisionConfigMixin.getMaxVMs());
+            precisionConfigMixin.getIterationResolution(), precisionConfigMixin.getVmResolution(),
+            precisionConfigMixin.getMinVMs(), precisionConfigMixin.getMaxVMs());
 
       String resultFolderName;
       if (precisionConfigMixin.isOutlierRemoval()) {

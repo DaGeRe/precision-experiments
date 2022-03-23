@@ -7,16 +7,17 @@ public class PrecisionConfig {
    private final String[] types;
    private final int iterationResolution;
    private final int vmResolution;
-   private final int maxVMs;
+   private final int minVMs, maxVMs;
 
    public PrecisionConfig(final boolean removeOutliers, final boolean printPicks, final int threads, final String[] types, 
-         final int iterationResolution, final int vmResolution, final int maxVMs) {
+         final int iterationResolution, final int vmResolution, final int minVMs, final int maxVMs) {
       this.removeOutliers = removeOutliers;
       this.printPicks = printPicks;
       this.threads = threads;
       this.types = types;
       this.iterationResolution = iterationResolution;
       this.vmResolution = vmResolution;
+      this.minVMs = minVMs;
       this.maxVMs = maxVMs;
    }
 
@@ -42,6 +43,10 @@ public class PrecisionConfig {
    
    public int getVmResolution() {
       return vmResolution;
+   }
+   
+   public int getMinVMs() {
+      return minVMs;
    }
    
    public int getMaxVMs() {

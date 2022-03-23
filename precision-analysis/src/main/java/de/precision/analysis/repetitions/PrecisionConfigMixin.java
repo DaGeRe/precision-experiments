@@ -15,10 +15,13 @@ public class PrecisionConfigMixin {
    @Option(names = { "-vmResolution", "--vmResolution" }, description = "Resolution for VM count analysis (by default: 50 steps for VM count)")
    private int vmResolution = 20;
    
+   @Option(names = { "-minVMs", "--minVMs" }, description = "Minimum amount of VMs that should be analyzed for detailed analysis (default 0, so all VMs are analyzed)")
+   private int minVMs = -1;
+   
    @Option(names = { "-maxVMs", "--maxVMs" }, description = "Maximum amount of VMs that should be analyzed for detailed analysis (default -1, so all VMs are analyzed)")
    private int maxVMs = -1;
 
-   @Option(names = { "-statisticalTests", "--statisticalTests" }, description = "Statistical tests that should be used (either ALL or ALL_NO_BIMODA)")
+   @Option(names = { "-statisticalTests", "--statisticalTests" }, description = "Statistical tests that should be used (either ALL or ALL_NO_BIMODAL)")
    private StatisticalTestList statisticalTestList = StatisticalTestList.ALL_NO_BIMODAL_NO_CONFIDENCE;
    
    @Option(names = { "-outlierRemoval", "--outlierRemoval" }, description = "Whether to remove outliers (default: false)")
@@ -54,6 +57,14 @@ public class PrecisionConfigMixin {
 
    public void setVmResolution(final int vmResolution) {
       this.vmResolution = vmResolution;
+   }
+   
+   public void setMinVMs(final int minVMs) {
+      this.minVMs = minVMs;
+   }
+   
+   public int getMinVMs() {
+      return minVMs;
    }
 
    public int getMaxVMs() {

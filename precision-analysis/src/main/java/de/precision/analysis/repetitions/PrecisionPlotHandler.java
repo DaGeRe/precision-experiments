@@ -44,9 +44,11 @@ public class PrecisionPlotHandler {
       for (int iterations = iterationStepSize; iterations <= maxIterations / 2; iterations += iterationStepSize) {
 
          final int vmStepSize = Math.max(1, maxVMs / precisionConfig.getVmResolution());
+         
+         int minVmCount = Math.max(vmStepSize, precisionConfig.getMinVMs());
          int usedMaxVMs = getUsedMaxVMs(maxVMs);
 
-         for (int vms = vmStepSize; vms <= usedMaxVMs; vms += vmStepSize) {
+         for (int vms = minVmCount; vms <= usedMaxVMs; vms += vmStepSize) {
             LOG.info("Warmup: {} Executions: {} VMs: {}", iterations, iterations, vms);
             executeVersionHandling(new ExecutionData(vms, iterations, iterations, repetitions));
          }
