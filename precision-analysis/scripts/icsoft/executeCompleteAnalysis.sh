@@ -65,15 +65,15 @@ function analyze {
 		echo "Analyzing $file"
 		
 		echo "... without outlier removal"
-		analyzeNoOutlierRemoval 0 50 100 $THREADS
-		mv $file/results_noOutlierRemoval/precision.csv mv $file/results_noOutlierRemoval/precision_0.csv 
-		analyzeNoOutlierRemoval 50 -1 20 $THREADS
+		analyzeNoOutlierRemoval 0 100 100 $THREADS
+		mv $file/results_noOutlierRemoval/precision.csv $file/results_noOutlierRemoval/precision_0.csv 
+		analyzeNoOutlierRemoval 100 -1 20 $THREADS
 		cat $file/results_noOutlierRemoval/precision_0.csv >> $file/results_noOutlierRemoval/precision.csv
 		
 		echo "... with outlier removal"
-		analyzeOutlierRemoval 0 50 100 $THREADS
-		mv $file/results_outlierRemoval/precision.csv mv $file/results_outlierRemoval/precision_0.csv 
-		analyzeOutlierRemoval 50 -1 20 $THREADS
+		analyzeOutlierRemoval 0 100 100 $THREADS
+		mv $file/results_outlierRemoval/precision.csv $file/results_outlierRemoval/precision_0.csv 
+		analyzeOutlierRemoval 100 -1 20 $THREADS
 		cat $file/results_outlierRemoval/precision_0.csv >> $file/results_outlierRemoval/precision.csv
 	done
 	wait
