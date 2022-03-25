@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -81,19 +82,49 @@ public class MergeHeatmaps {
                if (vmValue != null) {
                   value += vmValue.get(iterationCount);
                }
-               
+
             }
             value /= heatmaps.size();
             iterationMap.put(iterationCount, value);
          }
       }
 
-      return merged;
+      WorkloadHeatmap resolutionFilled = fillResolutions(merged);
+
+      return resolutionFilled;
+   }
+
+   private static WorkloadHeatmap fillResolutions(final WorkloadHeatmap merged) {
+      WorkloadHeatmap resolutionFilled = new WorkloadHeatmap();
+      
+      Iterator<Integer> iterator = merged.getOneHeatmap().keySet().iterator();
+     
+      int first = iterator.next();
+      resolutionFilled.getOneHeatmap().put(first, merged.getOneHeatmap().get(first));
+      int second = iterator.next();
+      resolutionFilled.getOneHeatmap().put(second, merged.getOneHeatmap().get(second));
+      int difference = second - first;
+
+      int last = second;
+      while (iterator.hasNext()) {
+         int key = iterator.next();
+         
+         if (key - last > difference) {
+            Map<Integer, Double> entry = merged.getOneHeatmap().get(key);
+            for (int i = last; i < key; i+= difference) {
+               resolutionFilled.getOneHeatmap().put(i, entry);
+            }
+         }
+         resolutionFilled.getOneHeatmap().put(key, merged.getOneHeatmap().get(key));
+         
+         last = key;
+      }
+      return resolutionFilled;
    }
 
    private static Map<Integer, Double> findValue(final Integer VMcount, final WorkloadHeatmap heatmap) {
       Map<Integer, Double> vmValue = heatmap.getOneHeatmap().get(VMcount);
-      int count = VMcount-1;
+      int count = VMcount - 1;
       while (vmValue == null && count > 0) {
          vmValue = heatmap.getOneHeatmap().get(count);
          count--;
