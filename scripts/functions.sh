@@ -9,7 +9,7 @@ function getTests {
 
 function getGlobalParameters {
 	if [[ -z "$VMS" ]]; then
-	  vms=250
+	  vms=1000
 	else
 	  vms=$VMS
 	fi
