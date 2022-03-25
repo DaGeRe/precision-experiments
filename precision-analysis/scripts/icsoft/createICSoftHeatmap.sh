@@ -3,7 +3,7 @@ function getHeatmapData {
 	index=$1
 	outname=$2
 	repetitions=$3
-	cat de.precision.*.csv | grep "^$repetitions " \
+	cat precision.csv | grep "^$repetitions " \
 		| awk '{print $2" "$3" "$'$index'}' \
 		| sort -k 1 -k 2 -n \
 		| awk -f $start/addblanks.awk \
@@ -27,10 +27,10 @@ function getTestIndex {
 			index=13
 			;;
 		"CONFIDENCE")
-			index=17
+			index=21
 			;;
 		"MANNWHITNEY")
-			index=21
+			index=25
 			;;
 	esac
 	echo $index
@@ -49,7 +49,7 @@ function createRepetitionHeatmaps {
 		for testcase in AddTest RAMTest SysoutTest
 		do
 			cd $sourceFolder/$testcase/results_noOutlierRemoval
-			for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
+			for repetitions in $(cat precision.csv | awk '{print $1}' | sort | uniq | grep -v "#" | grep -v "repetitions")
 			do
 				echo "Creating heatmap for $repetitions repetitions $testcase $statisticalTest $index"
 				getHeatmapData $index $start/$goalFolder/noOutlierRemoval_"$testcase"_"$repetitions"_"$statisticalTest".csv $repetitions
@@ -57,9 +57,9 @@ function createRepetitionHeatmaps {
 			cd $start
 			
 			cd $sourceFolder/$testcase/results_outlierRemoval
-			for repetitions in $(cat de.precision.*.csv | awk '{print $1}' | uniq | grep -v "#" | grep -v "repetitions")
+			for repetitions in $(cat precision.csv | awk '{print $1}' | sort | uniq | grep -v "#" | grep -v "repetitions")
 			do
-				echo "Creating heatmap for $repetitions repetitions $testcase"
+				echo "Creating heatmap for $repetitions repetitions $testcase $statisticalTest $index"
 				getHeatmapData $index $start/$goalFolder/outlierRemoval_"$testcase"_"$repetitions"_"$statisticalTest".csv $repetitions
 			done
 			cd $start
@@ -107,10 +107,17 @@ parallelFolder=$2
 
 start=$(pwd)
 
-echo "--- Creating basic heatmaps"
+echo "--- Sorting data"
 createRepetitionHeatmaps $sequentialFolder repetitionHeatmaps
-createMergedHeatmaps repetitionHeatmaps
+
+echo "--- Sorting parallel data"
 createRepetitionHeatmaps $parallelFolder repetitionHeatmapsParallel
+
+
+echo "--- Creating basic heatmaps"
+createMergedHeatmaps repetitionHeatmaps
+
+echo "--- Creating basic parallel heatmaps"
 createMergedHeatmaps repetitionHeatmapsParallel
 
 echo "--- Creating parallel / non parallel heatmap"
