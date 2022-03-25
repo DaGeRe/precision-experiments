@@ -50,10 +50,7 @@ public class GeneratePrecisionPlot implements Callable<Void> {
 
    @Override
    public Void call() throws Exception {
-      PrecisionConfig noOutlierRemovalConfig = new PrecisionConfig(precisionConfigMixin.isOutlierRemoval(), precisionConfigMixin.isPrintPicks(),
-            precisionConfigMixin.getThreads(), precisionConfigMixin.getStatisticalTestList().getTests(),
-            precisionConfigMixin.getIterationResolution(), precisionConfigMixin.getVmResolution(),
-            precisionConfigMixin.getMinVMs(), precisionConfigMixin.getMaxVMs());
+      PrecisionConfig precisionConfig = precisionConfigMixin.getConfig();
 
       String resultFolderName;
       if (precisionConfigMixin.isOutlierRemoval()) {
@@ -62,7 +59,7 @@ public class GeneratePrecisionPlot implements Callable<Void> {
          resultFolderName = "results_noOutlierRemoval";
       }
 
-      createTasks(data, noOutlierRemovalConfig, resultFolderName);
+      createTasks(data, precisionConfig, resultFolderName);
 
       for (String datafileName : data) {
          File inputFolder = new File(datafileName);

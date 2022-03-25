@@ -90,4 +90,12 @@ public class PrecisionConfigMixin {
    public void setOutlierRemoval(final boolean outlierRemoval) {
       this.outlierRemoval = outlierRemoval;
    }
+   
+   public PrecisionConfig getConfig() {
+      PrecisionConfig noOutlierRemovalConfig = new PrecisionConfig(isOutlierRemoval(), isPrintPicks(),
+            getThreads(), getStatisticalTestList().getTests(),
+            getIterationResolution(), getVmResolution(),
+            getMinVMs(), getMaxVMs());
+      return noOutlierRemovalConfig;
+   }
 }
