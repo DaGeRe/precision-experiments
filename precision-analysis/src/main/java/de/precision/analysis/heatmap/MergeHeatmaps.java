@@ -6,10 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,7 +40,7 @@ public class MergeHeatmaps {
    private static void writeHeatmap(final WorkloadHeatmap merged) throws IOException {
       File dest = new File("result.csv");
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(dest))) {
-         for (Map.Entry<Integer, Map<Integer, Double>> vmMap : merged.getOneHeatmap().entrySet()) {
+         for (Map.Entry<Integer, SortedMap<Integer, Double>> vmMap : merged.getOneHeatmap().entrySet()) {
             for (Map.Entry<Integer, Double> iterationEntry : vmMap.getValue().entrySet()) {
                writer.write(vmMap.getKey() + " " + iterationEntry.getKey() + " " + iterationEntry.getValue() + "\n");
             }
@@ -57,7 +58,7 @@ public class MergeHeatmaps {
       WorkloadHeatmap reference = heatmaps.get(0);
 
       for (Integer VMcount : reference.getOneHeatmap().keySet()) {
-         LinkedHashMap<Integer, Double> iterationMap = new LinkedHashMap<Integer, Double>();
+         SortedMap<Integer, Double> iterationMap = new TreeMap<Integer, Double>();
          merged.getOneHeatmap().put(VMcount, iterationMap);
          for (Integer iterationCount : reference.getOneHeatmap().get(VMcount).keySet()) {
             double value = 0.0;
@@ -94,7 +95,7 @@ public class MergeHeatmaps {
          int key = iterator.next();
          
          if (key - last > difference) {
-            Map<Integer, Double> entry = merged.getOneHeatmap().get(key);
+            SortedMap<Integer, Double> entry = merged.getOneHeatmap().get(key);
             for (int i = last; i < key; i+= difference) {
                resolutionFilled.getOneHeatmap().put(i, entry);
             }
