@@ -1,24 +1,17 @@
 package de.precision.analysis.repetitions;
 
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.math3.stat.inference.GTest;
 import org.apache.commons.math3.stat.inference.MannWhitneyUTest;
 import org.apache.commons.math3.stat.inference.TTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.common.primitives.Doubles;
-import com.google.common.primitives.Longs;
-
-import de.dagere.kopeme.generated.Result;
 import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.ConfidenceIntervalInterpretion;
 import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.bimodal.BimodalityTester;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
-import de.precision.processing.repetitions.misc.HistogramCreator;
 
 public class TestExecutors {
    private static final Logger LOG = LogManager.getLogger(TestExecutors.class);
@@ -57,17 +50,6 @@ public class TestExecutors {
          relations.put(StatisticalTests.TTEST2, Relation.EQUAL);
       }
       return tchange;
-   }
-
-   public static void getGTestRelation(final List<Result> beforeShortened, final List<Result> afterShortened, final Map<String, Relation> relations, final CompareData data) {
-      final long[][] histogramValues = HistogramCreator.createCommonHistogram(beforeShortened, afterShortened);
-      final double[] histExpected = Doubles.toArray(Longs.asList(histogramValues[0]));
-      final boolean gchange = new GTest().gTest(histExpected, histogramValues[1], 0.01);
-      if (gchange) {
-         relations.put("GTEST", data.getAvgBefore() < data.getAvgAfter() ? Relation.LESS_THAN : Relation.GREATER_THAN);
-      } else {
-         relations.put("GTEST", Relation.EQUAL);
-      }
    }
 
    public static void getMannWhitneyRelation(final Map<String, Relation> relations, final CompareData data, final StatisticsConfig config) {
