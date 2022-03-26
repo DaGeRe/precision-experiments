@@ -1,10 +1,8 @@
 package de.precision.analysis.heatmap;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
@@ -31,7 +29,8 @@ public class MergeHeatmaps {
       for (String arg : args) {
          File heatmapFile = new File(arg);
          LOG.debug("Reading: {}", heatmapFile.getAbsolutePath());
-         heatmaps.add(readHeatmap(heatmapFile));
+         WorkloadHeatmap heatmap = WorkloadHeatmapReader.readHeatmap(heatmapFile);
+         heatmaps.add(heatmap);
       }
       WorkloadHeatmap merged = mergeHeatmaps(heatmaps);
       writeHeatmap(merged);
@@ -50,22 +49,7 @@ public class MergeHeatmaps {
 
    }
 
-   private static WorkloadHeatmap readHeatmap(final File heatmapFile) throws FileNotFoundException, IOException {
-      final WorkloadHeatmap heatmap = new WorkloadHeatmap();
-      try (BufferedReader reader = new BufferedReader(new FileReader(heatmapFile))) {
-         String line;
-         while ((line = reader.readLine()) != null) {
-            if (line.length() > 3) {
-               String[] parts = line.split(" ");
-               int VMs = Integer.parseInt(parts[0]);
-               int iterations = Integer.parseInt(parts[1]);
-               double value = Double.parseDouble(parts[2]);
-               heatmap.add(VMs, iterations, value);
-            }
-         }
-      }
-      return heatmap;
-   }
+   
 
    public static WorkloadHeatmap mergeHeatmaps(final List<WorkloadHeatmap> heatmaps) {
       WorkloadHeatmap merged = new WorkloadHeatmap();

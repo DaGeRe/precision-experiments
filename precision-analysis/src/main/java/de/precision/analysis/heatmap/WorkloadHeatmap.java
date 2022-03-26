@@ -3,6 +3,11 @@ package de.precision.analysis.heatmap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Saves the mapping from VMs to a map from iterations to the concrete F1 values
+ * @author DaGeRe
+ *
+ */
 public class WorkloadHeatmap {
    private final Map<Integer, Map<Integer, Double>> oneHeatmap = new LinkedHashMap<Integer, Map<Integer,Double>>();
    
