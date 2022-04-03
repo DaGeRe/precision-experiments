@@ -1,8 +1,9 @@
 package de.precision.analysis.heatmap;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -54,8 +55,8 @@ public class TestMerging {
       return map;
    }
    
-   private LinkedHashMap<Integer, Double> createSimpleMap(final double base) {
-      LinkedHashMap<Integer, Double> iterationMap = new LinkedHashMap<Integer, Double>();
+   public static SortedMap<Integer, Double> createSimpleMap(final double base) {
+      SortedMap<Integer, Double> iterationMap = new TreeMap<Integer, Double>();
       iterationMap.put(10, base + 10.0);
       iterationMap.put(20, base + 20.0);
       iterationMap.put(30, base + 30.0);

@@ -1,6 +1,5 @@
 package de.precision.analysis.heatmap;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,19 +27,12 @@ public class TestResolutionChangeMerging {
       WorkloadHeatmap map = new WorkloadHeatmap();
 
       for (int i = 0; i < 10; i++) {
-         map.getOneHeatmap().put(i, createSimpleMap(0.0));
+         map.getOneHeatmap().put(i, TestMerging.createSimpleMap(0.0));
       }
       for (int i = 10; i <= 100; i+=10) {
-         map.getOneHeatmap().put(i, createSimpleMap(0.0));
+         map.getOneHeatmap().put(i, TestMerging.createSimpleMap(0.0));
       }
       return map;
    }
    
-   private LinkedHashMap<Integer, Double> createSimpleMap(final double base) {
-      LinkedHashMap<Integer, Double> iterationMap = new LinkedHashMap<Integer, Double>();
-      iterationMap.put(10, base + 10.0);
-      iterationMap.put(20, base + 20.0);
-      iterationMap.put(30, base + 30.0);
-      return iterationMap;
-   }
 }
