@@ -65,8 +65,6 @@ public class MinimalFeasibleConfigurationDeterminer {
                break;
             }
 
-            System.out.println("Schritt: " + candidate + " Last: " + repetitionCandidate);
-            
             if (repetitionCandidate != null) {
                int legalIterations = Math.max(candidate.getIterations(), repetitionCandidate.getIterations());
                Configuration candidate2 = new Configuration(repetitions, candidate.getVMs(), legalIterations);
@@ -77,7 +75,15 @@ public class MinimalFeasibleConfigurationDeterminer {
          }
 
          if (repetitionCandidate != null) {
-            minimal = repetitionCandidate;
+            if (minimal != null) {
+               if (repetitionCandidate.getVMs() < minimal.getVMs() || 
+                     (repetitionCandidate.getVMs() == minimal.getVMs() && repetitionCandidate.getIterations() < minimal.getIterations()) ||
+                     (repetitionCandidate.getVMs() == minimal.getVMs() && repetitionCandidate.getIterations() == minimal.getIterations() && repetitionCandidate.getRepetitions() > minimal.getRepetitions())) {
+                  minimal = repetitionCandidate;
+               }
+            } else {
+               minimal = repetitionCandidate;
+            }
          }
       }
 
