@@ -29,10 +29,22 @@ class Configuration {
       return iterations;
    }
 
+   @Override
+   public String toString() {
+      return "Repetitions: " + repetitions + " VMs: " + VMs + " iterations: " + iterations;
+   }
+
 }
 
 public class MinimalFeasibleConfigurationDeterminer {
-   public static Configuration getMinimalFeasibleConfiguration(final PrecisionData data) {
+
+   private double minimalF1Score = 99;
+
+   public MinimalFeasibleConfigurationDeterminer(final double minimalF1Score) {
+      this.minimalF1Score = minimalF1Score;
+   }
+
+   public Configuration getMinimalFeasibleConfiguration(final PrecisionData data) {
       Configuration minimal = new Configuration(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
 
       for (Map.Entry<Integer, WorkloadHeatmap> repetitionHeatmap : data.getPrecisionData().entrySet()) {
@@ -42,7 +54,7 @@ public class MinimalFeasibleConfigurationDeterminer {
          reverseOrderMap.putAll(repetitionHeatmap.getValue().getOneHeatmap());
 
          Configuration repetitionCandidate = null;
-         
+
          for (Entry<Integer, SortedMap<Integer, Double>> vmCount : reverseOrderMap.entrySet()) {
 
             SortedMap<Integer, Double> iterationReverseMap = new TreeMap<>(Collections.reverseOrder());
@@ -52,9 +64,18 @@ public class MinimalFeasibleConfigurationDeterminer {
             if (candidate == null) {
                break;
             }
-            repetitionCandidate = candidate;
+
+            System.out.println("Schritt: " + candidate + " Last: " + repetitionCandidate);
+            
+            if (repetitionCandidate != null) {
+               int legalIterations = Math.max(candidate.getIterations(), repetitionCandidate.getIterations());
+               Configuration candidate2 = new Configuration(repetitions, candidate.getVMs(), legalIterations);
+               repetitionCandidate = candidate2;
+            } else {
+               repetitionCandidate = candidate;
+            }
          }
-         
+
          if (repetitionCandidate != null) {
             minimal = repetitionCandidate;
          }
@@ -63,10 +84,11 @@ public class MinimalFeasibleConfigurationDeterminer {
       return minimal;
    }
 
-   private static Configuration getLowestIterationCandidate(final int repetitions, final Entry<Integer, SortedMap<Integer, Double>> vmCount, final SortedMap<Integer, Double> iterationReverseMap) {
+   private Configuration getLowestIterationCandidate(final int repetitions, final Entry<Integer, SortedMap<Integer, Double>> vmCount,
+         final SortedMap<Integer, Double> iterationReverseMap) {
       Configuration candidate = null;
       for (Entry<Integer, Double> iterationCount : iterationReverseMap.entrySet()) {
-         if (iterationCount.getValue() > 99.0) {
+         if (iterationCount.getValue() > minimalF1Score) {
             candidate = new Configuration(repetitions, vmCount.getKey(), iterationCount.getKey());
          } else {
             break;
