@@ -76,9 +76,12 @@ public class MinimalFeasibleConfigurationDeterminer {
 
          if (repetitionCandidate != null) {
             if (minimal != null) {
+               int candidateIterations = repetitionCandidate.getIterations() * repetitionCandidate.getRepetitions();
+               int newMinimalIterations = minimal.getIterations() * minimal.getRepetitions();
+               
                if (repetitionCandidate.getVMs() < minimal.getVMs() || 
-                     (repetitionCandidate.getVMs() == minimal.getVMs() && repetitionCandidate.getIterations() < minimal.getIterations()) ||
-                     (repetitionCandidate.getVMs() == minimal.getVMs() && repetitionCandidate.getIterations() == minimal.getIterations() && repetitionCandidate.getRepetitions() > minimal.getRepetitions())) {
+                     (repetitionCandidate.getVMs() == minimal.getVMs() && candidateIterations < newMinimalIterations) ||
+                     (repetitionCandidate.getVMs() == minimal.getVMs() && candidateIterations == newMinimalIterations && repetitionCandidate.getRepetitions() > minimal.getRepetitions())) {
                   minimal = repetitionCandidate;
                }
             } else {

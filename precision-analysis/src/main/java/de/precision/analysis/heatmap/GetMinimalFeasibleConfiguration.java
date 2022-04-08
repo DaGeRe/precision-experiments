@@ -3,6 +3,7 @@ package de.precision.analysis.heatmap;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -66,7 +67,10 @@ public class GetMinimalFeasibleConfiguration implements Callable<Void> {
       } else {
          System.out.print(" & ");
       }
-      System.out.println(overallConfig.getRepetitions() + " & " + overallConfig.getVMs() + " & " + overallConfig.getIterations());
+      String vMs = overallConfig.getVMs() == Integer.MAX_VALUE ? "-" : NumberFormat.getInstance().format(overallConfig.getVMs());
+      String iterations = overallConfig.getIterations() == Integer.MAX_VALUE ? "-" : NumberFormat.getInstance().format(overallConfig.getIterations());
+      String repetitions = overallConfig.getRepetitions() == Integer.MAX_VALUE ? "-" : NumberFormat.getInstance().format(overallConfig.getRepetitions());
+      System.out.println(repetitions + " & " + vMs + " & " + iterations + "\\\\");
    }
 
    private Configuration analyzePrecisionFile(String outlierRemovalString, Integer f1ScoreIndex, Configuration overallConfig, File testcaseFolder)
