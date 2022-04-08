@@ -15,12 +15,17 @@ import picocli.CommandLine.Option;
 public class GetMinimalFeasibleConfiguration implements Callable<Void> {
 
    public final static Map<String, Integer> statisticTestIndexes = new LinkedHashMap<>();
+   public final static Map<String, Integer> statisticTestIndexesDe = new LinkedHashMap<>();
 
    static {
       statisticTestIndexes.put("Mean Comparison", 8);
+      statisticTestIndexesDe.put("Mittelwertvergleich", 8);
       statisticTestIndexes.put("T-Test", 12);
+      statisticTestIndexesDe.put("T-Test", 12);
       statisticTestIndexes.put("Confidence Interval Comparison", 20);
+      statisticTestIndexesDe.put("Kofidenzintervallvergleich", 20);
       statisticTestIndexes.put("Mann-Whitney Test", 24);
+      statisticTestIndexesDe.put("Mann-Whitney Test", 24);
    }
 
    @Option(names = { "-data", "--data" }, description = "Data-Folder for analysis", required = true)
@@ -38,7 +43,7 @@ public class GetMinimalFeasibleConfiguration implements Callable<Void> {
    public Void call() throws Exception {
 
       for (File dataFile : data) {
-         for (Map.Entry<String, Integer> statisticalTest : statisticTestIndexes.entrySet()) {
+         for (Map.Entry<String, Integer> statisticalTest : statisticTestIndexesDe.entrySet()) {
             for (String outlierRemovalString : new String[] { "noOutlierRemoval", "outlierRemoval" }) {
                Integer f1ScoreIndex = statisticalTest.getValue();
                Configuration overallConfig = null;
