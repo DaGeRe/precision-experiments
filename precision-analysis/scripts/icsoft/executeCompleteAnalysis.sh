@@ -67,17 +67,23 @@ function analyze {
 	do
 		echo "Analyzing $file"
 		
-		echo "... without outlier removal"
-		analyzeNoOutlierRemoval 0 100 100 $THREADS
-		mv $file/results_noOutlierRemoval/precision.csv $file/results_noOutlierRemoval/precision_0.csv 
-		analyzeNoOutlierRemoval 100 -1 20 $THREADS
-		cat $file/results_noOutlierRemoval/precision_0.csv >> $file/results_noOutlierRemoval/precision.csv
+		if [ ! -d $file/results_noOutlierRemoval ]
+		then
+			echo "... without outlier removal"
+			analyzeNoOutlierRemoval 0 100 100 $THREADS
+			mv $file/results_noOutlierRemoval/precision.csv $file/results_noOutlierRemoval/precision_0.csv 
+			analyzeNoOutlierRemoval 100 -1 20 $THREADS
+			cat $file/results_noOutlierRemoval/precision_0.csv >> $file/results_noOutlierRemoval/precision.csv
+		fi
 		
-		echo "... with outlier removal"
-		analyzeOutlierRemoval 0 100 100 $THREADS
-		mv $file/results_outlierRemoval/precision.csv $file/results_outlierRemoval/precision_0.csv 
-		analyzeOutlierRemoval 100 -1 20 $THREADS
-		cat $file/results_outlierRemoval/precision_0.csv >> $file/results_outlierRemoval/precision.csv
+		if [ ! -d $file/results_noOutlierRemoval ]
+		then
+			echo "... with outlier removal"
+			analyzeOutlierRemoval 0 100 100 $THREADS
+			mv $file/results_outlierRemoval/precision.csv $file/results_outlierRemoval/precision_0.csv 
+			analyzeOutlierRemoval 100 -1 20 $THREADS
+			cat $file/results_outlierRemoval/precision_0.csv >> $file/results_outlierRemoval/precision.csv
+		fi
 	done
 	wait
 	cd $start
@@ -117,3 +123,4 @@ extractAll $parallelSequentialComparison
 analyze $parallelSequentialComparison
 
 ./createICSoftHeatmap.sh $basicParameterComparison $parallelSequentialComparison
+
