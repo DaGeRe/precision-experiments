@@ -55,3 +55,4 @@ precision-analysis/SysoutTest_analysis.txt
 
 precision-analysis/scripts/durations/result_durations.pdf
 precision-analysis/scripts/durations/result_durations_de.pdf
+precision-analysis/scripts/cov/*.pdf
