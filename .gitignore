@@ -52,3 +52,6 @@ precision-analysis/scripts/icsoft/histogram_outliers_en.pdf
 precision-analysis/AddTest_analysis.txt
 precision-analysis/RAMTest_analysis.txt
 precision-analysis/SysoutTest_analysis.txt
+
+precision-analysis/scripts/durations/result_durations.pdf
+precision-analysis/scripts/durations/result_durations_de.pdf

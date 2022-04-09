@@ -19,15 +19,31 @@ function getDuration {
    done 
 }
 
-for folder in $(ls | grep Test)
+if [ $# -lt 1 ]
+then
+	echo "Argument missing, please provide folder where you expect precision-analysis results data (repo-measurement-configuration/basic-parameter-comparison)"
+	exit 1
+fi
+
+start=$(pwd)
+
+mkdir -p $start/durations/
+
+cd $1
+
+for workloadFolder in $(ls | grep Test | grep -v ".txt")
 do
-	cd $folder
-	for file in $(ls | grep precision | grep -v .tar)
+	cd $workloadFolder
+	echo "Reading from $workloadFolder"
+	for file in $(ls | grep precision | grep -v ".tar" | grep -v ".txt" | grep -v ".csv")
 	do
 		echo $file | tr -d "precision_\n"
 		echo -n " "
 		duration=$(getDuration $file | getSum)
 		echo $duration
-	done
+	done > $start/durationData/$workloadFolder.csv
 	cd ..
 done
+
+cd $start/durations
+gnuplot -c plotDurations.plt
