@@ -76,7 +76,7 @@ function analyze {
 			cat $file/results_noOutlierRemoval/precision_0.csv >> $file/results_noOutlierRemoval/precision.csv
 		fi
 		
-		if [ ! -d $file/results_noOutlierRemoval ]
+		if [ ! -d $file/results_outlierRemoval ]
 		then
 			echo "... with outlier removal"
 			analyzeOutlierRemoval 0 100 100 $THREADS
