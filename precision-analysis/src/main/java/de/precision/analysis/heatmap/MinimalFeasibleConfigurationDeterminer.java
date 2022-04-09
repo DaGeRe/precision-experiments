@@ -44,8 +44,10 @@ public class MinimalFeasibleConfigurationDeterminer {
       this.minimalF1Score = minimalF1Score;
    }
 
-   public Configuration getMinimalFeasibleConfiguration(final PrecisionData data) {
-      Configuration minimal = new Configuration(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+   public Map<Integer, Configuration> getMinimalFeasibleConfiguration(final PrecisionData data) {
+//      Configuration minimal = new Configuration(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+      
+      Map<Integer, Configuration> minimalConfigurations = new TreeMap<>();
 
       for (Map.Entry<Integer, WorkloadHeatmap> repetitionHeatmap : data.getPrecisionData().entrySet()) {
          int repetitions = repetitionHeatmap.getKey();
@@ -75,22 +77,11 @@ public class MinimalFeasibleConfigurationDeterminer {
          }
 
          if (repetitionCandidate != null) {
-            if (minimal != null) {
-               int candidateIterations = repetitionCandidate.getIterations() * repetitionCandidate.getRepetitions();
-               int newMinimalIterations = minimal.getIterations() * minimal.getRepetitions();
-               
-               if (repetitionCandidate.getVMs() < minimal.getVMs() || 
-                     (repetitionCandidate.getVMs() == minimal.getVMs() && candidateIterations < newMinimalIterations) ||
-                     (repetitionCandidate.getVMs() == minimal.getVMs() && candidateIterations == newMinimalIterations && repetitionCandidate.getRepetitions() > minimal.getRepetitions())) {
-                  minimal = repetitionCandidate;
-               }
-            } else {
-               minimal = repetitionCandidate;
-            }
+            minimalConfigurations.put(repetitionCandidate.getRepetitions(), repetitionCandidate);
          }
       }
 
-      return minimal;
+      return minimalConfigurations;
    }
 
    private Configuration getLowestIterationCandidate(final int repetitions, final Entry<Integer, SortedMap<Integer, Double>> vmCount,

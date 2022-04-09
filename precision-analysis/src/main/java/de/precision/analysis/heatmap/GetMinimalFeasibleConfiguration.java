@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 
@@ -18,12 +19,12 @@ public class GetMinimalFeasibleConfiguration implements Callable<Void> {
    public final static Map<String, Integer> statisticTestIndexesDe = new LinkedHashMap<>();
 
    static {
-//      statisticTestIndexes.put("Mean Comparison", 8);
-//      statisticTestIndexesDe.put("Mittelwertvergleich", 8);
-//      statisticTestIndexes.put("T-Test", 12);
-//      statisticTestIndexesDe.put("T-Test", 12);
-//      statisticTestIndexes.put("Confidence Interval Comparison", 20);
-//      statisticTestIndexesDe.put("Kofidenzintervallvergleich", 20);
+      statisticTestIndexes.put("Mean Comparison", 8);
+      statisticTestIndexesDe.put("Mittelwertvergleich", 8);
+      statisticTestIndexes.put("T-Test", 12);
+      statisticTestIndexesDe.put("T-Test", 12);
+      statisticTestIndexes.put("Confidence Interval Comparison", 20);
+      statisticTestIndexesDe.put("Kofidenzintervallvergleich", 20);
       statisticTestIndexes.put("Mann-Whitney Test", 24);
       statisticTestIndexesDe.put("Mann-Whitney Test", 24);
    }
@@ -46,23 +47,59 @@ public class GetMinimalFeasibleConfiguration implements Callable<Void> {
          for (Map.Entry<String, Integer> statisticalTest : statisticTestIndexesDe.entrySet()) {
             for (String outlierRemovalString : new String[] { "noOutlierRemoval", "outlierRemoval" }) {
                Integer f1ScoreIndex = statisticalTest.getValue();
-               Configuration overallConfig = null;
-               for (String workload : workloads) {
-//                  System.out.println("Workload: " + workload);
-                  File testcaseFolder = new File(dataFile, workload);
-                  if (!testcaseFolder.exists()) {
-                     throw new RuntimeException("Folder " + testcaseFolder.getAbsolutePath() + " needs to exist for analysis");
-                  } else {
-                     overallConfig = analyzePrecisionFile(outlierRemovalString, f1ScoreIndex, overallConfig, testcaseFolder);
-                  }
-               }
+               Map<Integer, Configuration> overallConfigs = getRepetitionCandidates(dataFile, outlierRemovalString, f1ScoreIndex);
 
-               printResult(statisticalTest, outlierRemovalString, overallConfig);
+               Configuration minimal = detectBestRepetitionCandidate(overallConfigs);
+
+               printResult(statisticalTest, outlierRemovalString, minimal);
             }
          }
       }
 
       return null;
+   }
+
+   private Map<Integer, Configuration> getRepetitionCandidates(File dataFile, String outlierRemovalString, Integer f1ScoreIndex) throws FileNotFoundException, IOException {
+      Map<Integer, Configuration> overallConfigs = null;
+      for (String workload : workloads) {
+         // System.out.println("Workload: " + workload);
+         File testcaseFolder = new File(dataFile, workload);
+         if (!testcaseFolder.exists()) {
+            throw new RuntimeException("Folder " + testcaseFolder.getAbsolutePath() + " needs to exist for analysis");
+         } else {
+            Map<Integer, Configuration> currentConfig = analyzePrecisionFile(outlierRemovalString, f1ScoreIndex, testcaseFolder);
+            if (overallConfigs == null) {
+               overallConfigs = currentConfig;
+            } else {
+               Set<Integer> containedKeys = currentConfig.keySet();
+               containedKeys.retainAll(overallConfigs.keySet());
+               for (Integer repetitions : containedKeys) {
+                  Configuration old = overallConfigs.get(repetitions);
+                  Configuration current = currentConfig.get(repetitions);
+                  int newVMs = Math.max(old.getVMs(), current.getVMs());
+                  int newIterations = Math.max(old.getIterations(), current.getIterations());
+                  Configuration merged = new Configuration(repetitions, newVMs, newIterations);
+                  overallConfigs.put(repetitions, merged);
+               }
+            }
+         }
+      }
+      return overallConfigs;
+   }
+
+   private Configuration detectBestRepetitionCandidate(Map<Integer, Configuration> overallConfigs) {
+      Configuration minimal;
+      if (!overallConfigs.isEmpty()) {
+         minimal = overallConfigs.values().iterator().next();
+         for (Configuration config : overallConfigs.values()) {
+            if (config.getIterations() * config.getRepetitions() * config.getVMs() < minimal.getIterations() * config.getRepetitions() * config.getVMs()) {
+               minimal = config;
+            }
+         }
+      } else {
+         minimal = new Configuration(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+      }
+      return minimal;
    }
 
    private void printResult(Map.Entry<String, Integer> statisticalTest, String outlierRemovalString, Configuration overallConfig) {
@@ -79,29 +116,14 @@ public class GetMinimalFeasibleConfiguration implements Callable<Void> {
       System.out.println(repetitions + " & " + vMs + " & " + iterations + "\\\\");
    }
 
-   private Configuration analyzePrecisionFile(String outlierRemovalString, Integer f1ScoreIndex, Configuration overallConfig, File testcaseFolder)
+   private Map<Integer, Configuration> analyzePrecisionFile(String outlierRemovalString, Integer f1ScoreIndex, File testcaseFolder)
          throws FileNotFoundException, IOException {
       File precisionFile = new File(testcaseFolder, "results_" + outlierRemovalString + "/precision.csv");
 
       PrecisionData data = PrecisionDataReader.readHeatmap(precisionFile, f1ScoreIndex);
 
       MinimalFeasibleConfigurationDeterminer determiner = new MinimalFeasibleConfigurationDeterminer(99.0);
-      Configuration config = determiner.getMinimalFeasibleConfiguration(data);
-
-//       System.out.println(config);
-
-      if (config != null && config.getVMs() != Integer.MAX_VALUE) {
-         if (overallConfig == null) {
-            overallConfig = config;
-         } else {
-            int VMs = Math.max(overallConfig.getVMs(), config.getVMs());
-            int iterations = Math.max(overallConfig.getIterations(), config.getIterations());
-            overallConfig = new Configuration(overallConfig.getRepetitions(), VMs, iterations);
-         }
-      } else {
-         overallConfig = new Configuration(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
-      }
-
-      return overallConfig;
+      Map<Integer, Configuration> config = determiner.getMinimalFeasibleConfiguration(data);
+      return config;
    }
 }

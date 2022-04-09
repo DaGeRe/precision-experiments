@@ -11,7 +11,7 @@ public class TestMinimalFeasibleConfigurationDeterminer {
       PrecisionData data = new PrecisionData();
       createPrecisionData(data, 100);
       
-      Configuration config = new MinimalFeasibleConfigurationDeterminer(99.0).getMinimalFeasibleConfiguration(data);
+      Configuration config = new MinimalFeasibleConfigurationDeterminer(99.0).getMinimalFeasibleConfiguration(data).get(100);
       Assert.assertEquals(30, config.getVMs());
       Assert.assertEquals(20, config.getIterations());
       Assert.assertEquals(100, config.getRepetitions());
@@ -34,7 +34,7 @@ public class TestMinimalFeasibleConfigurationDeterminer {
       
       addFeasible40And50VMData(100, data);
       
-      Configuration config = new MinimalFeasibleConfigurationDeterminer(99.0).getMinimalFeasibleConfiguration(data);
+      Configuration config = new MinimalFeasibleConfigurationDeterminer(99.0).getMinimalFeasibleConfiguration(data).get(100);
       Assert.assertEquals(30, config.getVMs());
       Assert.assertEquals(20, config.getIterations());
       Assert.assertEquals(100, config.getRepetitions());
@@ -57,7 +57,7 @@ public class TestMinimalFeasibleConfigurationDeterminer {
       
       addFeasible40And50VMData(100, data);
       
-      Configuration config = new MinimalFeasibleConfigurationDeterminer(99.0).getMinimalFeasibleConfiguration(data);
+      Configuration config = new MinimalFeasibleConfigurationDeterminer(99.0).getMinimalFeasibleConfiguration(data).get(100);
       
       Assert.assertEquals(20, config.getVMs());
       Assert.assertEquals(20, config.getIterations());
@@ -70,7 +70,7 @@ public class TestMinimalFeasibleConfigurationDeterminer {
       createPrecisionData(data, 100);
       createPrecisionData(data, 1000);
       
-      Configuration config = new MinimalFeasibleConfigurationDeterminer(99.0).getMinimalFeasibleConfiguration(data);
+      Configuration config = new MinimalFeasibleConfigurationDeterminer(99.0).getMinimalFeasibleConfiguration(data).get(1000);
       
       Assert.assertEquals(30, config.getVMs());
       Assert.assertEquals(20, config.getIterations());
@@ -85,7 +85,7 @@ public class TestMinimalFeasibleConfigurationDeterminer {
       
       data.addData(1000, 30, 20, 98.1);
       
-      Configuration config = new MinimalFeasibleConfigurationDeterminer(99.0).getMinimalFeasibleConfiguration(data);
+      Configuration config = new MinimalFeasibleConfigurationDeterminer(99.0).getMinimalFeasibleConfiguration(data).get(100);
       
       Assert.assertEquals(30, config.getVMs());
       Assert.assertEquals(20, config.getIterations());
