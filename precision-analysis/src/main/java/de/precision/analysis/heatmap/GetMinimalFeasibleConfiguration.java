@@ -18,12 +18,12 @@ public class GetMinimalFeasibleConfiguration implements Callable<Void> {
    public final static Map<String, Integer> statisticTestIndexesDe = new LinkedHashMap<>();
 
    static {
-      statisticTestIndexes.put("Mean Comparison", 8);
-      statisticTestIndexesDe.put("Mittelwertvergleich", 8);
-      statisticTestIndexes.put("T-Test", 12);
-      statisticTestIndexesDe.put("T-Test", 12);
-      statisticTestIndexes.put("Confidence Interval Comparison", 20);
-      statisticTestIndexesDe.put("Kofidenzintervallvergleich", 20);
+//      statisticTestIndexes.put("Mean Comparison", 8);
+//      statisticTestIndexesDe.put("Mittelwertvergleich", 8);
+//      statisticTestIndexes.put("T-Test", 12);
+//      statisticTestIndexesDe.put("T-Test", 12);
+//      statisticTestIndexes.put("Confidence Interval Comparison", 20);
+//      statisticTestIndexesDe.put("Kofidenzintervallvergleich", 20);
       statisticTestIndexes.put("Mann-Whitney Test", 24);
       statisticTestIndexesDe.put("Mann-Whitney Test", 24);
    }
@@ -48,6 +48,7 @@ public class GetMinimalFeasibleConfiguration implements Callable<Void> {
                Integer f1ScoreIndex = statisticalTest.getValue();
                Configuration overallConfig = null;
                for (String workload : workloads) {
+//                  System.out.println("Workload: " + workload);
                   File testcaseFolder = new File(dataFile, workload);
                   if (!testcaseFolder.exists()) {
                      throw new RuntimeException("Folder " + testcaseFolder.getAbsolutePath() + " needs to exist for analysis");
@@ -87,15 +88,20 @@ public class GetMinimalFeasibleConfiguration implements Callable<Void> {
       MinimalFeasibleConfigurationDeterminer determiner = new MinimalFeasibleConfigurationDeterminer(99.0);
       Configuration config = determiner.getMinimalFeasibleConfiguration(data);
 
-      // System.out.println(config);
+//       System.out.println(config);
 
-      if (overallConfig == null) {
-         overallConfig = config;
+      if (config != null && config.getVMs() != Integer.MAX_VALUE) {
+         if (overallConfig == null) {
+            overallConfig = config;
+         } else {
+            int VMs = Math.max(overallConfig.getVMs(), config.getVMs());
+            int iterations = Math.max(overallConfig.getIterations(), config.getIterations());
+            overallConfig = new Configuration(overallConfig.getRepetitions(), VMs, iterations);
+         }
       } else {
-         int VMs = Math.max(overallConfig.getVMs(), config.getVMs());
-         int iterations = Math.max(overallConfig.getIterations(), config.getIterations());
-         overallConfig = new Configuration(overallConfig.getRepetitions(), VMs, iterations);
+         overallConfig = new Configuration(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
       }
+
       return overallConfig;
    }
 }
