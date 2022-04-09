@@ -135,3 +135,4 @@ echo "--- Creating histogram"
 cd $1/AddTest/results_noOutlierRemoval
 gnuplot -c $start/plotOutlierHistogram.plt
 mv histogram_outliers_en.pdf $start
+mv histogram_outliers_de.pdf $start
