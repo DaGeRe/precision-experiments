@@ -41,7 +41,7 @@ do
 		echo -n " "
 		duration=$(getDuration $file | getSum)
 		echo $duration
-	done > $start/durationData/$workloadFolder.csv
+	done > $start/durations/$workloadFolder.csv
 	cd ..
 done
 
