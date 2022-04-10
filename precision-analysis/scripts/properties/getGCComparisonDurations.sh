@@ -10,22 +10,27 @@ fi
 
 cd $1
 
-for file in $(ls | grep -v .tar | grep -v .sh | grep -v alt)
+for file in $(ls | grep -v .tar | grep -v .sh | grep -v alt | grep -v ".plt")
 do
 	echo -n "$file "
 	cd $file
 	start=$(cat result_1/*.xml | grep "<result" | awk -F'"' '{print $(NF-1)}')
 	lastFileIndex=$(ls | grep result | awk -F'_' '{print $2}' | sort -n | tail -n 1)
-	echo $lastFileIndex
 	end=$(tail -n 2 "result_"$lastFileIndex/kopeme* | grep -v "=")
-	diff=$(echo "($end-$start)/1000" | bc -l)
-	diffInH=$(echo "$diff/3600.0/$lastFileIndex" | bc -l)
-	echo $start" "$end" "$diff" "$diffInH" h"
+	diffInSeconds=$(echo "($end-$start)/1000/$lastFileIndex" | bc -l)
+	if [ $(echo $diffInSeconds'>'3600 | bc -l) = 1 ]
+	then
+		printf "%.2f" $(echo "$diffInSeconds/3600.0" | bc -l | tr "." ",")
+		echo " h"
+	else
+		displayableSeconds=$(numfmt --grouping $(echo $diffInSeconds | tr "." "," | sed 's/^00*\|00*$//g'))
+		echo $displayableSeconds" s"
+	fi
 	cd ..
 done
 
-for file in $(ls | grep -v .tar | grep -v .sh | grep -v alt)
-do
-       	echo $file
-       	cat $file/aggregated/steady_state.csv | awk '{print $3}' | getSum
-done
+#for file in $(ls | grep -v .tar | grep -v .sh | grep -v alt | grep -v ".plt")
+#do
+#       	echo $file
+#       	cat $file/aggregated/steady_state.csv | awk '{print $3}' | getSum
+#done
