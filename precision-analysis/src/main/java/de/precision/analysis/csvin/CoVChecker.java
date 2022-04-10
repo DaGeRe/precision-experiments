@@ -14,7 +14,7 @@ final class CoVChecker extends SteadyStateChecker {
    void check(int index, MeasurementEntry value, SummaryStatistics lastThree) {
       if (!success) {
          if (lastThree.getStandardDeviation() < DIFF) {
-            System.out.println("CoV Success: " + index);
+//            System.out.println("CoV Success: " + index);
             success = true;
             finishIndex = index;
             finishValue = value.getMean();

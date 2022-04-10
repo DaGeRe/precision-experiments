@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -17,10 +18,8 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.precision.analysis.repetitions.GeneratePrecisionPlot;
-
 public class FindRepeatableState {
-   
+
    private static final DecimalFormat df = new DecimalFormat("#,###.00", DecimalFormatSymbols.getInstance(Locale.GERMAN));
 
    private static final Logger LOG = LogManager.getLogger(FindRepeatableState.class);
@@ -39,7 +38,11 @@ public class FindRepeatableState {
    }
 
    public static void main(String[] args) throws FileNotFoundException, IOException {
-
+      if (args.length == 0) {
+         System.err.println("Please pass folders that contain aggregated CoV result data.\n"
+               + "If you got the dataset, normale $DATASET_LOCATION/CoV/AddTest/aggregated");
+      }
+      
       for (String arg : args) {
          File folder = new File(arg);
 
@@ -78,7 +81,16 @@ public class FindRepeatableState {
       for (SteadyStateChecker checker : checkers) {
          System.out.print(folder.getParentFile().getName() + " & " + checker.getClass().getSimpleName() + " & ");
          final double meanValue = checker.getValueStatistics().getMean();
-         System.out.print( df.format((int)checker.getIndexStatistics().getMean() * 5000) + " & " + (!Double.isNaN(meanValue) ? df.format(meanValue) : "NaN"));
+         String formatedDuration = !Double.isNaN(meanValue) ? df.format(meanValue) : "NaN";
+         int abortIndexValue = (int) checker.getIndexStatistics().getMean() * 5000;
+         String abortIndex;
+         if (abortIndexValue != 9990000) {
+            abortIndex = NumberFormat.getInstance(Locale.GERMAN).format(abortIndexValue);
+         } else {
+            abortIndex = "-";
+         }
+
+         System.out.print(abortIndex + " & " + formatedDuration);
          System.out.println("\\\\");
          // System.out.println(checker.getIndexStatistics().getStandardDeviation() + " " + checker.getValueStatistics().getStandardDeviation());
       }
