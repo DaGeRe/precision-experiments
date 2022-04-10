@@ -42,11 +42,23 @@ public class FindRepeatableState {
          System.err.println("Please pass folders that contain aggregated CoV result data.\n"
                + "If you got the dataset, normale $DATASET_LOCATION/CoV/AddTest/aggregated");
       }
-      
+
       for (String arg : args) {
          File folder = new File(arg);
+         File baselinetestFile = new File(folder, "BaselineTest/aggregated");
+         File addTestFile = new File(folder, "AddTest/aggregated");
+         File ramTestFile = new File(folder, "RAMTest/aggregated");
+         File sysoutTestFile = new File(folder, "SysoutTest/aggregated");
 
-         handleResultFolder(folder);
+         // If these folders all exist, we can safely assume that the parent folder was passed to the program
+         if (baselinetestFile.exists() && addTestFile.exists() && ramTestFile.exists() && sysoutTestFile.exists()) {
+            handleResultFolder(baselinetestFile);
+            handleResultFolder(addTestFile);
+            handleResultFolder(ramTestFile);
+            handleResultFolder(sysoutTestFile);
+         } else {
+            handleResultFolder(folder);
+         }
       }
    }
 
