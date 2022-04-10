@@ -21,4 +21,9 @@ final class CoVChecker extends SteadyStateChecker {
          }
       }
    }
+
+   @Override
+   String getGermanName() {
+      return "CoV-Abbruch";
+   }
 }

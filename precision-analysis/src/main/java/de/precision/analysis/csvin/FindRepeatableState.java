@@ -79,7 +79,7 @@ public class FindRepeatableState {
 
    private static void printResultTable(File folder, List<SteadyStateChecker> checkers) {
       for (SteadyStateChecker checker : checkers) {
-         System.out.print(folder.getParentFile().getName() + " & " + checker.getClass().getSimpleName() + " & ");
+         System.out.print(folder.getParentFile().getName() + " & " + checker.getGermanName() + " & ");
          final double meanValue = checker.getValueStatistics().getMean();
          String formatedDuration = !Double.isNaN(meanValue) ? df.format(meanValue) : "NaN";
          int abortIndexValue = (int) checker.getIndexStatistics().getMean() * 5000;

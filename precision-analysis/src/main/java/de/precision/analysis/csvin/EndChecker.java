@@ -19,4 +19,9 @@ final class EndChecker extends SteadyStateChecker {
          finishValue = steadyStateStatistics.getMean();
       }
    }
+   
+   @Override
+   String getGermanName() {
+      return "Endwertabbruch";
+   }
 }

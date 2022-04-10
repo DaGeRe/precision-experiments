@@ -21,4 +21,10 @@ final class DeviationToEndChecker extends SteadyStateChecker {
          }
       }
    }
+   
+   @Override
+   String getGermanName() {
+      // TODO Auto-generated method stub
+      return "Abweichungsabbruch";
+   }
 }

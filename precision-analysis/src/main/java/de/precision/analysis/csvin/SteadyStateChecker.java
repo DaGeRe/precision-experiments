@@ -58,4 +58,6 @@ abstract class SteadyStateChecker {
    public SummaryStatistics getValueStatistics() {
       return statisticSelectedValue;
    }
+   
+   abstract String getGermanName();
 }
