@@ -36,6 +36,8 @@ unset table
 
 set decimalsign locale 'de_DE.utf8'
 
+set format x "%'.0f"
+
 plot $VALUES_ADDTEST w linespoint title 'AddTest'
 
 set ylabel 'Relative Standardabweichung'
