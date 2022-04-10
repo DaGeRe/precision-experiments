@@ -2,6 +2,19 @@ function getSum {
    awk '{sum += $1; square += $1^2} END {print sqrt(square / NR - (sum/NR)^2)" "sum/NR" "NR}'
 }
 
+# Use this if you only want to extract the first and last file, to get the overall duration  
+function extractWithXMLName {
+	file=$1
+	xmlName=$2
+	
+	echo "  Extracting 1 $file $xmlName"
+	tar --occurrence=1 -xvf results_de.precision.*.tar result_1/$xmlName.xml
+	echo "  Extracting 1000 $file $xmlName"
+	tar --occurrence=1 -xvf results_de.precision.*.tar result_1000/$xmlName.xml
+	detailFile=$(cat result_1000/$xmlName.xml | grep "fileName" | awk -F'[<>]' '{print $3}')
+	tar --occurrence=1 -xvf results_de.precision.*.tar result_1000/$detailFile
+}
+
 if [ $# -eq 0 ]
 then
 	echo "Arguments missing: please pass folder with cov-test-results (either with or without GC activated) - measurements should be extracted (to get durations)"
