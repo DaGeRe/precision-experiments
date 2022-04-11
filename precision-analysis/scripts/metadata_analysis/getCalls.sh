@@ -39,6 +39,7 @@ function getProjectCalls {
 						        | egrep -v "^[ ]*int [a-zA-Z]*;" | egrep -v "^[ ]*int [a-zA-Z]*[ ]*=[ ]*0;" | egrep -v "^[ ]*long [a-zA-Z]*;" | egrep -v "^[ ]*long [a-zA-Z]*[ ]*=[ ]*0;" \
 						        | egrep -v "^[ ]*byte [a-zA-Z]*;" | egrep -v "^[ ]*byte [a-zA-Z]*[ ]*=[ ]*0;" | egrep -v "^[ ]*char [a-zA-Z]*;" \
 						        | egrep -v "^[ ]*boolean [a-zA-Z]*;" | egrep -v "^[ ]*boolean [a-zA-Z]*[ ]*=[ ]*true;"| egrep -v "^[ ]*boolean [a-zA-Z]*[ ]*=[ ]*false;" | egrep -v "^[ ]*String [a-zA-Z]*;" \
+						        | egrep -v "^[ ]*[a-zA-Z]* [a-zA-Z]*[ ]*;" | egrep -v "^[ ]*[a-zA-Z]* [a-zA-Z]*[ ]*=[ ]*null;" \
 						        | wc -l)
 
 						#echo $calls" "$methodCompressedCount" "$methodCompressedLines
