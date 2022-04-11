@@ -17,8 +17,8 @@ function getProjectCalls {
 					expandedFiles=( $file/$testcase/$testmethod/*_method_expanded )
 					if [ -f ${expandedFiles[0]} ]
 					then
-						calls=$(cat $file/$testcase/$testmethod/*_method_expanded | grep -v "#get" | grep -v "#is" | grep -v "#set" | wc -l)
-						methodCompressedCount=$(cat $file/$testcase/$testmethod/*_method | grep -v "#get" | grep -v "#is" | grep -v "#set" | wc -l)
+						calls=$(cat $file/$testcase/$testmethod/*_method_expanded | grep -v "#get" | grep -v "#is" | grep -v "#set" | grep -v '#access\$' | wc -l)
+						methodCompressedCount=$(cat $file/$testcase/$testmethod/*_method | grep -v "#get" | grep -v "#is" | grep -v "#set" | grep -v '#access\$' | wc -l)
 						methodCompressedLines=$(cd $file/$testcase/$testmethod/; \
 						        cat *_nocomment | tr -d '\000' \
 						        | grep -a -v "}" \
@@ -34,7 +34,9 @@ function getProjectCalls {
 						        | egrep -v "^[ ]*\*[ ]*" \
 						        | egrep -v "^[ ]*/\*" \
 						        | egrep -v "[ ]*\([0-9]*\)[ ]*$" \
-						        | grep -v "#get" | grep -v "#is" | grep -v "#set" | grep -v ".get" | grep -v ".is" | grep -v ".set" \
+						        | grep -v "#get" | grep -v "#is" | grep -v "#set" | grep -v ".get" | grep -v ".is" | grep -v ".set" | grep -v '#access\$' \
+						        | grep -v "super()" | grep -v "@Test" | grep -v "@PerformanceTest" | grep -v "@de.dagere.kopeme.annotations.PerformanceTest" | grep -v "continue" \
+						        | egrep -v "^[ ]*int [a-zA-Z]*;" | egrep -v "^[ ]*byte [a-zA-Z]*;" | egrep -v "^[ ]*long [a-zA-Z]*;" | egrep -v "^[ ]*String [a-zA-Z]*;" \
 						        | wc -l)
 
 						#echo $calls" "$methodCompressedCount" "$methodCompressedLines
@@ -61,7 +63,7 @@ do
 done
 cat *.csv | awk '{sum+=$1; sum2+=$2} END {print sum/NR" "sum2/NR}'
 
-cat *.csv | sort > all.csv
+cat *.csv | grep -v "view_" | sort > all.csv
 gnuplot -c plotHistogram.plt
 
 echo "Median Call Count"
