@@ -18,7 +18,7 @@ function getProjectCalls {
 					if [ -f ${expandedFiles[0]} ]
 					then
 						calls=$(cat $file/$testcase/$testmethod/*_method_expanded | grep -v "#get" | grep -v "#is" | grep -v "#set" | wc -l)
-						methodCompressedCount=$(cat $file/$testcase/$testmethod/*_method | grep -v "#get" | grep -v "#is" | grep -v "#set" wc -l)
+						methodCompressedCount=$(cat $file/$testcase/$testmethod/*_method | grep -v "#get" | grep -v "#is" | grep -v "#set" | wc -l)
 						methodCompressedLines=$(cd $file/$testcase/$testmethod/; \
 						        cat *_nocomment | tr -d '\000' \
 						        | grep -a -v "}" \
