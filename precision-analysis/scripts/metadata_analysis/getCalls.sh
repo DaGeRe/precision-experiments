@@ -35,8 +35,10 @@ function getProjectCalls {
 						        | egrep -v "^[ ]*/\*" \
 						        | egrep -v "[ ]*\([0-9]*\)[ ]*$" \
 						        | grep -v "#get" | grep -v "#is" | grep -v "#set" | grep -v ".get" | grep -v ".is" | grep -v ".set" | grep -v '#access\$' \
-						        | grep -v "super()" | grep -v "@Test" | grep -v "@PerformanceTest" | grep -v "@de.dagere.kopeme.annotations.PerformanceTest" | grep -v "continue" \
-						        | egrep -v "^[ ]*int [a-zA-Z]*;" | egrep -v "^[ ]*byte [a-zA-Z]*;" | egrep -v "^[ ]*long [a-zA-Z]*;" | egrep -v "^[ ]*String [a-zA-Z]*;" \
+						        | grep -v "super(" | grep -v "@Test" | grep -v "@PerformanceTest" | grep -v "@de.dagere.kopeme.annotations.PerformanceTest" | grep -v "continue" \
+						        | egrep -v "^[ ]*int [a-zA-Z]*;" | egrep -v "^[ ]*int [a-zA-Z]*[ ]*=[ ]*0;" | egrep -v "^[ ]*long [a-zA-Z]*;" | egrep -v "^[ ]*long [a-zA-Z]*[ ]*=[ ]*0;" \
+						        | egrep -v "^[ ]*byte [a-zA-Z]*;" | egrep -v "^[ ]*byte [a-zA-Z]*[ ]*=[ ]*0;" | egrep -v "^[ ]*char [a-zA-Z]*;" \
+						        | egrep -v "^[ ]*boolean [a-zA-Z]*;" | egrep -v "^[ ]*boolean [a-zA-Z]*=[ ]*true;"| egrep -v "^[ ]*boolean [a-zA-Z]*=[ ]*false;" | egrep -v "^[ ]*String [a-zA-Z]*;" \
 						        | wc -l)
 
 						#echo $calls" "$methodCompressedCount" "$methodCompressedLines
