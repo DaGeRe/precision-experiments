@@ -29,6 +29,9 @@ function getProjectCalls {
 						        | grep -v "try {" \
 						        | grep -v "@Override" \
 						        | grep -v "@SuppressWarning" \
+						        | grep -v "@Deprecated" \
+						        | grep -v "@After" \
+						        | grep -v "@Before" \
 						        | grep -v "case " \
 						        | grep -v -e '^[[:space:]]*$' \
 						        | egrep -v "^[ ]*\*[ ]*" \
