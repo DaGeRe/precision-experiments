@@ -40,6 +40,7 @@ function getProjectCalls {
 						        | grep -v "#get" | grep -v "#is" | grep -v "#set" | grep -v ".get" | grep -v ".is" | grep -v ".set" | grep -v '#access\$' \
 						        | grep -v "super(" | grep -v "@Test" | grep -v "@PerformanceTest" | grep -v "@de.dagere.kopeme.annotations.PerformanceTest" | grep -v "continue" \
 						        | egrep -v "^[ ]*int [a-zA-Z_0-9]*;" | egrep -v "^[ ]*int [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" | egrep -v "^[ ]*final int [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" \
+						        | egrep -v "^[ ]*short [a-zA-Z_0-9]*;" | egrep -v "^[ ]*short [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" | egrep -v "^[ ]*final short [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" \
 						        | egrep -v "^[ ]*long [a-zA-Z_0-9]*;" | egrep -v "^[ ]*long [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" | egrep -v "^[ ]*final long [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" \
 						        | egrep -v "^[ ]*byte [a-zA-Z_0-9]*;" | egrep -v "^[ ]*byte [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" | egrep -v "^[ ]*final byte [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" \
 						        | egrep -v "^[ ]*char [a-zA-Z_0-9]*;" | egrep -v "^[ ]*char [a-zA-Z_0-9]*[ ]*=[ ]*'[A-Za-z+-q_]';" | egrep -v "^[ ]*final char [a-zA-Z_0-9]*[ ]*=[ ]*'[A-Za-z+-q_]';" \
