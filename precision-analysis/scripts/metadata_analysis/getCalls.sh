@@ -36,10 +36,15 @@ function getProjectCalls {
 						        | egrep -v "[ ]*\([0-9]*\)[ ]*$" \
 						        | grep -v "#get" | grep -v "#is" | grep -v "#set" | grep -v ".get" | grep -v ".is" | grep -v ".set" | grep -v '#access\$' \
 						        | grep -v "super(" | grep -v "@Test" | grep -v "@PerformanceTest" | grep -v "@de.dagere.kopeme.annotations.PerformanceTest" | grep -v "continue" \
-						        | egrep -v "^[ ]*int [a-zA-Z]*;" | egrep -v "^[ ]*int [a-zA-Z]*[ ]*=[ ]*0;" | egrep -v "^[ ]*long [a-zA-Z]*;" | egrep -v "^[ ]*long [a-zA-Z]*[ ]*=[ ]*0;" \
-						        | egrep -v "^[ ]*byte [a-zA-Z]*;" | egrep -v "^[ ]*byte [a-zA-Z]*[ ]*=[ ]*0;" | egrep -v "^[ ]*char [a-zA-Z]*;" \
-						        | egrep -v "^[ ]*boolean [a-zA-Z]*;" | egrep -v "^[ ]*boolean [a-zA-Z]*[ ]*=[ ]*true;"| egrep -v "^[ ]*boolean [a-zA-Z]*[ ]*=[ ]*false;" | egrep -v "^[ ]*String [a-zA-Z]*;" \
-						        | egrep -v "^[ ]*[a-zA-Z]* [a-zA-Z]*[ ]*;" | egrep -v "^[ ]*[a-zA-Z]* [a-zA-Z]*[ ]*=[ ]*null;" \
+						        | egrep -v "^[ ]*int [a-zA-Z_0-9]*;" | egrep -v "^[ ]*int [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" | egrep -v "^[ ]*final int [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" \
+						        | egrep -v "^[ ]*long [a-zA-Z_0-9]*;" | egrep -v "^[ ]*long [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" | egrep -v "^[ ]*final long [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" \
+						        | egrep -v "^[ ]*byte [a-zA-Z_0-9]*;" | egrep -v "^[ ]*byte [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" | egrep -v "^[ ]*final byte [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" \
+						        | egrep -v "^[ ]*char [a-zA-Z_0-9]*;" \
+						        | egrep -v "^[ ]*float [a-zA-Z_0-9]*;" | egrep -v "^[ ]*float [a-zA-Z_]*[ ]*=[ ]*[0-9]+;" \
+						        | egrep -v "^[ ]*double [a-zA-Z_]*;" | egrep -v "^[ ]*double [a-zA-Z_]*[ ]*=[ ]*[-0-9.]+;" | egrep -v "^[ ]*final double [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9.]+;" | egrep -v "^[ ]*double [a-zA-Z_0-9]*[ ]*=[ ]*Double.MAX_VALUE+;" \
+						        | egrep -v "^[ ]*boolean [a-zA-Z_0-9]*;" | egrep -v "^[ ]*boolean [a-zA-Z_0-9]*[ ]*=[ ]*true;"| egrep -v "^[ ]*boolean [a-zA-Z_0-9]*[ ]*=[ ]*false;" | egrep -v "^[ ]*final boolean [a-zA-Z_0-9]*[ ]*=[ ]*true;"| egrep -v "^[ ]*final boolean [a-zA-Z_0-9]*[ ]*=[ ]*false;" \
+						        | egrep -v "^[ ]*String [a-zA-Z_0-9]*;" | egrep -v "^[ ]*final String [a-zA-Z_0-9]*[ ]*=[ ]*\"[a-zA-Z_0-9 /]*\";" \
+						        | egrep -v "^[ ]*[a-zA-Z_0-9]* [a-zA-Z_0-9]*[ ]*;" | egrep -v "^[ ]*[a-zA-Z_0-9]* [a-zA-Z_0-9]*[ ]*=[ ]*null;" \
 						        | wc -l)
 
 						#echo $calls" "$methodCompressedCount" "$methodCompressedLines
