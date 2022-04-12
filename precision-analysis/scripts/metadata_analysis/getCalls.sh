@@ -43,12 +43,14 @@ function getProjectCalls {
 						        | egrep -v "^[ ]*short [a-zA-Z_0-9]*;" | egrep -v "^[ ]*short [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" | egrep -v "^[ ]*final short [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" \
 						        | egrep -v "^[ ]*long [a-zA-Z_0-9]*;" | egrep -v "^[ ]*long [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" | egrep -v "^[ ]*final long [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" \
 						        | egrep -v "^[ ]*byte [a-zA-Z_0-9]*;" | egrep -v "^[ ]*byte [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" | egrep -v "^[ ]*final byte [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9]+;" \
+						        | egrep -v "^[ ]*final byte [a-zA-Z_0-9]*[ ]*=[ ]*[a-zA-Z_0-9]*\[[a-zA-Z_0-9]*\];" \
 						        | egrep -v "^[ ]*char [a-zA-Z_0-9]*;" | egrep -v "^[ ]*char [a-zA-Z_0-9]*[ ]*=[ ]*'[A-Za-z+-q_]';" | egrep -v "^[ ]*final char [a-zA-Z_0-9]*[ ]*=[ ]*'[A-Za-z+-q_]';" \
 						        | egrep -v "^[ ]*float [a-zA-Z_0-9]*;" | egrep -v "^[ ]*float [a-zA-Z_]*[ ]*=[ ]*[0-9]+;" \
 						        | egrep -v "^[ ]*double [a-zA-Z_]*;" | egrep -v "^[ ]*double [a-zA-Z_]*[ ]*=[ ]*[-0-9.]+;" | egrep -v "^[ ]*final double [a-zA-Z_0-9]*[ ]*=[ ]*[-0-9.]+;" | egrep -v "^[ ]*double [a-zA-Z_0-9]*[ ]*=[ ]*Double.MIN_VALUE+;" | egrep -v "^[ ]*double [a-zA-Z_0-9]*[ ]*=[ ]*Double.MAX_VALUE+;" \
-						        | egrep -v "^[ ]*boolean [a-zA-Z_0-9]*;" | egrep -v "^[ ]*boolean [a-zA-Z_0-9]*[ ]*=[ ]*true;"| egrep -v "^[ ]*boolean [a-zA-Z_0-9]*[ ]*=[ ]*false;" | egrep -v "^[ ]*final boolean [a-zA-Z_0-9]*[ ]*=[ ]*true;"| egrep -v "^[ ]*final boolean [a-zA-Z_0-9]*[ ]*=[ ]*false;" \
+						        | egrep -v "^[ ]*boolean [a-zA-Z_0-9]*;" | egrep -v "^[ ]*boolean [a-zA-Z_0-9]*[ ]*=[ ]*true;"| egrep -v "^[ ]*boolean [a-zA-Z_0-9]*[ ]*=[ ]*false;" | egrep -v "^[ ]*final boolean [a-zA-Z_0-9]*[ ]*=[ ]*true;" | egrep -v "^[ ]*final boolean [a-zA-Z_0-9]*[ ]*=[ ]*false;" | egrep -v "^[ ]*final boolean [a-zA-Z_0-9]*[ ]*=[ ]*[a-zA-Z_0-9]*;" \
 						        | egrep -v "^[ ]*String [a-zA-Z_0-9]*;" | egrep -v "^[ ]*String [a-zA-Z_0-9]*[ ]*=[ ]*\"[a-zA-Z_0-9 /\\,-;='\"!]*\";" | egrep -v "^[ ]*final String [a-zA-Z_0-9]*[ ]*=[ ]*\"[a-zA-Z_0-9 /\\,-;='\"!]*\";" \
-						        | egrep -v "^[ ]*[a-zA-Z_0-9]* [a-zA-Z_0-9]*[ ]*;" | egrep -v "^[ ]*[a-zA-Z_0-9]* [a-zA-Z_0-9]*[ ]*=[ ]*null;" \
+						        | egrep -v "^[ ]*final String [a-zA-Z_0-9]*[ ]*=[ ]*[a-zA-Z_0-9]*\[[a-zA-Z_0-9]*\];" \
+						        | egrep -v "^[ ]*[a-zA-Z_0-9]* [a-zA-Z_0-9]*[ ]*;" | egrep -v "^[ ]*[a-zA-Z_0-9]* [a-zA-Z_0-9]*[ ]*=[ ]*null;" | egrep -v "^[ ]*[a-zA-Z_0-9]* [a-zA-Z_0-9]*[ ]*=[ ]*[a-zA-Z_0-9];" | egrep -v "^[ ]*final [a-zA-Z_0-9]* [a-zA-Z_0-9]*[ ]*=[ ]*[a-zA-Z_0-9]*;" \
 						        | wc -l)
 
 						#echo $calls" "$methodCompressedCount" "$methodCompressedLines
