@@ -1,6 +1,6 @@
 package de.precision.analysis.IterationEvolution;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 public interface CoVLoader {
 

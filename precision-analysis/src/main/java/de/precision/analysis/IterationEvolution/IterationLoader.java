@@ -3,7 +3,7 @@ package de.precision.analysis.IterationEvolution;
 import java.io.File;
 import java.io.FileFilter;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 

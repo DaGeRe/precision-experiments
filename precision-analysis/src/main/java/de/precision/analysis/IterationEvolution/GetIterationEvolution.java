@@ -2,7 +2,7 @@ package de.precision.analysis.IterationEvolution;
 
 import java.io.File;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 public class GetIterationEvolution {
 

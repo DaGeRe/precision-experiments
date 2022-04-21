@@ -3,7 +3,7 @@ package de.precision.analysis.covSteady;
 import java.io.File;
 import java.util.Random;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 

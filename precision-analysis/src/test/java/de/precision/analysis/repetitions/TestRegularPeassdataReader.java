@@ -2,7 +2,7 @@ package de.precision.analysis.repetitions;
 
 import java.io.File;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsIterableWithSize;
