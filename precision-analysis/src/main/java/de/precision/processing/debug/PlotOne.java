@@ -11,10 +11,9 @@ import jakarta.xml.bind.JAXBException;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import de.dagere.kopeme.datastorage.XMLDataLoader;
-import de.dagere.kopeme.generated.Kopemedata;
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.dagere.kopeme.generated.TestcaseType;
+import de.dagere.kopeme.datastorage.JSONDataLoader;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.TestMethod;
 import de.dagere.peass.analysis.measurement.statistics.MeanCoVData;
 
 public class PlotOne {
@@ -31,17 +30,16 @@ public class PlotOne {
 
 	public static void main(final String[] args) throws JAXBException, IOException {
 		final File folder = new File(args[0]);
-		final Kopemedata data = new XMLDataLoader(folder).getFullData();
-		final Testcases testclazz = data.getTestcases();
+		final Kopemedata data = new JSONDataLoader(folder).getFullData();
 
-		final TestcaseType testcase = testclazz.getTestcase().get(0);
+		final TestMethod testcase = data.getFirstMethodResult();
 		final MeanCoVData data2 = new MeanCoVData(testcase, 100);
 		data2.printTestcaseData(RESULTFOLDER);
 		final List<DescriptiveStatistics> means = data2.getAllMeans();
 
 		final int avgCount = 100;
 
-		final File csvFile = new File(RESULTFOLDER, "result_" + testcase.getName() + "_mean.csv");
+		final File csvFile = new File(RESULTFOLDER, "result_" + testcase.getMethod() + "_mean.csv");
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
 			DescriptiveStatistics statistics = new DescriptiveStatistics();
 			for (final DescriptiveStatistics mean : means) {

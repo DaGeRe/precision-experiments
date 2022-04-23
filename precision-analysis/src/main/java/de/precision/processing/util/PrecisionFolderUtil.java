@@ -12,8 +12,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import jakarta.xml.bind.JAXBException;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -37,7 +35,7 @@ public final class PrecisionFolderUtil {
 
    }
 
-   public static void processFolder(final File folder, final Creator creator) throws JAXBException, IOException {
+   public static void processFolder(final File folder, final Creator creator) throws IOException {
       processFolder(folder, creator, "results", "precision");
    }
 
@@ -47,7 +45,7 @@ public final class PrecisionFolderUtil {
     * @param folder Folder to look for repetition folders
     * @param creator Creator for ReptitionFolderHandler
     */
-   public static void processFolder(final File folder, final Creator creator, String... prefixes) throws JAXBException, IOException {
+   public static void processFolder(final File folder, final Creator creator, String... prefixes) throws IOException {
       final File[] repetitionFolders = folder.listFiles();
       final String pattern = buildPattern(prefixes);
       sortFolders(repetitionFolders, pattern, prefixes);
@@ -59,7 +57,7 @@ public final class PrecisionFolderUtil {
       }
    }
 
-   public static void processFolderParallel(final File folder, final CreatorParallel creator, int threads) throws JAXBException, IOException, InterruptedException {
+   public static void processFolderParallel(final File folder, final CreatorParallel creator, int threads) throws IOException, InterruptedException {
       final File[] repetitionFolders = folder.listFiles();
       final String pattern = buildPattern("precision");
       sortFolders(repetitionFolders, pattern, "precision");

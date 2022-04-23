@@ -8,7 +8,8 @@ import jakarta.xml.bind.JAXBException;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.inference.TTest;
 
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.TestMethod;
 import de.dagere.peass.measurement.dataloading.MultipleVMTestUtil;
 import de.precision.processing.util.PrecisionFolderUtil;
 import de.precision.processing.util.RepetitionFolderHandler;
@@ -31,9 +32,9 @@ public class AnalyseMediumsize extends RepetitionFolderHandler {
 	}
 
 	@Override
-	protected void processTestcases(final Testcases versionFast, final Testcases versionSlow) {
-		final SummaryStatistics statisticsFast = MultipleVMTestUtil.getStatistic(versionFast.getTestcase().get(0).getDatacollector().get(0).getResult());
-		final SummaryStatistics statisticsSlow = MultipleVMTestUtil.getStatistic(versionSlow.getTestcase().get(0).getDatacollector().get(0).getResult());
+	protected void processTestcases(final Kopemedata versionFast, final Kopemedata versionSlow) {
+		final SummaryStatistics statisticsFast = MultipleVMTestUtil.getStatistic(versionFast.getFirstDatacollectorContent());
+		final SummaryStatistics statisticsSlow = MultipleVMTestUtil.getStatistic(versionSlow.getFirstDatacollectorContent());
 		
 		final double tval = new TTest().homoscedasticT(statisticsFast, statisticsSlow);
 		

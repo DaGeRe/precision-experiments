@@ -16,6 +16,9 @@ import org.apache.logging.log4j.Logger;
 import de.dagere.kopeme.generated.Kopemedata.Testcases;
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.Result.Fulldata.Value;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.MeasuredValue;
+import de.dagere.kopeme.kopemedata.VMResult;
 import de.precision.processing.util.RepetitionFolderHandler;
 import de.precision.processing.util.PrecisionFolderUtil;
 
@@ -42,15 +45,15 @@ public class DetermineAverageTime extends RepetitionFolderHandler {
    static Map<Integer, DescriptiveStatistics> executionDurations = new TreeMap<>();
 
    @Override
-   protected void processTestcases(final Testcases versionFast, final Testcases versionSlow) {
+   protected void processTestcases(final Kopemedata versionFast, final Kopemedata versionSlow) {
       DescriptiveStatistics statistics = executionDurations.get(repetitions);
       if (statistics == null) {
          statistics = new DescriptiveStatistics();
          executionDurations.put(repetitions, statistics);
       }
 
-      final long overhead = getOverhead(versionFast.getTestcase().get(0).getDatacollector().get(0).getResult(), versionSlow.getTestcase().get(0).getDatacollector().get(0).getResult());
-      final double duration = getAverageDuration(versionFast.getTestcase().get(0).getDatacollector().get(0).getResult(), versionSlow.getTestcase().get(0).getDatacollector().get(0).getResult());
+      final long overhead = getOverhead(versionFast.getFirstDatacollectorContent(), versionSlow.getFirstDatacollectorContent());
+      final double duration = getAverageDuration(versionFast.getFirstDatacollectorContent(), versionSlow.getFirstDatacollectorContent());
 
       overheads.addValue(overhead);
 
@@ -64,38 +67,38 @@ public class DetermineAverageTime extends RepetitionFolderHandler {
     * @param versionSlow
     * @return
     */
-   public static long getOverhead(final List<Result> versionFast, final List<Result> versionSlow) {
-      final Iterator<Result> slowIt = versionFast.iterator();
-      final Iterator<Result> fastIt = versionSlow.iterator();
+   public static long getOverhead(final List<VMResult> versionFast, final List<VMResult> versionSlow) {
+      final Iterator<VMResult> slowIt = versionFast.iterator();
+      final Iterator<VMResult> fastIt = versionSlow.iterator();
 
-      final List<Value> fastFullData = fastIt.next().getFulldata().getValue();
-      final Long endFast = fastFullData.get(fastFullData.size() - 1).getStart();
+      final List<MeasuredValue> fastFullData = fastIt.next().getFulldata().getValues();
+      final Long endFast = fastFullData.get(fastFullData.size() - 1).getStartTime();
 
-      final List<Value> slowFullData = slowIt.next().getFulldata().getValue();
-      final Long start = slowFullData.get(0).getStart();
+      final List<MeasuredValue> slowFullData = slowIt.next().getFulldata().getValues();
+      final Long start = slowFullData.get(0).getStartTime();
       LOG.info("Start slow: " + start + " End slow: " + endFast);
 
       return start - endFast;
    }
 
-   public static double getDurationInMS(final List<Result> versionFast, final List<Result> versionSlow) {
+   public static double getDurationInMS(final List<VMResult> versionFast, final List<VMResult> versionSlow) {
 
       long firstFast = versionFast.get(0).getDate();
       long firstSlow = versionSlow.get(0).getDate();
 
-      Value lastFast = getLast(versionFast);
-      Value lasttSlow = getLast(versionSlow);
+      MeasuredValue lastFast = getLast(versionFast);
+      MeasuredValue lasttSlow = getLast(versionSlow);
       
       final long startTime = Math.min(firstFast, firstSlow);
-      final long endTime = Math.max(lastFast.getStart(), lasttSlow.getStart());
+      final long endTime = Math.max(lastFast.getStartTime(), lasttSlow.getStartTime());
       long duration = endTime - startTime;
 
       return duration;
    }
 
-   private static Value getLast(final List<Result> version) {
-      List<Value> values = version.get(0).getFulldata().getValue();
-      Value last = values.get(values.size() - 1);
+   private static MeasuredValue getLast(final List<VMResult> version) {
+      List<MeasuredValue> values = version.get(0).getFulldata().getValues();
+      MeasuredValue last = values.get(values.size() - 1);
       return last;
    }
 
@@ -106,17 +109,17 @@ public class DetermineAverageTime extends RepetitionFolderHandler {
     * @param versionSlow
     * @return
     */
-   public static double getAverageDuration(final List<Result> versionFast, final List<Result> versionSlow) {
-      final Iterator<Result> slowIt = versionFast.iterator();
-      final Iterator<Result> fastIt = versionSlow.iterator();
-      final List<Value> fastFD = fastIt.next().getFulldata().getValue();
-      final Long startFast = fastFD.get(0).getStart();
-      final Long endFast = fastFD.get(fastFD.size() - 1).getStart();
+   public static double getAverageDuration(final List<VMResult> versionFast, final List<VMResult> versionSlow) {
+      final Iterator<VMResult> slowIt = versionFast.iterator();
+      final Iterator<VMResult> fastIt = versionSlow.iterator();
+      final List<MeasuredValue> fastFD = fastIt.next().getFulldata().getValues();
+      final Long startFast = fastFD.get(0).getStartTime();
+      final Long endFast = fastFD.get(fastFD.size() - 1).getStartTime();
       final double averageFast = ((double) (endFast - startFast)) / fastFD.size();
 
-      final List<Value> slowFD = slowIt.next().getFulldata().getValue();
-      final Long start = slowFD.get(0).getStart();
-      final Long end = slowFD.get(slowFD.size() - 1).getStart();
+      final List<MeasuredValue> slowFD = slowIt.next().getFulldata().getValues();
+      final Long start = slowFD.get(0).getStartTime();
+      final Long end = slowFD.get(slowFD.size() - 1).getStartTime();
 
       final double averageSlow = ((double) (end - start)) / slowFD.size();
 

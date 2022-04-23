@@ -10,21 +10,21 @@ import jakarta.xml.bind.JAXBException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
+import de.dagere.kopeme.kopemedata.Kopemedata;
 
 public class PrecisionPlotHandler {
 
    private static final Logger LOG = LogManager.getLogger(PrecisionPlotHandler.class);
 
-   private final Map<String, Testcases> testcasesV1;
-   private final Map<String, Testcases> testcasesV2;
+   private final Map<String, Kopemedata> testcasesV1;
+   private final Map<String, Kopemedata> testcasesV2;
 
    private final ExecutorService pool;
    private final long repetitions;
    private final PrecisionConfig precisionConfig;
    private WritingData writingData;
 
-   public PrecisionPlotHandler(final Map<String, Testcases> testcasesV1, final Map<String, Testcases> testcasesV2, final ExecutorService pool, final long repetitions,
+   public PrecisionPlotHandler(final Map<String, Kopemedata> testcasesV1, final Map<String, Kopemedata> testcasesV2, final ExecutorService pool, final long repetitions,
          final PrecisionConfig precisionConfig,
          final WritingData writingData) {
       this.testcasesV1 = testcasesV1;
@@ -35,7 +35,7 @@ public class PrecisionPlotHandler {
       this.writingData = writingData;
    }
 
-   public void handleAllParameters(final int maxVMs, final int maxIterations) throws JAXBException, IOException {
+   public void handleAllParameters(final int maxVMs, final int maxIterations) throws IOException {
       final int iterationStepSize = Math.max(maxIterations / precisionConfig.getIterationResolution(), 1);
       LOG.debug("Step size: {}", iterationStepSize);
       // for (int warmup = 0; warmup <= maxWarmup; warmup += executionStepSize) {
@@ -66,7 +66,7 @@ public class PrecisionPlotHandler {
       return usedMaxVMs;
    }
 
-   public void handleOnlyVMs(final int maxVMs, final int maxExecutions) throws JAXBException, IOException {
+   public void handleOnlyVMs(final int maxVMs, final int maxExecutions) throws IOException {
       int warmup = maxExecutions / 2;
       // this.executions = maxExecutions - warmup;
       int executions = maxExecutions - warmup;
@@ -90,7 +90,7 @@ public class PrecisionPlotHandler {
       }
    }
 
-   private void executeVersionHandling(final ExecutionData config) throws JAXBException, IOException {
+   private void executeVersionHandling(final ExecutionData config) throws IOException {
       pool.submit(() -> {
          try {
             LOG.info("Starting processing: {}", repetitions);

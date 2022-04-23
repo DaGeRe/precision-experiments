@@ -12,11 +12,11 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.dagere.kopeme.datastorage.XMLDataLoader;
-import de.dagere.kopeme.generated.Kopemedata;
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.dagere.kopeme.generated.Result;
-import de.dagere.kopeme.generated.Result.Fulldata.Value;
+import de.dagere.kopeme.datastorage.JSONDataLoader;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.MeasuredValue;
+import de.dagere.kopeme.kopemedata.TestMethod;
+import de.dagere.kopeme.kopemedata.VMResult;
 import de.dagere.kopeme.generated.TestcaseType;
 import de.dagere.peass.analysis.measurement.statistics.MeanCoVData;
 import de.dagere.peass.analysis.measurement.statistics.MeanCoVDataContinous;
@@ -60,10 +60,10 @@ public final class GenerateCoVPlots {
    }
 
    private static int handleFile(int index, final GenerateCoVPlots generator, final File dataFile) throws JAXBException, IOException {
-      final Kopemedata data = XMLDataLoader.loadData(dataFile, 0);
-      final Testcases testclazz = data.getTestcases();
+      final Kopemedata data = JSONDataLoader.loadData(dataFile, 0);
+      final List<TestMethod> methods = data.getMethods();
       final String parentFileName = dataFile.getParentFile().getName();
-      generator.handleTestcase(testclazz.getClazz(), testclazz.getTestcase().get(0), parentFileName, index);
+      generator.handleTestcase(data.getClazz(), methods.get(0), parentFileName, index);
       index++;
       return index;
    }
@@ -89,7 +89,7 @@ public final class GenerateCoVPlots {
       System.out.println("set ylabel 'Zeit / {/Symbol m}'");
    }
 
-   public void handleTestcase(final String clazzname, final TestcaseType testcase, final String type, final int index) throws IOException {
+   public void handleTestcase(final String clazzname, final TestMethod testcase, final String type, final int index) throws IOException {
       final MeanCoVData data = useFullData ? new MeanCoVDataContinous(testcase, avg_count) : new MeanCoVData(testcase, avg_count);
       // data.printTestcaseData(GenerateCoVPlots.RESULTFOLDER);
 
@@ -106,7 +106,7 @@ public final class GenerateCoVPlots {
       }
 
       int outliers = 0;
-      for (Value r : testcase.getDatacollector().get(0).getResult().get(0).getFulldata().getValue()) {
+      for (MeasuredValue r : testcase.getDatacollectorResults().get(0).getResults().get(0).getFulldata().getValues()) {
          if (r.getValue() > OutlierRemover.Z_SCORE * steadyMean.getMean()) {
             outliers++;
          }
@@ -115,13 +115,13 @@ public final class GenerateCoVPlots {
       vmInformationWriter.write(steadyMean.getMean() + " " + steadyMean.getStandardDeviation() + " " + outliers + "\n");
    }
 
-   static void printVMDeviations(final String clazzname, final TestcaseType testcase, final List<Result> results) throws IOException {
+   static void printVMDeviations(final String clazzname, final TestcaseType testcase, final List<VMResult> results) throws IOException {
       final File summaryFile = new File(ProcessConstants.RESULTFOLDER_COV, "deviations_" + clazzname + "_" + testcase.getName() + "_all.csv");
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(summaryFile))) {
 
-         for (final Result result : results) {
+         for (final VMResult result : results) {
             final DescriptiveStatistics statistics = new DescriptiveStatistics();
-            result.getFulldata().getValue().forEach(value -> statistics.addValue(value.getValue()));
+            result.getFulldata().getValues().forEach(value -> statistics.addValue(value.getValue()));
             writer.write(statistics.getMean() + ProcessConstants.DATAFILE_SEPARATOR + statistics.getVariance() + "\n");
          }
          writer.flush();

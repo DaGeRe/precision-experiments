@@ -5,14 +5,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-import jakarta.xml.bind.JAXBException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.dagere.kopeme.generated.Result;
-import de.dagere.kopeme.generated.TestcaseType;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.TestMethod;
+import de.dagere.kopeme.kopemedata.VMResult;
 import de.precision.processing.util.RepetitionFolderHandler;
 
 public class PrecisionPlotGenerator extends RepetitionFolderHandler {
@@ -49,16 +48,16 @@ public class PrecisionPlotGenerator extends RepetitionFolderHandler {
     * @throws IOException
     */
    @Override
-   public void handleVersion() throws JAXBException, IOException {
+   public void handleVersion() throws IOException {
       if (finished) {
          throw new RuntimeException("Call only once!");
       }
       super.clearCache();
       finished = true;
-      List<TestcaseType> testcase = testcasesV1.values().iterator().next().getTestcase();
-      List<Result> results = testcase.get(0).getDatacollector().get(0).getResult();
+      List<TestMethod> testcase = testcasesV1.values().iterator().next().getMethods();
+      List<VMResult> results = testcase.get(0).getDatacollectorResults().get(0).getResults();
       int maxVMs = results.size();
-      int maxExecutions = results.get(0).getFulldata().getValue().size();
+      int maxExecutions = results.get(0).getFulldata().getValues().size();
       LOG.debug("Max Executions: {} Max VMs: {}", maxExecutions, maxVMs);
 
       PrecisionPlotHandler handler = new PrecisionPlotHandler(testcasesV1, testcasesV2, pool, repetitions, precisionConfig, writingData);
@@ -71,7 +70,7 @@ public class PrecisionPlotGenerator extends RepetitionFolderHandler {
    }
 
    @Override
-   protected void processTestcases(final Testcases versionFast, final Testcases versionSlow) {
+   protected void processTestcases(final Kopemedata versionFast, final Kopemedata versionSlow) {
       throw new RuntimeException("Old interface; should never be run");
    }
    

@@ -10,75 +10,74 @@ import jakarta.xml.bind.JAXBException;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
-import de.dagere.kopeme.datastorage.XMLDataLoader;
-import de.dagere.kopeme.generated.Kopemedata;
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.dagere.kopeme.generated.Result;
-import de.dagere.kopeme.generated.TestcaseType.Datacollector;
+import de.dagere.kopeme.datastorage.JSONDataLoader;
+import de.dagere.kopeme.kopemedata.DatacollectorResult;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.VMResult;
+
 
 public class RegularPeassdataReader {
-   private final Map<String, Testcases> testcasesV1 = new LinkedHashMap<>();
-   private final Map<String, Testcases> testcasesV2 = new LinkedHashMap<>();
+   private final Map<String, Kopemedata> testcasesV1 = new LinkedHashMap<>();
+   private final Map<String, Kopemedata> testcasesV2 = new LinkedHashMap<>();
 
    public void read(final String slowVersionName, final File versionFile, final File testclazzFile) throws JAXBException {
       for (File subversionFile : versionFile.listFiles()) {
          for (File vmRun : subversionFile.listFiles((FileFilter) new WildcardFileFilter("*xml"))) {
-            Testcases current = getTestcases(slowVersionName, testclazzFile, subversionFile, vmRun);
+            Kopemedata current = getTestcases(slowVersionName, testclazzFile, subversionFile, vmRun);
             
-            Kopemedata data = XMLDataLoader.loadData(vmRun);
-            Testcases internalData = data.getTestcases();
-            if (current.getTestcase().size() > 0) {
-               List<Result> addableResults = internalData.getTestcase().get(0).getDatacollector().get(0).getResult();
-               current.getTestcase().get(0).getDatacollector().get(0).getResult().addAll(addableResults);
+            Kopemedata data = JSONDataLoader.loadData(vmRun);
+            if (current.getMethods().size() > 0) {
+               List<VMResult> addableResults = data.getMethods().get(0).getDatacollectorResults().get(0).getResults();
+               current.getMethods().get(0).getDatacollectorResults().get(0).getResults().addAll(addableResults);
             } else {
-               current.getTestcase().add(internalData.getTestcase().get(0));
+               current.getMethods().add(data.getMethods().get(0));
             }
          }
       }
    }
 
-   private Testcases getTestcases(final String slowVersionName, final File testclazzFile, final File subversionFile, final File vmRun) {
+   private Kopemedata getTestcases(final String slowVersionName, final File testclazzFile, final File subversionFile, final File vmRun) {
       String testMethodName = vmRun.getName().substring(0, vmRun.getName().indexOf("_"));
-      Testcases current;
+      Kopemedata current;
       String testcaseName = testclazzFile.getName() + "#" + testMethodName;
       if (!subversionFile.getName().equals(slowVersionName)) {
          current = testcasesV1.get(testcaseName);
          if (current == null) {
-            current = new Testcases();
+            current = new Kopemedata("");
             testcasesV1.put(testcaseName, current);
          }
       } else {
          current = testcasesV2.get(testcaseName);
          if (current == null) {
-            current = new Testcases();
+            current = new Kopemedata("");
             testcasesV2.put(testcaseName, current);
          }
       }
       return current;
    }
 
-   public Map<String, Testcases> getTestcasesV1() {
+   public Map<String, Kopemedata> getTestcasesV1() {
       return testcasesV1;
    }
 
-   public Map<String, Testcases> getTestcasesV2() {
+   public Map<String, Kopemedata> getTestcasesV2() {
       return testcasesV2;
    }
 
    public int getRepetitions() {
-      Result exampleResult = testcasesV1.values().iterator().next().getTestcase().get(0).getDatacollector().get(0).getResult().get(0);
+      VMResult exampleResult = testcasesV1.values().iterator().next().getFirstResult();
       int repetitions = (int) exampleResult.getRepetitions();
       return repetitions;
    }
 
    public int getIterations() {
-      Result exampleResult = testcasesV1.values().iterator().next().getTestcase().get(0).getDatacollector().get(0).getResult().get(0);
+      VMResult exampleResult = testcasesV1.values().iterator().next().getFirstResult();
       int iterations = (int) exampleResult.getIterations();
       return iterations;
    }
    
    public int getVMs() {
-      Datacollector datacollector = testcasesV1.values().iterator().next().getTestcase().get(0).getDatacollector().get(0);
-      return datacollector.getResult().size();
+      DatacollectorResult datacollector = testcasesV1.values().iterator().next().getMethods().get(0).getDatacollectorResults().get(0);
+      return datacollector.getResults().size();
    }
 }

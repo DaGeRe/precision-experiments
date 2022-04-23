@@ -16,7 +16,7 @@ import jakarta.xml.bind.JAXBException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
+import de.dagere.kopeme.kopemedata.Kopemedata;
 import de.dagere.peass.folders.PeassFolders;
 import picocli.CommandLine;
 import picocli.CommandLine.Mixin;
@@ -70,8 +70,8 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
                RegularPeassdataReader reader = new RegularPeassdataReader();
                reader.read(slowVersionName, versionFile, testclazzFile);
 
-               Map<String, Testcases> testcasesV1 = reader.getTestcasesV1();
-               Map<String, Testcases> testcasesV2 = reader.getTestcasesV2();
+               Map<String, Kopemedata> testcasesV1 = reader.getTestcasesV1();
+               Map<String, Kopemedata> testcasesV2 = reader.getTestcasesV2();
                int repetitions = reader.getRepetitions();
                int maxIterations = reader.getIterations();
                int maxVMsMeasured = reader.getVMs();

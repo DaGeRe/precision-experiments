@@ -9,8 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import jakarta.xml.bind.JAXBException;
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.inference.TTest;
 import org.apache.logging.log4j.LogManager;
@@ -18,8 +16,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.common.primitives.Doubles;
 
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.dagere.kopeme.generated.Result;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.VMResult;
 import de.dagere.peass.measurement.statistics.StatisticUtil;
 import de.precision.processing.ProcessConstants;
 import de.precision.processing.util.PrecisionFolderUtil;
@@ -48,7 +46,7 @@ public class GenerateConfidenceDiffPlot extends RepetitionFolderHandler {
       RepetitionFolderHandler.clearResultFolder(RESULTFOLDER);
    }
 
-   public static void main(final String[] args) throws JAXBException, IOException {
+   public static void main(final String[] args) throws IOException {
       for (String folderName : args) {
          final File folder = new File(folderName);
 
@@ -65,13 +63,13 @@ public class GenerateConfidenceDiffPlot extends RepetitionFolderHandler {
    }
 
    @Override
-   public void handleVersion() throws JAXBException, IOException {
+   public void handleVersion() throws IOException {
       clearCache();
       super.handleVersion();
    }
 
    @Override
-   protected void processTestcases(final Testcases versionFast, final Testcases versionSlow) {
+   protected void processTestcases(final Kopemedata versionFast, final Kopemedata versionSlow) {
       final File testcaseFile = new File(RESULTFOLDER, versionFast.getClazz() + "_" + nameOfAll + ".csv");
       final File testcaseFile_tVal = new File(RESULTFOLDER, "tval_" + nameOfAll + ".csv");
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(testcaseFile, true));
@@ -112,14 +110,14 @@ public class GenerateConfidenceDiffPlot extends RepetitionFolderHandler {
       }
    }
 
-   private void buildShortenedValues(final Testcases versionFast, final Testcases versionSlow, final BufferedWriter writer, final List<Double> slowL, final List<Double> fastL)
+   private void buildShortenedValues(final Kopemedata versionFast, final Kopemedata versionSlow, final BufferedWriter writer, final List<Double> slowL, final List<Double> fastL)
          throws IOException {
-      final Iterator<Result> slowIt = versionSlow.getTestcase().get(0).getDatacollector().get(0).getResult().iterator();
-      for (final Iterator<Result> fastIt = versionFast.getTestcase().get(0).getDatacollector().get(0).getResult().iterator(); fastIt.hasNext();) {
-         final Result fast = fastIt.next();
-         final Result slow = slowIt.next();
-         Result fastShortened = StatisticUtil.shortenResult(fast);
-         Result slowShortened = StatisticUtil.shortenResult(slow);
+      final Iterator<VMResult> slowIt = versionSlow.getFirstDatacollectorContent().iterator();
+      for (final Iterator<VMResult> fastIt = versionFast.getFirstDatacollectorContent().iterator(); fastIt.hasNext();) {
+         final VMResult fast = fastIt.next();
+         final VMResult slow = slowIt.next();
+         VMResult fastShortened = StatisticUtil.shortenResult(fast);
+         VMResult slowShortened = StatisticUtil.shortenResult(slow);
          slowL.add(slowShortened.getValue());
          fastL.add(fastShortened.getValue());
       }

@@ -10,11 +10,12 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.concurrent.Callable;
 
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.dagere.kopeme.generated.Result;
-import de.dagere.kopeme.generated.Result.Fulldata;
-import de.dagere.kopeme.generated.TestcaseType;
-import de.dagere.kopeme.generated.TestcaseType.Datacollector;
+import de.dagere.kopeme.kopemedata.DatacollectorResult;
+import de.dagere.kopeme.kopemedata.Fulldata;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.MeasuredValue;
+import de.dagere.kopeme.kopemedata.TestMethod;
+import de.dagere.kopeme.kopemedata.VMResult;
 import de.dagere.peass.config.StatisticsConfig;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
 import de.precision.processing.repetitions.sampling.VMCombinationSampler;
@@ -54,13 +55,12 @@ public class AggregatedValueSampler implements Callable<Void> {
       final File fileFast = new File(fastFileName);
       final File fileSlow = new File(slowFileName);
 
-      final TestcaseType versionFast = readFile(fileFast);
-      final TestcaseType versionSlow = readFile(fileSlow);
+      final TestMethod versionFast = readFile(fileFast);
+      final TestMethod versionSlow = readFile(fileSlow);
 
       System.out.println("Reading finished");
 
-      final Testcases testclazz = new Testcases();
-      testclazz.setClazz("Test");
+      final Kopemedata testclazz = new Kopemedata("Test");
 
       final File resultFile = new File(out != null ? out : "result.csv");
       precisionRecallWriter = new BufferedWriter(new FileWriter(resultFile));
@@ -73,7 +73,7 @@ public class AggregatedValueSampler implements Callable<Void> {
       return null;
    }
 
-   private void executeSampling(final TestcaseType versionSlow, final TestcaseType versionFast, final Testcases testclazz, final PrintStream out, final int vms) throws FileNotFoundException {
+   private void executeSampling(final TestMethod versionSlow, final TestMethod versionFast, final Kopemedata testclazz, final PrintStream out, final int vms) throws FileNotFoundException {
       System.setOut(new PrintStream(new File("results", "vals_" + vms + ".csv")));
 
       final SamplingConfig config = new SamplingConfig(vms, "Test");
@@ -98,9 +98,9 @@ public class AggregatedValueSampler implements Callable<Void> {
       }
    }
 
-   private static TestcaseType readFile(final File file) throws IOException, FileNotFoundException {
-      TestcaseType versionSlow = new TestcaseType();
-      final Datacollector datacollector = new Datacollector();
+   private static TestMethod readFile(final File file) throws IOException, FileNotFoundException {
+      TestMethod versionSlow = new TestMethod("");
+      final DatacollectorResult datacollector = new DatacollectorResult("");
       try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
          String line;
          while ((line = reader.readLine()) != null) {
@@ -110,23 +110,23 @@ public class AggregatedValueSampler implements Callable<Void> {
          }
       }
 
-      versionSlow.getDatacollector().add(datacollector);
+      versionSlow.getDatacollectorResults().add(datacollector);
       return versionSlow;
    }
 
-   private static void buildResult(final Datacollector datacollector, final double thisVMValue) {
-      final Result result = new Result();
+   private static void buildResult(final DatacollectorResult datacollector, final double thisVMValue) {
+      final VMResult result = new VMResult();
       result.setDate(0l);
-      final Result.Fulldata.Value value = new Result.Fulldata.Value();
-      value.setStart(0l);
+      final MeasuredValue value = new MeasuredValue();
+      value.setStartTime(0l);
       value.setValue((long) thisVMValue);
 
       final Fulldata fulldata = new Fulldata();
-      fulldata.getValue().add(value);
+      fulldata.getValues().add(value);
 
       result.setFulldata(fulldata);
       result.setValue(thisVMValue);
-      datacollector.getResult().add(result);
+      datacollector.getResults().add(result);
    }
 
 }

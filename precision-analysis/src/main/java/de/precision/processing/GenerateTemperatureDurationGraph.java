@@ -16,11 +16,11 @@ import jakarta.xml.bind.JAXBException;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import de.dagere.kopeme.datastorage.XMLDataLoader;
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.dagere.kopeme.generated.Result;
-import de.dagere.kopeme.generated.Result.Fulldata.Value;
-import de.dagere.kopeme.generated.TestcaseType;
+import de.dagere.kopeme.datastorage.JSONDataLoader;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.MeasuredValue;
+import de.dagere.kopeme.kopemedata.TestMethod;
+import de.dagere.kopeme.kopemedata.VMResult;
 import de.dagere.peass.measurement.statistics.StatisticUtil;
 
 /**
@@ -59,17 +59,17 @@ public class GenerateTemperatureDurationGraph {
 
 	private final File indexCorrelationFile;
 	private final Map<Integer, Integer> temperatureMap;
-	private final List<Result> results;
+	private final List<VMResult> results;
 
 	public GenerateTemperatureDurationGraph(final File timeValueFile, final File temperatureFile) throws JAXBException, FileNotFoundException, IOException {
 		temperatureMap = readTemperature(temperatureFile);
 
-		final Testcases testcases = new XMLDataLoader(timeValueFile).getFullData().getTestcases();
-		final TestcaseType testcase = testcases.getTestcase().get(0);
-		results = StatisticUtil.shortenValues(testcase.getDatacollector().get(0).getResult(), 10000, 20000);
+		final Kopemedata testcases = new JSONDataLoader(timeValueFile).getFullData();
+		final TestMethod testcase = testcases.getMethods().get(0);
+		results = StatisticUtil.shortenValues(testcase.getDatacollectorResults().get(0).getResults(), 10000, 20000);
 		// results = testcase.getDatacollector().get(0).getResult();
 
-		indexCorrelationFile = new File(RESULTFOLDER, "indexcorrelation_" + testcases.getClazz() + "_" + testcase.getName() + ".csv");
+		indexCorrelationFile = new File(RESULTFOLDER, "indexcorrelation_" + testcases.getClazz() + "_" + testcase.getMethod() + ".csv");
 	}
 
 	public void analyse() {
@@ -78,7 +78,7 @@ public class GenerateTemperatureDurationGraph {
 				final DescriptiveStatistics overallMean = new DescriptiveStatistics();
 				final DescriptiveStatistics meanTemp = new DescriptiveStatistics();
 
-				final long unusedSecond = results.get(i).getFulldata().getValue().get(0).getStart() / 1000;
+				final long unusedSecond = results.get(i).getFulldata().getValues().get(0).getStartTime() / 1000;
 				cleanTemperature(unusedSecond);
 
 				handleIndex(i, overallMean, meanTemp);
@@ -107,7 +107,7 @@ public class GenerateTemperatureDurationGraph {
 		try (final BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
 			final DescriptiveStatistics statistics = new DescriptiveStatistics();
 			final DescriptiveStatistics temp = new DescriptiveStatistics();
-			for (final Value value : results.get(i).getFulldata().getValue()) {
+			for (final MeasuredValue value : results.get(i).getFulldata().getValues()) {
 				handleValue(overallMean, meanTemp, writer, statistics, temp, value);
 			}
 
@@ -117,12 +117,12 @@ public class GenerateTemperatureDurationGraph {
 	}
 
 	private void handleValue(final DescriptiveStatistics overallMean, final DescriptiveStatistics meanTemp, final BufferedWriter writer,
-			final DescriptiveStatistics statistics, final DescriptiveStatistics temp, final Value value) throws IOException {
+			final DescriptiveStatistics statistics, final DescriptiveStatistics temp, final MeasuredValue value) throws IOException {
 		final double currentValue = value.getValue();
 		statistics.addValue(currentValue);
 		overallMean.addValue(currentValue);
 
-		final int second = (int) (value.getStart() / 1000);
+		final int second = (int) (value.getStartTime() / 1000);
 		// writer.write(second + ";" + value.getValue());
 		final int foundTemp = findTemperature(temperatureMap, second);
 		if (foundTemp != -1) {

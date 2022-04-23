@@ -7,6 +7,8 @@ import org.apache.logging.log4j.Logger;
 
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.TestcaseType;
+import de.dagere.kopeme.kopemedata.TestMethod;
+import de.dagere.kopeme.kopemedata.VMResult;
 import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.StatisticUtil;
@@ -38,9 +40,9 @@ public class VMCombinationSampler {
     * @param versionSlow
     * @return average VM-duration in seconds
     */
-   public double sampleArtificialVMCombinations(final TestcaseType versionFast, final TestcaseType versionSlow) {
-      final List<Result> fastShortened = StatisticUtil.shortenValues(versionFast.getDatacollector().get(0).getResult(), warmup, allExecutions);
-      final List<Result> slowShortened = StatisticUtil.shortenValues(versionSlow.getDatacollector().get(0).getResult(), warmup, allExecutions);
+   public double sampleArtificialVMCombinations(final TestMethod versionFast, final TestMethod versionSlow) {
+      final List<VMResult> fastShortened = StatisticUtil.shortenValues(versionFast.getDatacollectorResults().get(0).getResults(), warmup, allExecutions);
+      final List<VMResult> slowShortened = StatisticUtil.shortenValues(versionSlow.getDatacollectorResults().get(0).getResults(), warmup, allExecutions);
 
       return sampleArtificialVMCombinations(fastShortened, slowShortened);
    }
@@ -51,7 +53,7 @@ public class VMCombinationSampler {
     * @param slowShortened
     * @return average duration in seconds
     */
-   public double sampleArtificialVMCombinations(final List<Result> fastShortened, final List<Result> slowShortened) {
+   public double sampleArtificialVMCombinations(final List<VMResult> fastShortened, final List<VMResult> slowShortened) {
       final double overallDuration = DetermineAverageTime.getDurationInMS(fastShortened, slowShortened);
       final double calculatedDuration = overallDuration / fastShortened.size() * config.getVms();
       

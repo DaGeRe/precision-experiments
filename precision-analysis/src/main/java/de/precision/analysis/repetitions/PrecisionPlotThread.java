@@ -10,9 +10,9 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.dagere.kopeme.generated.Result;
-import de.dagere.kopeme.generated.TestcaseType;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.TestMethod;
+import de.dagere.kopeme.kopemedata.VMResult;
 import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.StatisticUtil;
 import de.precision.processing.repetitions.misc.DetermineAverageTime;
@@ -30,11 +30,11 @@ public class PrecisionPlotThread {
    private final PrecisionConfig precisionConfig;
    private long overhead = 0, duration = 0;
 
-   protected Map<String, Testcases> testcasesV1 = null;
-   protected Map<String, Testcases> testcasesV2 = null;
+   protected Map<String, Kopemedata> testcasesV1 = null;
+   protected Map<String, Kopemedata> testcasesV2 = null;
 
-   public PrecisionPlotThread(final ExecutionData executionData, final WritingData writinData, final PrecisionConfig precisionConfig, final Map<String, Testcases> testcasesV1,
-         final Map<String, Testcases> testcasesV2) {
+   public PrecisionPlotThread(final ExecutionData executionData, final WritingData writinData, final PrecisionConfig precisionConfig, final Map<String, Kopemedata> testcasesV1,
+         final Map<String, Kopemedata> testcasesV2) {
       this.executionData = executionData;
       this.writingData = writinData;
       this.precisionConfig = precisionConfig;
@@ -74,7 +74,7 @@ public class PrecisionPlotThread {
       new PrecisionWriter(comparer, executionData).writeTestcase(writingData.getPrecisionRecallWriter(), comparer.getOverallResults().getResults());
    }
 
-   protected void processTestcases(final Testcases testclazz, final Testcases otherPackageTestcase) {
+   protected void processTestcases(final Kopemedata testclazz, final Kopemedata otherPackageTestcase) {
       config = new SamplingConfig(executionData.getVms(), testclazz.getClazz());
       StatisticsConfig statisticsConfig = new StatisticsConfig();
       if (precisionConfig.isRemoveOutliers()) {
@@ -84,10 +84,10 @@ public class PrecisionPlotThread {
       }
       comparer = new PrecisionComparer(statisticsConfig, precisionConfig);
 
-      final TestcaseType before = testclazz.getTestcase().get(0);
-      final TestcaseType after = otherPackageTestcase.getTestcase().get(0);
+      final TestMethod before = testclazz.getMethods().get(0);
+      final TestMethod after = otherPackageTestcase.getMethods().get(0);
 
-      final long averageOverheadInMS = DetermineAverageTime.getOverhead(after.getDatacollector().get(0).getResult(), before.getDatacollector().get(0).getResult());
+      final long averageOverheadInMS = DetermineAverageTime.getOverhead(after.getDatacollectorResults().get(0).getResults(), before.getDatacollectorResults().get(0).getResults());
       LOG.debug("Overhead in ms: {}", averageOverheadInMS);
       overhead += ((double) averageOverheadInMS) / 1000;
 
@@ -95,8 +95,8 @@ public class PrecisionPlotThread {
 
       LOG.debug("VMs: {}", executionData.getVms());
 
-      final List<Result> fastShortened = StatisticUtil.shortenValues(before.getDatacollector().get(0).getResult(), executionData.getWarmup(), allExecutions);
-      final List<Result> slowShortened = StatisticUtil.shortenValues(after.getDatacollector().get(0).getResult(), executionData.getWarmup(), allExecutions);
+      final List<VMResult> fastShortened = StatisticUtil.shortenValues(before.getDatacollectorResults().get(0).getResults(), executionData.getWarmup(), allExecutions);
+      final List<VMResult> slowShortened = StatisticUtil.shortenValues(after.getDatacollectorResults().get(0).getResults(), executionData.getWarmup(), allExecutions);
 
       writeValues(fastShortened, new File(writingData.getResultFolder(), "fast_" + executionData.getRepetitions() + ".csv"));
       writeValues(slowShortened, new File(writingData.getResultFolder(), "slow_" + executionData.getRepetitions() + ".csv"));
@@ -110,9 +110,9 @@ public class PrecisionPlotThread {
       executionData.setOverhead(overhead);
    }
 
-   private void writeValues(final List<Result> values, final File destination) {
+   private void writeValues(final List<VMResult> values, final File destination) {
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(destination))) {
-         for (Result r : values) {
+         for (VMResult r : values) {
             writer.write(r.getValue() + "\n");
          }
          writer.flush();

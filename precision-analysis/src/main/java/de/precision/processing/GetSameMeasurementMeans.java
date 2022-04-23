@@ -15,9 +15,9 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.inference.TTest;
 
-import de.dagere.kopeme.datastorage.XMLDataLoader;
-import de.dagere.kopeme.generated.Kopemedata;
-import de.dagere.kopeme.generated.Result;
+import de.dagere.kopeme.datastorage.JSONDataLoader;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.VMResult;
 import de.dagere.peass.measurement.statistics.StatisticUtil;
 
 public class GetSameMeasurementMeans {
@@ -63,7 +63,7 @@ public class GetSameMeasurementMeans {
                int size = getSize(parts);
                // int index = Integer.parseInt(parts[1]);
                if (parts.length == 3) {
-                  final Result result = readShortenedResult(file);
+                  final VMResult result = readShortenedResult(file);
                   stat.addValue(result.getValue());
                   writer.write(result.getValue() + "\n");
                   // dataManager.addMean(size, folder.getName(), result.getValue());
@@ -77,13 +77,13 @@ public class GetSameMeasurementMeans {
 
    }
 
-   private Result readShortenedResult(final File file) throws JAXBException {
+   private VMResult readShortenedResult(final File file) throws JAXBException {
       System.out.println(Arrays.toString(file.listFiles()));
       File measurementFile = file.listFiles((FileFilter) new WildcardFileFilter("*.xml"))[0];
-      final Kopemedata loadData = XMLDataLoader.loadData(measurementFile);
+      final Kopemedata loadData = JSONDataLoader.loadData(measurementFile);
 
-      final Result basicResult = loadData.getTestcases().getTestcase().get(0).getDatacollector().get(0).getResult().get(0);
-      final Result result = StatisticUtil.shortenResult(basicResult);
+      final VMResult basicResult = loadData.getFirstResult();
+      final VMResult result = StatisticUtil.shortenResult(basicResult);
       return result;
    }
 }

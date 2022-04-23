@@ -18,11 +18,10 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.dagere.kopeme.datastorage.XMLDataLoader;
-import de.dagere.kopeme.generated.Kopemedata;
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.dagere.kopeme.generated.Result;
-import de.dagere.kopeme.generated.TestcaseType;
+import de.dagere.kopeme.datastorage.JSONDataLoader;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.TestMethod;
+import de.dagere.kopeme.kopemedata.VMResult;
 import de.dagere.peass.analysis.measurement.statistics.MeanCoVData;
 import de.dagere.peass.analysis.measurement.statistics.MeanCoVDataContinous;
 
@@ -48,34 +47,33 @@ public final class GenerateMeanPlots {
 
       printConfig();
 
-      final Map<String, List<Result>> results = new TreeMap<>();
+      final Map<String, List<VMResult>> results = new TreeMap<>();
       
       final File folder = new File(args[0]);
       for (final File dataFile : FileUtils.listFiles(folder, new WildcardFileFilter("*.xml"), TrueFileFilter.INSTANCE)) {
          LOG.debug("Loading: {}", dataFile);
-         final Kopemedata data = new XMLDataLoader(dataFile).getFullData();
-         final Testcases testclazz = data.getTestcases();
-         final TestcaseType testcase = testclazz.getTestcase().get(0);
+         final Kopemedata data = new JSONDataLoader(dataFile).getFullData();
+         final TestMethod testcase = data.getMethods().get(0);
          final File testclazzFolder = dataFile.getParentFile();
-         handleTestcase(testclazz.getClazz(), testcase, testclazzFolder.getName());
+         handleTestcase(data.getClazz(), testcase, testclazzFolder.getName());
          
          addResult(results, testcase, testclazzFolder);
       }
       
-      for (Map.Entry<String, List<Result>> sizeResults : results.entrySet()) {
+      for (Map.Entry<String, List<VMResult>> sizeResults : results.entrySet()) {
          MeanCoVData data = new MeanCoVData(sizeResults.getKey(), sizeResults.getValue());
          data.printAverages(new File(ProcessConstants.RESULTFOLDER_COV, sizeResults.getKey()));
       }
    }
 
-   private static void addResult(final Map<String, List<Result>> results, final TestcaseType testcase, final File testclazzFolder) {
+   private static void addResult(final Map<String, List<VMResult>> results, final TestMethod testcase, final File testclazzFolder) {
       final String sizeFolderName = testclazzFolder.getParentFile().getParentFile().getName();
-      List<Result> currentResults = results.get(sizeFolderName);
+      List<VMResult> currentResults = results.get(sizeFolderName);
       if (currentResults == null) {
          currentResults = new LinkedList<>();
          results.put(sizeFolderName, currentResults);
       }
-      currentResults.add(testcase.getDatacollector().get(0).getResult().get(0));
+      currentResults.add(testcase.getDatacollectorResults().get(0).getResults().get(0));
    }
 
    public static void printConfig() {
@@ -88,7 +86,7 @@ public final class GenerateMeanPlots {
       System.out.println("set ylabel 'Zeit / {/Symbol m}'");
    }
 
-   public static void handleTestcase(final String clazzname, final TestcaseType testcase, final String type) throws IOException {
+   public static void handleTestcase(final String clazzname, final TestMethod testcase, final String type) throws IOException {
       final MeanCoVData data = useFullData ? new MeanCoVDataContinous(testcase, AVG_COUNT) : new MeanCoVData(testcase, AVG_COUNT);
 //      data.printTestcaseData(GenerateCoVPlots.RESULTFOLDER);
 
@@ -97,18 +95,18 @@ public final class GenerateMeanPlots {
       data.printAverages(ProcessConstants.RESULTFOLDER_COV, "one_" + type);
    }
 
-   static void printVMDeviations(final String clazzname, final TestcaseType testcase, final List<Result> results) throws IOException {
-      final File summaryFile = new File(ProcessConstants.RESULTFOLDER_COV, "deviations_" + clazzname + "_" + testcase.getName() + "_all.csv");
+   static void printVMDeviations(final String clazzname, final TestMethod testcase, final List<VMResult> results) throws IOException {
+      final File summaryFile = new File(ProcessConstants.RESULTFOLDER_COV, "deviations_" + clazzname + "_" + testcase.getMethod() + "_all.csv");
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(summaryFile))) {
 
-         for (final Result result : results) {
+         for (final VMResult result : results) {
             final DescriptiveStatistics statistics = new DescriptiveStatistics();
-            result.getFulldata().getValue().forEach(value -> statistics.addValue(value.getValue()));
+            result.getFulldata().getValues().forEach(value -> statistics.addValue(value.getValue()));
             writer.write(statistics.getMean() + ";" + statistics.getVariance() + "\n");
          }
          writer.flush();
 
-         System.out.println("set title 'Means and Variation for " + clazzname + "." + testcase.getName() + "'");
+         System.out.println("set title 'Means and Variation for " + clazzname + "." + testcase.getMethod() + "'");
          System.out.println("plot '" + summaryFile.getName() + "' u 1:2 title 'Variations'");
          System.out.println();
       }

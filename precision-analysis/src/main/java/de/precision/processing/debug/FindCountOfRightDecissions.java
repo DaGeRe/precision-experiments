@@ -12,21 +12,21 @@ import org.apache.commons.math3.stat.descriptive.moment.Kurtosis;
 import org.apache.commons.math3.stat.descriptive.moment.Skewness;
 import org.apache.commons.math3.stat.inference.TestUtils;
 
-import de.dagere.kopeme.datastorage.XMLDataLoader;
-import de.dagere.kopeme.generated.Kopemedata;
-import de.dagere.kopeme.generated.Result;
-import de.dagere.kopeme.generated.TestcaseType.Datacollector;
+import de.dagere.kopeme.datastorage.JSONDataLoader;
+import de.dagere.kopeme.kopemedata.DatacollectorResult;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.VMResult;
 import de.dagere.peass.measurement.dataloading.MultipleVMTestUtil;
 
 public class FindCountOfRightDecissions {
 
    static interface StatisticMethod {
-      boolean isDifferent(List<Result> list1, List<Result> list2);
+      boolean isDifferent(List<VMResult> list1, List<VMResult> list2);
    }
 
    static class TTest implements StatisticMethod {
       @Override
-      public boolean isDifferent(final List<Result> list1, final List<Result> list2) {
+      public boolean isDifferent(final List<VMResult> list1, final List<VMResult> list2) {
          final SummaryStatistics statistics1 = MultipleVMTestUtil.getStatistic(list1);
          final SummaryStatistics statistics2 = MultipleVMTestUtil.getStatistic(list2);
          
@@ -37,14 +37,14 @@ public class FindCountOfRightDecissions {
    
    static class MyTest implements StatisticMethod {
       @Override
-      public boolean isDifferent(final List<Result> list1, final List<Result> list2) {
+      public boolean isDifferent(final List<VMResult> list1, final List<VMResult> list2) {
          final SummaryStatistics statistics1 = MultipleVMTestUtil.getStatistic(list1);
          final SummaryStatistics statistics2 = MultipleVMTestUtil.getStatistic(list2);
          
          final DescriptiveStatistics st = new DescriptiveStatistics();
          final double[] values = new double[list1.size()];
          int i = 0;
-         for (final Result r : list1) {
+         for (final VMResult r : list1) {
             values[i] = r.getValue();
             i++;
          }
@@ -71,20 +71,20 @@ public class FindCountOfRightDecissions {
          final File file1 = new File(args[i]);
          final File file2 = new File(args[i + 1]);
 
-         final Kopemedata data = new XMLDataLoader(file1).getFullData();
-         final Kopemedata data2 = new XMLDataLoader(file2).getFullData();
+         final Kopemedata data = new JSONDataLoader(file1).getFullData();
+         final Kopemedata data2 = new JSONDataLoader(file2).getFullData();
 
-         final Datacollector results = data.getTestcases().getTestcase().get(0).getDatacollector().get(0);
-         final Datacollector results2 = data2.getTestcases().getTestcase().get(0).getDatacollector().get(0);
+         final DatacollectorResult results = data.getMethods().get(0).getDatacollectorResults().get(0);
+         final DatacollectorResult results2 = data2.getMethods().get(0).getDatacollectorResults().get(0);
 
          final int size = 30;
          
          final StatisticMethod method = new MyTest();
 
          int trueCount = 0;
-         for (int firstIndex = 0; firstIndex < results.getResult().size() - size - 1; firstIndex++) {
-            final List<Result> list1 = results.getResult().subList(firstIndex, firstIndex + size);
-            final List<Result> list2 = results2.getResult().subList(firstIndex, firstIndex + size);
+         for (int firstIndex = 0; firstIndex < results.getResults().size() - size - 1; firstIndex++) {
+            final List<VMResult> list1 = results.getResults().subList(firstIndex, firstIndex + size);
+            final List<VMResult> list2 = results2.getResults().subList(firstIndex, firstIndex + size);
             final boolean isDiff = method.isDifferent(list1, list2);
             if (isDiff) {
                trueCount++;
@@ -101,14 +101,14 @@ public class FindCountOfRightDecissions {
       }
    }
 
-   private static int getTrueCount(final Datacollector results, final int size, final StatisticMethod method) {
+   private static int getTrueCount(final DatacollectorResult results, final int size, final StatisticMethod method) {
       int trueCount = 0;
-      final int maxIndex = results.getResult().size() - size - 1;
+      final int maxIndex = results.getResults().size() - size - 1;
       for (int firstIndex = 0; firstIndex < maxIndex; firstIndex++) {
-         final List<Result> shortened = results.getResult().subList(firstIndex, firstIndex + size);
+         final List<VMResult> shortened = results.getResults().subList(firstIndex, firstIndex + size);
 //         final SummaryStatistics statisticsFast = MultipleVMTestUtil.getStatistic(shortened);
          for (int secondIndex = firstIndex + 30; secondIndex < maxIndex; secondIndex++) {
-            final List<Result> shortened2 = results.getResult().subList(secondIndex, secondIndex + size);
+            final List<VMResult> shortened2 = results.getResults().subList(secondIndex, secondIndex + size);
 //            final SummaryStatistics statisticsSlow = MultipleVMTestUtil.getStatistic(shortened2);
 //
 //            final boolean isDiff = TestUtils.tTest(statisticsFast, statisticsSlow, 0.01);

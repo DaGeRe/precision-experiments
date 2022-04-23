@@ -17,11 +17,11 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.dagere.kopeme.datastorage.XMLDataLoader;
-import de.dagere.kopeme.generated.Kopemedata;
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.dagere.kopeme.generated.Result;
-import de.dagere.kopeme.generated.Result.Fulldata.Value;
+import de.dagere.kopeme.datastorage.JSONDataLoader;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.MeasuredValue;
+import de.dagere.kopeme.kopemedata.TestMethod;
+import de.dagere.kopeme.kopemedata.VMResult;
 
 /**
  * Base class for a class that processes each testcase of a repetition folder
@@ -81,22 +81,22 @@ public abstract class RepetitionFolderHandler {
    }
 
    private int slowSize, fastSize;
-   protected Map<String, Testcases> testcasesV1 = null;
-   protected Map<String, Testcases> testcasesV2 = null;
+   protected Map<String, Kopemedata> testcasesV1 = null;
+   protected Map<String, Kopemedata> testcasesV2 = null;
 
-   public void clearCache() throws JAXBException {
+   public void clearCache() {
       testcasesV1 = null;
       testcasesV2 = null;
       loadTestcaseData();
    }
 
-   public void handleVersion() throws JAXBException, IOException {
+   public void handleVersion() throws IOException {
       for (String testcase : testcasesV1.keySet()) {
          processTestcases(testcasesV1.get(testcase), testcasesV2.get(testcase));
       }
    }
 
-   private void loadTestcaseData() throws JAXBException {
+   private void loadTestcaseData() {
       testcasesV1 = new HashMap<>();
       testcasesV2 = new HashMap<>();
       LOG.debug("Loading: {} Repetitions: {}", repetitionFolder, repetitions);
@@ -137,13 +137,12 @@ public abstract class RepetitionFolderHandler {
       return files;
    }
 
-   private void loadFile(final File dataFile) throws JAXBException {
-      final Kopemedata data = XMLDataLoader.loadData(dataFile, 0);
-      final Testcases testclazz = data.getTestcases();
-      loadGenericData(dataFile, testclazz);
+   private void loadFile(final File dataFile) {
+      final Kopemedata data = JSONDataLoader.loadData(dataFile, 0);
+      loadGenericData(dataFile, data);
    }
 
-   private void loadGenericData(final File dataFile, final Testcases testclazz) {
+   private void loadGenericData(final File dataFile, final Kopemedata testclazz) {
       String resultFileName = getResultFileName(dataFile);
       int workloadSize = Integer.parseInt(resultFileName.split("_")[1]);
       if (workloadSize == fastSize) {
@@ -170,27 +169,27 @@ public abstract class RepetitionFolderHandler {
       return resultFileName;
    }
 
-   private void putNewData(final Testcases testclazz, final Map<String, Testcases> testcases) {
+   private void putNewData(final Kopemedata testclazz, final Map<String, Kopemedata> testcases) {
       if (clearStartDates) {
          LOG.debug("Clearing start dates");
          setValueStartsNull(testclazz);
       }
-      Testcases tests = testcases.get(testclazz.getClazz());
+      Kopemedata tests = testcases.get(testclazz.getClazz());
       if (tests == null) {
          testcases.put(testclazz.getClazz(), testclazz);
       } else {
-         List<Result> results = testclazz.getTestcase().get(0).getDatacollector().get(0).getResult();
-         tests.getTestcase().get(0).getDatacollector().get(0).getResult().addAll(results);
+         List<VMResult> results = testclazz.getFirstDatacollectorContent();
+         tests.getFirstDatacollectorContent().addAll(results);
       }
    }
 
-   private void setValueStartsNull(final Testcases testclazz) {
-      final List<Value> allValues = testclazz.getTestcase().get(0).getDatacollector().get(0).getResult().get(0).getFulldata().getValue();
-      for (Value value : allValues.subList(1, allValues.size() - 1)) {
-         value.setStart(null);
+   private void setValueStartsNull(final Kopemedata testclazz) {
+      final List<MeasuredValue> allValues = testclazz.getFirstResult().getFulldata().getValues();
+      for (MeasuredValue value : allValues.subList(1, allValues.size() - 1)) {
+         value.setStartTime(-1);
       }
    }
 
-   protected abstract void processTestcases(Testcases versionFast, Testcases versionSlow);
+   protected abstract void processTestcases(Kopemedata versionFast, Kopemedata versionSlow);
 
 }

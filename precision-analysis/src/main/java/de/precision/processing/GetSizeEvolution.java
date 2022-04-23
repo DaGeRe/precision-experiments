@@ -15,9 +15,9 @@ import jakarta.xml.bind.JAXBException;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
-import de.dagere.kopeme.datastorage.XMLDataLoader;
-import de.dagere.kopeme.generated.Kopemedata;
-import de.dagere.kopeme.generated.Result;
+import de.dagere.kopeme.datastorage.JSONDataLoader;
+import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.VMResult;
 
 public class GetSizeEvolution {
 
@@ -172,7 +172,7 @@ public class GetSizeEvolution {
             int size = getSize(parts);
             // int index = Integer.parseInt(parts[1]);
             if (parts.length == 3) {
-               final Result result = readShortenedResult(file);
+               final VMResult result = readShortenedResult(file);
                dataManager.addMean(size, folder.getName(), result.getValue());
                double relativeDeviation = getRelativeDeviation(result, size);
                dataManager.addDeviation(size, folder.getName(), relativeDeviation);
@@ -181,17 +181,17 @@ public class GetSizeEvolution {
       }
    }
 
-   private Result readShortenedResult(File file) throws JAXBException {
+   private VMResult readShortenedResult(File file) throws JAXBException {
       System.out.println(Arrays.toString(file.listFiles()));
       File measurementFile = file.listFiles((FileFilter) new WildcardFileFilter("*.xml"))[0];
-      final Kopemedata loadData = XMLDataLoader.loadWarmedupData(measurementFile);
+      final Kopemedata loadData = JSONDataLoader.loadWarmedupData(measurementFile);
 
-      final Result basicResult = loadData.getTestcases().getTestcase().get(0).getDatacollector().get(0).getResult().get(0);
+      final VMResult basicResult = loadData.getFirstResult();
 //      final Result result = StatisticUtil.shortenResult(basicResult);
       return basicResult;
    }
 
-   private double getRelativeDeviation(Result result, int size) throws JAXBException {
+   private double getRelativeDeviation(VMResult result, int size) throws JAXBException {
       double relativeDeviation = result.getDeviation() / result.getValue();
       System.out.println("Values: " + size + " " + +relativeDeviation + " " + result.getDeviation() + " " + result.getValue());
       return relativeDeviation;

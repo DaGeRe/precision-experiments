@@ -4,15 +4,17 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import de.dagere.kopeme.generated.Result;
 import de.dagere.kopeme.generated.Result.Fulldata.Value;
+import de.dagere.kopeme.kopemedata.MeasuredValue;
+import de.dagere.kopeme.kopemedata.VMResult;
 
 public class VMExecution {
    private final double[] values;
    private final double average;
 
-   public VMExecution(Result r) {
-      values = new double[r.getFulldata().getValue().size()];
+   public VMExecution(VMResult r) {
+      values = new double[r.getFulldata().getValues().size()];
       int i = 0;
-      for (Value value : r.getFulldata().getValue()) {
+      for (MeasuredValue value : r.getFulldata().getValues()) {
          values[i] = value.getValue();
          i++;
       }
