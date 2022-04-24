@@ -2,7 +2,7 @@ package de.precision.analysis.repetitions;
 
 import java.io.File;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsIterableWithSize;
@@ -13,7 +13,7 @@ import de.dagere.kopeme.kopemedata.Kopemedata;
 public class TestRegularPeassdataReader {
 
    @Test
-   public void testReading() throws JAXBException {
+   public void testReading()  {
       
       File exampleData = new File("src/test/resources/measurementsFull_example");
       

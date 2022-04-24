@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -24,7 +24,7 @@ public class GetSameMeasurementMeans {
 
    static Map<File, DescriptiveStatistics> data = new LinkedHashMap<>();
 
-   public static void main(final String[] args) throws JAXBException {
+   public static void main(final String[] args)  {
 
       GetSameMeasurementMeans getSameMeasurementMeans = new GetSameMeasurementMeans();
       for (File job : new File(args[0]).listFiles()) {
@@ -53,7 +53,7 @@ public class GetSameMeasurementMeans {
       return size;
    }
 
-   private void getSizeStatistics(final File folder, final DescriptiveStatistics stat) throws JAXBException {
+   private void getSizeStatistics(final File folder, final DescriptiveStatistics stat)  {
       File valueCSV = new File(folder.getParentFile(), folder.getName() + ".csv");
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(valueCSV))) {
          for (File file : folder.listFiles()) {
@@ -77,7 +77,7 @@ public class GetSameMeasurementMeans {
 
    }
 
-   private VMResult readShortenedResult(final File file) throws JAXBException {
+   private VMResult readShortenedResult(final File file)  {
       System.out.println(Arrays.toString(file.listFiles()));
       File measurementFile = file.listFiles((FileFilter) new WildcardFileFilter("*.xml"))[0];
       final Kopemedata loadData = JSONDataLoader.loadData(measurementFile);

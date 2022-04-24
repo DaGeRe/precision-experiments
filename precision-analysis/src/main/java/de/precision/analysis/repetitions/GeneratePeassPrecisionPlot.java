@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,7 +56,7 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
       return null;
    }
 
-   private void createPoolTasks(final ExecutorService pool, final Map<String, BufferedWriter> testcaseWriters, final File file) throws IOException, JAXBException {
+   private void createPoolTasks(final ExecutorService pool, final Map<String, BufferedWriter> testcaseWriters, final File file) throws IOException {
       LOG.info("Handling Peass-Folder {}", file);
       File measurementsFolder = new File(file, PeassFolders.MEASUREMENTS);
       for (File testclazzFile : measurementsFolder.listFiles()) {

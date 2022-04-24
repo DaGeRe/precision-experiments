@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
@@ -20,7 +20,7 @@ public class RegularPeassdataReader {
    private final Map<String, Kopemedata> testcasesV1 = new LinkedHashMap<>();
    private final Map<String, Kopemedata> testcasesV2 = new LinkedHashMap<>();
 
-   public void read(final String slowVersionName, final File versionFile, final File testclazzFile) throws JAXBException {
+   public void read(final String slowVersionName, final File versionFile, final File testclazzFile)  {
       for (File subversionFile : versionFile.listFiles()) {
          for (File vmRun : subversionFile.listFiles((FileFilter) new WildcardFileFilter("*xml"))) {
             Kopemedata current = getTestcases(slowVersionName, testclazzFile, subversionFile, vmRun);

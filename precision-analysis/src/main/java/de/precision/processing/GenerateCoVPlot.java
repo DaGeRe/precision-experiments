@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -41,7 +41,7 @@ public final class GenerateCoVPlot {
 
 	static final int AVG_COUNT = 50;
 
-	public static void main(final String[] args) throws JAXBException, IOException {
+	public static void main(final String[] args) throws IOException {
 
 		GenerateCoVPlots.printConfig();
 

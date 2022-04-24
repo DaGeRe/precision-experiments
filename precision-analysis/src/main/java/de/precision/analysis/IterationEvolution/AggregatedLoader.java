@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -35,7 +35,7 @@ public class AggregatedLoader implements CoVLoader {
    }
 
    @Override
-   public void load() throws JAXBException {
+   public void load()  {
       final File[] resultFiles = parentFolder.listFiles((FileFilter) new WildcardFileFilter("*.csv"));
       final List<VMExecution> executions = new LinkedList<>();
       for (File resultFile : resultFiles) {

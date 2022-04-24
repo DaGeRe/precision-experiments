@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.List;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -28,7 +28,7 @@ public class PlotOne {
 
 	private static final NumberFormat FORMAT = NumberFormat.getInstance();
 
-	public static void main(final String[] args) throws JAXBException, IOException {
+	public static void main(final String[] args) throws IOException {
 		final File folder = new File(args[0]);
 		final Kopemedata data = new JSONDataLoader(folder).getFullData();
 

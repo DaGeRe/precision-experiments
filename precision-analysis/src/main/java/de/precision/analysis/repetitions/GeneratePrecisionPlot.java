@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -31,7 +31,7 @@ public class GeneratePrecisionPlot implements Callable<Void> {
    @Mixin
    private PrecisionConfigMixin precisionConfigMixin;
 
-   public static void main(final String[] args) throws JAXBException, IOException, InterruptedException {
+   public static void main(final String[] args) throws IOException, InterruptedException {
       Configurator.setLevel("de.peass.measurement.analysis.statistics.ConfidenceIntervalInterpretion", Level.INFO);
 
       final GeneratePrecisionPlot command = new GeneratePrecisionPlot();
@@ -39,7 +39,7 @@ public class GeneratePrecisionPlot implements Callable<Void> {
       commandLine.execute(args);
    }
 
-   private void createTasks(final String[] folders, final PrecisionConfig config, final String suffix) throws IOException, JAXBException, InterruptedException {
+   private void createTasks(final String[] folders, final PrecisionConfig config, final String suffix) throws IOException, InterruptedException {
       for (final String inputFolderName : folders) {
          final File inputFolder = new File(inputFolderName);
 

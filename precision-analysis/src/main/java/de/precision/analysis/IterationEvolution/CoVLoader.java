@@ -1,6 +1,6 @@
 package de.precision.analysis.IterationEvolution;
 
-import jakarta.xml.bind.JAXBException;
+
 
 public interface CoVLoader {
 
@@ -8,6 +8,6 @@ public interface CoVLoader {
 
    long getIterations();
 
-   void load() throws JAXBException;
+   void load() ;
 
 }

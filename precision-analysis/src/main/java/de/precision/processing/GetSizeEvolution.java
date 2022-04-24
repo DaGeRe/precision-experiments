@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -24,7 +24,7 @@ public class GetSizeEvolution {
    private List<String> testNames = new LinkedList<>();
    private SizeDataManager dataManager = new SizeDataManager();
 
-   public static void main(String[] args) throws JAXBException, IOException {
+   public static void main(String[] args) throws IOException {
       System.out.println(args.length);
       
       for (String folderPath : args) {
@@ -163,7 +163,7 @@ public class GetSizeEvolution {
       }
    }
 
-   private void getSizeStatistics(File folder) throws JAXBException {
+   private void getSizeStatistics(File folder)  {
       testNames.add(folder.getName());
       for (File file : folder.listFiles()) {
          if (file.getName().startsWith("wl_") && !file.getName().endsWith(".tar")) {
@@ -181,7 +181,7 @@ public class GetSizeEvolution {
       }
    }
 
-   private VMResult readShortenedResult(File file) throws JAXBException {
+   private VMResult readShortenedResult(File file)  {
       System.out.println(Arrays.toString(file.listFiles()));
       File measurementFile = file.listFiles((FileFilter) new WildcardFileFilter("*.xml"))[0];
       final Kopemedata loadData = JSONDataLoader.loadWarmedupData(measurementFile);
@@ -191,7 +191,7 @@ public class GetSizeEvolution {
       return basicResult;
    }
 
-   private double getRelativeDeviation(VMResult result, int size) throws JAXBException {
+   private double getRelativeDeviation(VMResult result, int size)  {
       double relativeDeviation = result.getDeviation() / result.getValue();
       System.out.println("Values: " + size + " " + +relativeDeviation + " " + result.getDeviation() + " " + result.getValue());
       return relativeDeviation;

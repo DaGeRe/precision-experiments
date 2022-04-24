@@ -3,7 +3,7 @@ package de.precision.processing;
 import java.io.File;
 import java.io.IOException;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.inference.TTest;
@@ -25,7 +25,7 @@ public class AnalyseMediumsize extends RepetitionFolderHandler {
 		super(repetitionFolder);
 	}
 
-	public static void main(final String[] args) throws JAXBException, IOException {
+	public static void main(final String[] args) throws IOException {
 		final File folder = new File(args[0]);
 
 		PrecisionFolderUtil.processFolder(folder, (repetition_folder) -> new AnalyseMediumsize(repetition_folder));

@@ -12,8 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.xml.bind.JAXBException;
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import de.dagere.kopeme.datastorage.JSONDataLoader;
@@ -38,7 +36,7 @@ public class GenerateTemperatureDurationGraph {
 		}
 	}
 
-	public static void main(final String[] args) throws IOException, JAXBException {
+	public static void main(final String[] args) throws IOException {
 		final File temperatureFile = new File(args[0]);
 
 		for (int arg = 1; arg < args.length; arg++) {
@@ -61,7 +59,7 @@ public class GenerateTemperatureDurationGraph {
 	private final Map<Integer, Integer> temperatureMap;
 	private final List<VMResult> results;
 
-	public GenerateTemperatureDurationGraph(final File timeValueFile, final File temperatureFile) throws JAXBException, FileNotFoundException, IOException {
+	public GenerateTemperatureDurationGraph(final File timeValueFile, final File temperatureFile) throws FileNotFoundException, IOException {
 		temperatureMap = readTemperature(temperatureFile);
 
 		final Kopemedata testcases = new JSONDataLoader(timeValueFile).getFullData();

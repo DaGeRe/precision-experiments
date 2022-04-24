@@ -2,11 +2,11 @@ package de.precision.analysis.IterationEvolution;
 
 import java.io.File;
 
-import jakarta.xml.bind.JAXBException;
+
 
 public class GetIterationEvolution {
 
-   public static void main(String[] args) throws JAXBException {
+   public static void main(String[] args)  {
       final File parentFolder = new File(args[0]);
 
       if (args.length >= 2 && args[1].equals("subfolders")) {
@@ -21,7 +21,7 @@ public class GetIterationEvolution {
       }
    }
 
-   private static void analyzeFolder(final File parentFolder) throws JAXBException {
+   private static void analyzeFolder(final File parentFolder)  {
       System.out.println("Loading: " + parentFolder);
       final CoVLoader loader = loadData(parentFolder);
 
@@ -33,7 +33,7 @@ public class GetIterationEvolution {
       analyzer.analyze();
    }
 
-   public static CoVLoader loadData(final File parentFolder) throws JAXBException {
+   public static CoVLoader loadData(final File parentFolder)  {
       final CoVLoader loader;
       if (parentFolder.getName().equals("aggregated")) {
          loader = new AggregatedLoader(parentFolder);

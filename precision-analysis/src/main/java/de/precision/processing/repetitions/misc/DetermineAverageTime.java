@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +26,7 @@ public class DetermineAverageTime extends RepetitionFolderHandler {
 
    private static final Logger LOG = LogManager.getLogger(DetermineAverageTime.class);
 
-   public static void main(final String[] args) throws JAXBException, IOException {
+   public static void main(final String[] args) throws IOException {
       final File folder = new File(args[0]);
       PrecisionFolderUtil.processFolder(folder, (repetition_folder) -> new DetermineAverageTime(repetition_folder));
 

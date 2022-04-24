@@ -6,7 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
@@ -35,7 +35,7 @@ public final class GenerateCoVPlots {
 
    static boolean useFullData = false;
 
-   public static void main(final String[] args) throws JAXBException, IOException {
+   public static void main(final String[] args) throws IOException {
 
       printConfig();
 
@@ -59,7 +59,7 @@ public final class GenerateCoVPlots {
       }
    }
 
-   private static int handleFile(int index, final GenerateCoVPlots generator, final File dataFile) throws JAXBException, IOException {
+   private static int handleFile(int index, final GenerateCoVPlots generator, final File dataFile) throws IOException {
       final Kopemedata data = JSONDataLoader.loadData(dataFile, 0);
       final List<TestMethod> methods = data.getMethods();
       final String parentFileName = dataFile.getParentFile().getName();

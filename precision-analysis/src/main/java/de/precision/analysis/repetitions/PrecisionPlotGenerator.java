@@ -44,7 +44,7 @@ public class PrecisionPlotGenerator extends RepetitionFolderHandler {
     * @param sequencefolder
     * @param repetitions
     * @param precision
-    * @throws JAXBException XML Exceptions should not occur at any time - if this happens, they should be thrown to the top level and handled by the user
+    * @ XML Exceptions should not occur at any time - if this happens, they should be thrown to the top level and handled by the user
     * @throws IOException
     */
    @Override

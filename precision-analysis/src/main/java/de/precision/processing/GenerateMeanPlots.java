@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -43,7 +43,7 @@ public final class GenerateMeanPlots {
    
    static boolean useFullData = false;
 
-   public static void main(final String[] args) throws JAXBException, IOException {
+   public static void main(final String[] args) throws IOException {
 
       printConfig();
 

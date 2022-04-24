@@ -3,15 +3,13 @@ package de.precision.analysis.covSteady;
 import java.io.File;
 import java.util.Random;
 
-import jakarta.xml.bind.JAXBException;
-
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import de.precision.analysis.IterationEvolution.CoVLoader;
 import de.precision.analysis.IterationEvolution.GetIterationEvolution;
 
 public class GetSufficientCoVVMs {
-   public static void main(String[] args) throws JAXBException {
+   public static void main(String[] args) {
       final File parentFolder = new File(args[0]);
       final CoVLoader loader = GetIterationEvolution.loadData(parentFolder);
 

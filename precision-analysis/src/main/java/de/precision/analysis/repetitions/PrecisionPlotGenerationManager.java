@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import de.precision.processing.util.PrecisionFolderUtil;
 import de.precision.processing.util.RepetitionFolderHandler.CreatorParallel;
@@ -27,7 +27,7 @@ public class PrecisionPlotGenerationManager {
       precisionRecallWriter = new BufferedWriter(new FileWriter(new File(resultFolder, "precision.csv")));
    }
 
-   void handleFolder(final File inputFolder) throws IOException, JAXBException, InterruptedException {
+   void handleFolder(final File inputFolder) throws IOException, InterruptedException {
       PrecisionWriter.writeHeader(precisionRecallWriter, StatisticalTestList.ALL.getTests());
 
       boolean hasPrecisionChild = false;
@@ -40,7 +40,7 @@ public class PrecisionPlotGenerationManager {
       startProcessing(inputFolder, hasPrecisionChild);
    }
 
-   private void startProcessing(final File inputFolder, final boolean hasPrecisionChild) throws JAXBException, IOException, InterruptedException {
+   private void startProcessing(final File inputFolder, final boolean hasPrecisionChild) throws IOException, InterruptedException {
       final WritingData writingData = new WritingData(resultFolder, precisionRecallWriter, testcaseWriters);
       if (inputFolder.getName().contains("Test") || hasPrecisionChild) {
          PrecisionFolderUtil.processFolderParallel(inputFolder, creatorFunction(writingData), config.getThreads());

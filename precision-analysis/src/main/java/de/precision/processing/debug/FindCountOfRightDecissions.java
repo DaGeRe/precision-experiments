@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import jakarta.xml.bind.JAXBException;
+
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -63,7 +63,7 @@ public class FindCountOfRightDecissions {
       }
    }
 
-   public static void main(final String[] args) throws JAXBException {
+   public static void main(final String[] args)  {
 
       System.out.println("Files passed: " + args.length);
 
