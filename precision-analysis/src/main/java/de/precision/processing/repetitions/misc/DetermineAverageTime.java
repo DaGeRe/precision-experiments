@@ -7,20 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.dagere.kopeme.generated.Kopemedata.Testcases;
-import de.dagere.kopeme.generated.Result;
-import de.dagere.kopeme.generated.Result.Fulldata.Value;
 import de.dagere.kopeme.kopemedata.Kopemedata;
 import de.dagere.kopeme.kopemedata.MeasuredValue;
 import de.dagere.kopeme.kopemedata.VMResult;
-import de.precision.processing.util.RepetitionFolderHandler;
 import de.precision.processing.util.PrecisionFolderUtil;
+import de.precision.processing.util.RepetitionFolderHandler;
 
 public class DetermineAverageTime extends RepetitionFolderHandler {
 

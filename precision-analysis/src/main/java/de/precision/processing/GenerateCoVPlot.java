@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -17,12 +15,10 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.dagere.kopeme.datastorage.JSONDataLoader;
 import de.dagere.kopeme.kopemedata.Kopemedata;
 import de.dagere.kopeme.kopemedata.TestMethod;
 import de.dagere.kopeme.kopemedata.VMResult;
-import de.dagere.kopeme.datastorage.JSONDataLoader;
-import de.dagere.kopeme.generated.Result;
-import de.dagere.kopeme.generated.TestcaseType;
 import de.dagere.peass.analysis.measurement.statistics.MeanCoVData;
 
 /**

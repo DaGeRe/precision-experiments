@@ -3,13 +3,10 @@ package de.precision.processing;
 import java.io.File;
 import java.io.IOException;
 
-
-
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.inference.TTest;
 
 import de.dagere.kopeme.kopemedata.Kopemedata;
-import de.dagere.kopeme.kopemedata.TestMethod;
 import de.dagere.peass.measurement.dataloading.MultipleVMTestUtil;
 import de.precision.processing.util.PrecisionFolderUtil;
 import de.precision.processing.util.RepetitionFolderHandler;

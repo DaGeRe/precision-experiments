@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.List;
 
-
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import de.dagere.kopeme.datastorage.JSONDataLoader;

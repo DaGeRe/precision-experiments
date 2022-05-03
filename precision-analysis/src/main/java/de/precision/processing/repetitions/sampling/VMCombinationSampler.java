@@ -5,8 +5,6 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.dagere.kopeme.generated.Result;
-import de.dagere.kopeme.generated.TestcaseType;
 import de.dagere.kopeme.kopemedata.TestMethod;
 import de.dagere.kopeme.kopemedata.VMResult;
 import de.dagere.peass.config.StatisticsConfig;

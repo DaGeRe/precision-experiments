@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.descriptive.moment.Kurtosis;

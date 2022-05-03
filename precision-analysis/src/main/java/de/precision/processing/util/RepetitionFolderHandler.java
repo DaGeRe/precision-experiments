@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -20,7 +18,6 @@ import org.apache.logging.log4j.Logger;
 import de.dagere.kopeme.datastorage.JSONDataLoader;
 import de.dagere.kopeme.kopemedata.Kopemedata;
 import de.dagere.kopeme.kopemedata.MeasuredValue;
-import de.dagere.kopeme.kopemedata.TestMethod;
 import de.dagere.kopeme.kopemedata.VMResult;
 
 /**

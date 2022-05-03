@@ -7,7 +7,6 @@ import java.text.NumberFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.Callable;
 
 import picocli.CommandLine;

@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

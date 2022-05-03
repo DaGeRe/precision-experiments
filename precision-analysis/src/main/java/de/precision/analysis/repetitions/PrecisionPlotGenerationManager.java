@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-
-
 import de.precision.processing.util.PrecisionFolderUtil;
 import de.precision.processing.util.RepetitionFolderHandler.CreatorParallel;
 

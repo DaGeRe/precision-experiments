@@ -6,18 +6,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.dagere.kopeme.datastorage.JSONDataLoader;
+import de.dagere.kopeme.generated.TestcaseType;
 import de.dagere.kopeme.kopemedata.Kopemedata;
 import de.dagere.kopeme.kopemedata.MeasuredValue;
 import de.dagere.kopeme.kopemedata.TestMethod;
 import de.dagere.kopeme.kopemedata.VMResult;
-import de.dagere.kopeme.generated.TestcaseType;
 import de.dagere.peass.analysis.measurement.statistics.MeanCoVData;
 import de.dagere.peass.analysis.measurement.statistics.MeanCoVDataContinous;
 import de.dagere.peass.measurement.statistics.data.OutlierRemover;
