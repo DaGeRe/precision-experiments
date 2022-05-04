@@ -122,5 +122,5 @@ fi
 #extractAll $parallelSequentialComparison
 #analyze $parallelSequentialComparison
 
-./createICSoftHeatmap.sh $basicParameterComparison $parallelSequentialComparison
+./createHeatmaps.sh $basicParameterComparison $parallelSequentialComparison
 
