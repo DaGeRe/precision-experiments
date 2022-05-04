@@ -126,13 +126,13 @@ createMergedHeatmaps repetitionHeatmaps
 echo "--- Creating basic parallel heatmaps"
 createMergedHeatmaps repetitionHeatmapsParallel
 
-echo "--- Creating parallel / non parallel heatmap"
+echo "--- Plotting parallel / non parallel heatmap"
 gnuplot -c plotParallelHeatmap.plt
 
-echo "--- Creating outlier removal heatmap"
+echo "--- Creating outlier removal heatmap data + plot outlier removal heatmap"
 createOutlierRemovalHeatmap
 
-echo "--- Creating all heatmap"
+echo "--- Plotting all heatmap"
 cd repetitionHeatmaps
 gnuplot -c ../../plotAllHeatmap.plt
 cd $start
