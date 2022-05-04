@@ -29,6 +29,8 @@ unset multiplot
 unset output
 
 
+
+
 set encoding iso_8859_1
 set terminal pdf size 3,4
 
@@ -42,7 +44,7 @@ unset key
 set xrange [0:1000]
 set xlabel 'VMs'
 set ylabel 'Iterationen'
-set cblabel 'F1-Ma{\337}'
+set cblabel 'F_1-Ma{\337}'
 
 
 set yrange [0:500]
@@ -55,6 +57,41 @@ plot 'outlierRemoval_10000_MANNWHITNEY.csv' u 1:2:3 with image notitle
 
 unset multiplot
 unset output
+
+
+
+
+set encoding iso_8859_1
+set terminal pdf size 3,4
+
+set out 'heatmap_outlierRemoval_MANNWHITNEY_en.pdf'
+set multiplot layout 2,1
+
+set cbrange [0:100]
+
+unset key
+
+set xrange [0:1000]
+set xlabel 'VMs'
+set ylabel 'Iterationen'
+set cblabel 'F_1-score'
+
+set xtics ("0" 0, "200" 200, "400" 400, "600" 600, "800" 800, "1,000" 1000 )
+
+set yrange [0:50]
+set title 'No Outlier Removal'
+plot 'noOutlierRemoval_100000_MANNWHITNEY.csv' u 1:2:3 with image notitle
+
+set yrange [0:50]
+set title 'Outier Removal'
+plot 'outlierRemoval_100000_MANNWHITNEY.csv' u 1:2:3 with image notitle
+
+unset multiplot
+unset output
+
+
+
+
 
 
 set encoding iso_8859_1
