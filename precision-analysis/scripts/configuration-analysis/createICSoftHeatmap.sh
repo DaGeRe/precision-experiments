@@ -107,6 +107,12 @@ parallelFolder=$2
 
 start=$(pwd)
 
+if [ ! -f ../../build/libs/precision-analysis-all-2.13.jar ]
+then
+	echo "Please compile precision-analysis before executing the analysis!"
+	exit 1
+fi
+
 echo "--- Sorting data"
 createRepetitionHeatmaps $sequentialFolder repetitionHeatmaps
 

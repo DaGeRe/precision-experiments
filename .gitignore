@@ -2,8 +2,8 @@ precision-analysis/scripts/parallel_*
 precision-analysis/scripts/repetitionHeatmap/results_*
 precision-analysis/scripts/histograms/histogramData/
 precision-analysis/scripts/histograms/histogram_*pdf
-precision-analysis/scripts/icsoft/complete_analysis.txt
-precision-analysis/scripts/icsoft/*.pdf
+precision-analysis/scripts/configuration-analysis/complete_analysis.txt
+precision-analysis/scripts/configuration-analysis/*.pdf
 precision-analysis/scripts/repetitionHeatmap/sizes/
 precision-analysis/scripts/peass_*
 jmh-test/scripts/exponential_2er/
@@ -42,13 +42,13 @@ jmh-test/scripts/comparison_sizes.pdf
 jmh-test/scripts/averages/
 
 # Do not save result data
-precision-analysis/scripts/icsoft/outlier_AddTest_basic-parameter-comparison/
-precision-analysis/scripts/icsoft/parallel_AddTest_results_outlierRemoval/
-precision-analysis/scripts/icsoft/heatmap_parallel_de.pdf
-precision-analysis/scripts/icsoft/heatmap_parallel_en.pdf
-precision-analysis/scripts/icsoft/repetitionHeatmaps/
-precision-analysis/scripts/icsoft/repetitionHeatmapsParallel/
-precision-analysis/scripts/icsoft/histogram_outliers_en.pdf
+precision-analysis/scripts/configuration-analysis/outlier_AddTest_basic-parameter-comparison/
+precision-analysis/scripts/configuration-analysis/parallel_AddTest_results_outlierRemoval/
+precision-analysis/scripts/configuration-analysis/heatmap_parallel_de.pdf
+precision-analysis/scripts/configuration-analysis/heatmap_parallel_en.pdf
+precision-analysis/scripts/configuration-analysis/repetitionHeatmaps/
+precision-analysis/scripts/configuration-analysis/repetitionHeatmapsParallel/
+precision-analysis/scripts/configuration-analysis/histogram_outliers_en.pdf
 precision-analysis/AddTest_analysis.txt
 precision-analysis/RAMTest_analysis.txt
 precision-analysis/SysoutTest_analysis.txt

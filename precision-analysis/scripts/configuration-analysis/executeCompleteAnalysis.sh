@@ -117,10 +117,10 @@ then
 fi
 
 
-extractAll $basicParameterComparison
-analyze $basicParameterComparison
-extractAll $parallelSequentialComparison
-analyze $parallelSequentialComparison
+#extractAll $basicParameterComparison
+#analyze $basicParameterComparison
+#extractAll $parallelSequentialComparison
+#analyze $parallelSequentialComparison
 
 ./createICSoftHeatmap.sh $basicParameterComparison $parallelSequentialComparison
 
