@@ -13,11 +13,16 @@ public class WorkloadHeatmapReader {
          String line;
          while ((line = reader.readLine()) != null) {
             if (line.length() > 3) {
-               String[] parts = line.split(" ");
-               int VMs = Integer.parseInt(parts[0]);
-               int iterations = Integer.parseInt(parts[1]);
-               double value = Double.parseDouble(parts[2]);
-               heatmap.add(VMs, iterations, value);
+               if (!line.startsWith("#") && !line.startsWith("repetitions")) {
+                  String[] parts = line.split(" ");
+                  if (parts.length > 3) {
+                     throw new RuntimeException("Expecting pure heatmap data! These contain only 3 columns (VMs, iterations, value e.g. F1-Score)");
+                  }
+                  int VMs = Integer.parseInt(parts[0]);
+                  int iterations = Integer.parseInt(parts[1]);
+                  double value = Double.parseDouble(parts[2]);
+                  heatmap.add(VMs, iterations, value);
+               }
             }
          }
       }
