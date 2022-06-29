@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.filefilter.OrFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 import de.dagere.kopeme.datastorage.JSONDataLoader;
@@ -20,7 +21,7 @@ public class RegularPeassdataReader {
 
    public void read(final String slowVersionName, final File versionFile, final File testclazzFile)  {
       for (File subversionFile : versionFile.listFiles()) {
-         for (File vmRun : subversionFile.listFiles((FileFilter) new WildcardFileFilter("*xml"))) {
+         for (File vmRun : subversionFile.listFiles((FileFilter) new OrFileFilter(new WildcardFileFilter("*xml"), new WildcardFileFilter("*json")))) {
             Kopemedata current = getTestcases(slowVersionName, testclazzFile, subversionFile, vmRun);
             
             Kopemedata data = JSONDataLoader.loadData(vmRun);
