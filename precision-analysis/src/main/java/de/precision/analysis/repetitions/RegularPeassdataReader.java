@@ -19,10 +19,10 @@ public class RegularPeassdataReader {
    private final Map<String, Kopemedata> testcasesV1 = new LinkedHashMap<>();
    private final Map<String, Kopemedata> testcasesV2 = new LinkedHashMap<>();
 
-   public void read(final String slowVersionName, final File versionFile, final File testclazzFile)  {
+   public void read(final String slowCommitName, final File versionFile, final File testclazzFile)  {
       for (File subversionFile : versionFile.listFiles()) {
          for (File vmRun : subversionFile.listFiles((FileFilter) new OrFileFilter(new WildcardFileFilter("*xml"), new WildcardFileFilter("*json")))) {
-            Kopemedata current = getTestcases(slowVersionName, testclazzFile, subversionFile, vmRun);
+            Kopemedata current = getTestcases(slowCommitName, testclazzFile, subversionFile, vmRun);
             
             Kopemedata data = JSONDataLoader.loadData(vmRun);
             if (current.getMethods().size() > 0) {

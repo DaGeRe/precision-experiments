@@ -27,8 +27,8 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
    @Option(names = { "-data", "--data" }, description = "Data-Folder for analysis", required = true)
    private File[] data;
 
-   @Option(names = { "-slowVersionName", "--slowVersionName" }, description = "Version that is assumed to be slower", required = true)
-   private String slowVersionName;
+   @Option(names = { "-slowCommitName", "--slowCommitName" }, description = "Commit that is assumed to be slower", required = true)
+   private String slowCommitName;
 
    @Mixin
    private PrecisionConfigMixin precisionConfigMixin;
@@ -66,7 +66,7 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
          for (File versionFile : testclazzFile.listFiles()) {
             if (!versionFile.getName().equals("results")) {
                RegularPeassdataReader reader = new RegularPeassdataReader();
-               reader.read(slowVersionName, versionFile, testclazzFile);
+               reader.read(slowCommitName, versionFile, testclazzFile);
 
                Map<String, Kopemedata> testcasesV1 = reader.getTestcasesV1();
                Map<String, Kopemedata> testcasesV2 = reader.getTestcasesV2();
