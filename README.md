@@ -7,7 +7,7 @@ The artificial unit tests focus on addition and ram reservation. Unit tests for 
 
 # Reusing Existing Measurements
 
-If you got existing measurement results from a Peass run, you can use these to check when your performance change would have been reproduced. Therefore, build `precision-analysis` by executing `../gradlew fatJar` in this folder and execute `java -cp build/libs/precision-analysis-all-2.13.jar de.precision.analysis.repetitions.GeneratePeassPrecisionPlot -data $DATAFOLDER -slowVersionName $SLOWVERSION`. 
+If you got existing measurement results from a Peass run, you can use these to check when your performance change would have been reproduced. Therefore, build `precision-analysis` by executing `../gradlew fatJar` in this folder and execute `java -cp build/libs/precision-analysis-all-2.13.jar de.precision.analysis.repetitions.GeneratePeassPrecisionPlot -data $DATAFOLDER -slowCommitName $SLOWCOMMIT`. 
 
 The data folder needs to be the `measurementsFull` folder of a peass execution. Afterwards, you will find precision data in each testcase folder, e.g. `$DATAFOLDER/measurements/$TESTCASE/results`. To plot these data, execute `cd scripts` and run `./createPeassHeatmap.sh $DATAFOLDER/measurements/$TESTCASE/results` for the `$TESTCASE` you want to visualize. Afterwards, you'll find heatmaps of your measurement in `peass_$TESTCASE`.
 
@@ -37,7 +37,7 @@ Tests may be every test in `src/test/java`, especially
 * `de.precision.AddTest_NoGC` (default)
 * `de.precision.RAMTest_NoGC`
 * `de.precision.SysoutTest_NoGC`
-The `$diffsize` defines the count of operations (i.e. Add, RAM-reservation or System.out.println-operations) that the slower and faster version of the test differ by. 
+The `$diffsize` defines the count of operations (i.e. Add, RAM-reservation or System.out.println-operations) that the slower and faster commit of the test differ by. 
 
 You might specify
 * the count of VM starts by the parameter `$VMs`,
