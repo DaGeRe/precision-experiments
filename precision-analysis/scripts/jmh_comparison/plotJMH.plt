@@ -2,9 +2,9 @@ set encoding iso_8859_1
 set terminal pdf size 5,3
 set key top center
 
-set out 'evaluation_comparison.pdf'
+set out 'comparison_jmh_junit.pdf'
 set xlabel 'VMs'
-set ylabel 'F1-Ma{\337}'
+set ylabel 'F_1-Ma{\337}'
 plot '1mio_5.csv' u 1:3 w linespoint title 'PeASS', 'precision_junit.csv' u 2:15 title 'JUnit' w linespoint, 'precision_bench.csv' u 2:15 title 'Benchmark' w linespoint
 
 unset out
