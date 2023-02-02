@@ -44,6 +44,9 @@ public class PrecisionPlotHandler {
          final int vmStepSize = Math.max(1, maxVMs / precisionConfig.getVmResolution());
          
          int minVmCount = Math.max(vmStepSize, precisionConfig.getMinVMs());
+         if (minVmCount == 1) {
+            minVmCount = 2;
+         }
          int usedMaxVMs = getUsedMaxVMs(maxVMs);
 
          for (int vms = minVmCount; vms <= usedMaxVMs; vms += vmStepSize) {
