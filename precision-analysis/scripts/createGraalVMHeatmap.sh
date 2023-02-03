@@ -18,14 +18,9 @@ fi
 
 start=$(pwd)
 
-test=$(echo $1 | awk -F'/' '{print $(NF-1)}')
-base=$(basename $1)
+base=results_graalvm
 
-base=$base"_"$test
-
-type=$(echo $base | awk -F'_' '{print $2}')
-
-echo "Basefolder: $base Test: $test"
+echo "Basefolder: $base"
 
 mkdir -p $base
 

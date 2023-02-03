@@ -15,6 +15,14 @@ The result for the mean value comparison and T-Test might look like this: (conve
 
 ![image](img/result_meanTTest.png)
 
+# GraalVM Experiment Analysis
+
+This repository also allows to analyse existing experimental from GraalVM. To do so, execute the following steps:
+* Assure that a JDK and gnuplot are installed on your system
+* Go to `precision-analysis` and build the project by executing `../gradlew fatJar` 
+* Staying in the same folder, execute the analysis. It is assumed that there are folders named after the version, and using  for example using `java -cp build/libs/precision-analysis-all-2.13.jar de.precision.analysis.repetitions.GenerateGraalVMPrecisionPlot -v1folder $v1folder -v2folder $v2folder`, the analysis can be executed (e.g. `java -cp build/libs/precision-analysis-all-2.13.jar de.precision.analysis.repetitions.GenerateGraalVMPrecisionPlot -v1folder /tmp/pid-4968/example/30/measurements/66493/ -v2folder /tmp/pid-4968/example/30/measurements/68933/`)
+* The analysis will create folder `$v1folder/../results`. The heatmap can be plotted by going to `precision-analysis/scripts` and executing `createGraalVMHeatmap.sh` on the results folder, e.g., `./createGraalVMHeatmap.sh /tmp/pid-4968/example/30/measurements/results`. Afterwards, `results_graalvm` contains PDF files with the heatmaps.
+
 # Test Execution
 
 ## Before all tests
@@ -54,4 +62,3 @@ This allows to research how the coefficient of variation changes with growing wo
 To start this experiment, go to `scripts` and run `./runSizeEvolution.sh $testName`. The `$testName` and `$REDIRECT` may be specified as described above.
 
 Afterwards, results are in `~/.KoPeMe/sizeEvolution_"$REDIRECT"_"$testName"_"$id"`.
-
