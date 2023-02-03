@@ -33,13 +33,11 @@ public class PrecisionPlotHandler {
       this.writingData = writingData;
    }
 
-   public void handleAllParameters(final int maxVMs, final int maxIterations) throws IOException {
+   public void handleAllParameters(final int maxVMs, final int maxIterations, boolean useWarmup) throws IOException {
       final int iterationStepSize = Math.max(maxIterations / precisionConfig.getIterationResolution(), 1);
       LOG.debug("Step size: {}", iterationStepSize);
-      // for (int warmup = 0; warmup <= maxWarmup; warmup += executionStepSize) {
-      // this.warmup = warmup;
-      // this.executions = maxExecutions - warmup;
-      for (int iterations = iterationStepSize; iterations <= maxIterations / 2; iterations += iterationStepSize) {
+      int usedMax = useWarmup ? maxIterations / 2 : maxIterations;
+      for (int iterations = iterationStepSize; iterations <= usedMax; iterations += iterationStepSize) {
 
          final int vmStepSize = Math.max(1, maxVMs / precisionConfig.getVmResolution());
          
@@ -51,7 +49,8 @@ public class PrecisionPlotHandler {
 
          for (int vms = minVmCount; vms <= usedMaxVMs; vms += vmStepSize) {
             LOG.info("Warmup: {} Executions: {} VMs: {}", iterations, iterations, vms);
-            executeVersionHandling(new ExecutionData(vms, iterations, iterations, repetitions));
+            int warmup = useWarmup ? iterations : 0;
+            executeVersionHandling(new ExecutionData(vms, warmup, iterations, repetitions));
          }
          // }
       }

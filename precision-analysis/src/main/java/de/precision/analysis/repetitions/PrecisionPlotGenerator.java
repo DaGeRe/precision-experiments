@@ -64,7 +64,7 @@ public class PrecisionPlotGenerator extends RepetitionFolderHandler {
       if (handleOnlyVMS) {
          handler.handleOnlyVMs(maxVMs, maxExecutions);
       } else {
-         handler.handleAllParameters(maxVMs, maxExecutions);
+         handler.handleAllParameters(maxVMs, maxExecutions, true);
       }
    }
 

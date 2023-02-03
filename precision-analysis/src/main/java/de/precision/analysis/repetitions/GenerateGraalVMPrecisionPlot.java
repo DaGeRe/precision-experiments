@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
@@ -29,8 +30,11 @@ import picocli.CommandLine.Option;
 
 public class GenerateGraalVMPrecisionPlot implements Callable<Void> {
 
-   @Option(names = { "-graalVMDataFolder", "--graalVMDataFolder" }, description = "Data-Folder for analysis", required = true)
-   private File graalVMDataFolder;
+   @Option(names = { "-v1folder", "--v1folder" }, description = "Data-Folder for analysis", required = true)
+   private File v1folder;
+   
+   @Option(names = { "-v2folder", "--v2folder" }, description = "Data-Folder for analysis", required = true)
+   private File v2folder;
 
    @Mixin
    private PrecisionConfigMixin precisionConfigMixin;
@@ -45,7 +49,7 @@ public class GenerateGraalVMPrecisionPlot implements Callable<Void> {
    public Void call() throws Exception {
       ExecutorService pool = Executors.newFixedThreadPool(2);
 
-      File resultFolder = new File(graalVMDataFolder, "results");
+      File resultFolder = new File(v1folder.getParentFile(), "results");
       resultFolder.mkdir();
 
       BufferedWriter precisionRecallWriter = new BufferedWriter(new FileWriter(new File(resultFolder, "precision.csv")));
@@ -55,29 +59,29 @@ public class GenerateGraalVMPrecisionPlot implements Callable<Void> {
       Map<String, Kopemedata> testcasesV1 = new HashMap<>();
       Map<String, Kopemedata> testcasesV2 = new HashMap<>();
 
-      Kopemedata dataV1 = readData("68901");
+      Kopemedata dataV1 = readData(v1folder);
       testcasesV1.put(dataV1.getClazz(), dataV1);
       
-      Kopemedata dataV2 = readData("68900");
+      Kopemedata dataV2 = readData(v2folder);
       testcasesV2.put(dataV2.getClazz(), dataV2);
       
       System.err.println("Data:" + dataV2.getFirstDatacollectorContent().size());
 
       PrecisionPlotHandler handler = new PrecisionPlotHandler(testcasesV1, testcasesV2, pool, 1, precisionConfigMixin.getConfig(), writingData);
-      handler.handleAllParameters(30, 8);
+      handler.handleAllParameters(30, 8, false);
+      pool.shutdown();
       return null;
    }
 
-   private Kopemedata readData(String versionName) throws IOException, FileNotFoundException {
-      File versionFolder = new File(graalVMDataFolder, versionName);
+   private Kopemedata readData(File vmFolder) throws IOException, FileNotFoundException {
       Kopemedata data = new Kopemedata("unkownClazz");
       data.getMethods().add(new TestMethod("unkownMethod"));
       data.getMethods().get(0).getDatacollectorResults().add(new DatacollectorResult("time"));
-      for (File versionDataFile : versionFolder.listFiles((FilenameFilter) new WildcardFileFilter("*-raw.csv"))) {
+      for (File versionDataFile : vmFolder.listFiles((FilenameFilter) new WildcardFileFilter("*-raw.csv"))) {
          VMResult vmResult = new VMResult();
          data.getFirstDatacollectorContent().add(vmResult);
          vmResult.setFulldata(new Fulldata());
-         vmResult.setCommit(versionName);
+         vmResult.setCommit(vmFolder.getName());
          LinkedList<MeasuredValue> values = new LinkedList<>();
          
          vmResult.getFulldata().setValues(values);

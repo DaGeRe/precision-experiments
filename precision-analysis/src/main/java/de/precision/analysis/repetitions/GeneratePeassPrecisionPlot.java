@@ -76,7 +76,7 @@ public class GeneratePeassPrecisionPlot implements Callable<Void> {
 
                PrecisionConfig precisionConfig = precisionConfigMixin.getConfig();
                PrecisionPlotHandler handler = new PrecisionPlotHandler(testcasesV1, testcasesV2, pool, repetitions, precisionConfig, writingData);
-               handler.handleAllParameters(maxVMsMeasured, maxIterations);
+               handler.handleAllParameters(maxVMsMeasured, maxIterations, true);
             }
          }
       }
