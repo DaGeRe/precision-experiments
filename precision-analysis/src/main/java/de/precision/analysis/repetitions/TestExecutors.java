@@ -18,10 +18,10 @@ public class TestExecutors {
 
    public static void getMeanRelation(final Map<String, Relation> relations, final CompareData data) {
       final double minChange = 0.997;
-      if (data.getAvgBefore() < data.getAvgAfter() * minChange) {
+      if (data.getAvgPredecessor() < data.getAvgCurrent() * minChange) {
          relations.put(StatisticalTests.MEAN, Relation.LESS_THAN);
       } else {
-         if (data.getAvgAfter() * 0.99 > data.getAvgBefore()) {
+         if (data.getAvgCurrent() * 0.99 > data.getAvgPredecessor()) {
             relations.put(StatisticalTests.MEAN, Relation.GREATER_THAN);
          } else {
             relations.put(StatisticalTests.MEAN, Relation.EQUAL);
@@ -30,10 +30,10 @@ public class TestExecutors {
    }
 
    public static boolean getTTestRelation(final Map<String, Relation> relations, final CompareData data, final StatisticsConfig config) {
-      final boolean tchange = new TTest().homoscedasticTTest(data.getBefore(), data.getAfter(), config.getType1error());
+      final boolean tchange = new TTest().homoscedasticTTest(data.getPredecessor(), data.getCurrent(), config.getType1error());
       // final boolean tchange = new TTest().homoscedasticTTest(values.get(0), values.get(1), 0.01);
       if (tchange) {
-         relations.put(StatisticalTests.TTEST, data.getAvgBefore() < data.getAvgAfter() ? Relation.LESS_THAN : Relation.GREATER_THAN);
+         relations.put(StatisticalTests.TTEST, data.getAvgPredecessor() < data.getAvgCurrent() ? Relation.LESS_THAN : Relation.GREATER_THAN);
       } else {
          relations.put(StatisticalTests.TTEST, Relation.EQUAL);
       }
@@ -53,11 +53,11 @@ public class TestExecutors {
    }
 
    public static void getMannWhitneyRelation(final Map<String, Relation> relations, final CompareData data, final StatisticsConfig config) {
-      final double statistic = new MannWhitneyUTest().mannWhitneyUTest(data.getBefore(), data.getAfter());
+      final double statistic = new MannWhitneyUTest().mannWhitneyUTest(data.getPredecessor(), data.getCurrent());
       LOG.trace(statistic);
       final boolean mannchange = statistic < config.getType1error(); // 2.33 - critical value for confidence level 0.99
       if (mannchange) {
-         relations.put(StatisticalTests.MANNWHITNEY, data.getAvgBefore() < data.getAvgAfter() ? Relation.LESS_THAN : Relation.GREATER_THAN);
+         relations.put(StatisticalTests.MANNWHITNEY, data.getAvgPredecessor() < data.getAvgCurrent() ? Relation.LESS_THAN : Relation.GREATER_THAN);
       } else {
          relations.put(StatisticalTests.MANNWHITNEY, Relation.EQUAL);
       }

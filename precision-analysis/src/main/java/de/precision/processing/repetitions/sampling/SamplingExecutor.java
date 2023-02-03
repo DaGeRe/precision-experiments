@@ -22,7 +22,7 @@ public class SamplingExecutor {
       this.comparer = comparer;
       this.config = config;
 
-      CompareData withOutliers = selectPart(origin.getBefore(), origin.getAfter(), config.getVms());
+      CompareData withOutliers = selectPart(origin.getPredecessor(), origin.getCurrent(), config.getVms());
 
       if (statisticsConfig.getOutlierFactor() != 0) {
          data = OutlierRemoverBimodal.removeOutliersSimple(withOutliers, statisticsConfig.getOutlierFactor());
@@ -31,11 +31,11 @@ public class SamplingExecutor {
       }
    }
    
-   public SamplingExecutor(final SamplingConfig config, final StatisticsConfig statisticsConfig, final double[] beforeData, final double[] afterData, final PrecisionComparer comparer) {
+   public SamplingExecutor(final SamplingConfig config, final StatisticsConfig statisticsConfig, final double[] predecessorData, final double[] currentData, final PrecisionComparer comparer) {
       this.comparer = comparer;
       this.config = config;
 
-      CompareData withOutliers = selectPart(beforeData, afterData, config.getVms());
+      CompareData withOutliers = selectPart(predecessorData, currentData, config.getVms());
 
       if (statisticsConfig.getOutlierFactor() != 0) {
          data = OutlierRemoverBimodal.removeOutliersSimple(withOutliers, statisticsConfig.getOutlierFactor());

@@ -65,7 +65,7 @@ public class VMCombinationSampler {
    private void executeComparisons(final SamplingConfig config, final CompareData data) {
       final SamplingExecutor samplingExecutor = new SamplingExecutor(config, statisticsConfig, data, comparer);
       samplingExecutor.executeComparisons(Relation.LESS_THAN);
-      final SamplingExecutor samplingExecutor2 = new SamplingExecutor(config, statisticsConfig, data.getBefore(), data.getBefore(), comparer);
+      final SamplingExecutor samplingExecutor2 = new SamplingExecutor(config, statisticsConfig, data.getPredecessor(), data.getPredecessor(), comparer);
       samplingExecutor2.executeComparisons(Relation.EQUAL);
    }
 

@@ -34,11 +34,11 @@ public class PrecisionComparer {
 
       boolean ttest = TestExecutors.getTTestRelation(relations, data, statisticsConfig);
       if (precisionConfig.isPrintPicks()) {
-         LOG.debug(data.getAvgBefore() + " " + data.getAvgAfter() + " " +
-               data.getBeforeStat().getVariance() + " " + data.getAfterStat().getVariance()
+         LOG.debug(data.getAvgPredecessor() + " " + data.getAvgCurrent() + " " +
+               data.getPredecessorStat().getVariance() + " " + data.getCurrentStat().getVariance()
                + " " + (ttest ? 1 : 0)
-               + " " + new TTest().homoscedasticT(data.getBefore(), data.getAfter())
-               + " " + data.getBefore().length + " " + data.getAfter().length);
+               + " " + new TTest().homoscedasticT(data.getPredecessor(), data.getCurrent())
+               + " " + data.getPredecessor().length + " " + data.getCurrent().length);
       }
 
       if (Arrays.asList(precisionConfig.getTypes()).contains(StatisticalTests.TTEST2)) {
