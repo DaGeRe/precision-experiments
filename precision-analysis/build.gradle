@@ -31,19 +31,6 @@ publishing {
     }
 }
 
-jar {
-    manifest {
-        attributes "Main-Class": "de.precision.analysis.repetitions.GeneratePeassPrecisionPlot"
-    }
-    
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	
-	from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}
-
-
 repositories {
     mavenCentral()
     mavenLocal()
