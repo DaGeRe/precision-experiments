@@ -41,7 +41,7 @@ repositories {
 
 
 dependencies {
-   implementation group: 'de.dagere.peass', name: 'analysis', version: '0.3.5'
+   implementation group: 'de.dagere.peass', name: 'analysis', version: '0.3.7'
    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
-   testImplementation group: 'de.dagere.peass', name: 'measurement', version: '0.3.5', classifier: 'tests'
+   testImplementation group: 'de.dagere.peass', name: 'measurement', version: '0.3.7', classifier: 'tests'
 }
