@@ -1,4 +1,4 @@
-package de.precision.analysis.repetitions;
+package de.precision.analysis.graalvm;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,6 +23,11 @@ import de.dagere.kopeme.kopemedata.Kopemedata;
 import de.dagere.kopeme.kopemedata.MeasuredValue;
 import de.dagere.kopeme.kopemedata.TestMethod;
 import de.dagere.kopeme.kopemedata.VMResult;
+import de.precision.analysis.repetitions.PrecisionConfigMixin;
+import de.precision.analysis.repetitions.PrecisionPlotHandler;
+import de.precision.analysis.repetitions.PrecisionWriter;
+import de.precision.analysis.repetitions.StatisticalTestList;
+import de.precision.analysis.repetitions.WritingData;
 import picocli.CommandLine;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
@@ -58,10 +63,10 @@ public class GenerateGraalVMPrecisionPlot implements Callable<Void> {
       Map<String, Kopemedata> testcasesV1 = new HashMap<>();
       Map<String, Kopemedata> testcasesV2 = new HashMap<>();
 
-      Kopemedata dataV1 = readData(v1folder);
+      Kopemedata dataV1 = GraalVMReadUtil.readData(v1folder);
       testcasesV1.put(dataV1.getClazz(), dataV1);
       
-      Kopemedata dataV2 = readData(v2folder);
+      Kopemedata dataV2 = GraalVMReadUtil.readData(v2folder);
       testcasesV2.put(dataV2.getClazz(), dataV2);
       
       System.err.println("Data:" + dataV2.getFirstDatacollectorContent().size());
@@ -72,33 +77,5 @@ public class GenerateGraalVMPrecisionPlot implements Callable<Void> {
       return null;
    }
 
-   private Kopemedata readData(File vmFolder) throws IOException, FileNotFoundException {
-      Kopemedata data = new Kopemedata("unkownClazz");
-      data.getMethods().add(new TestMethod("unkownMethod"));
-      data.getMethods().get(0).getDatacollectorResults().add(new DatacollectorResult("time"));
-      for (File versionDataFile : vmFolder.listFiles((FilenameFilter) new WildcardFileFilter("*-raw.csv"))) {
-         VMResult vmResult = new VMResult();
-         data.getFirstDatacollectorContent().add(vmResult);
-         vmResult.setFulldata(new Fulldata());
-         vmResult.setCommit(vmFolder.getName());
-         LinkedList<MeasuredValue> values = new LinkedList<>();
-         
-         vmResult.getFulldata().setValues(values);
-         try (BufferedReader reader = new BufferedReader(new FileReader(versionDataFile))){
-            String line;
-            while ((line = reader.readLine()) != null) {
-               String[] parts = line.split(",");
-               if (!"index".equals(parts[0])) {
-                  long startTime = Long.parseLong(parts[0]);
-                  long duration = Long.parseLong(parts[1]);
-                  MeasuredValue measuredValue = new MeasuredValue();
-                  measuredValue.setStartTime(startTime);
-                  measuredValue.setValue(duration);
-                  values.add(measuredValue);
-               }
-            }
-         }
-      }
-      return data;
-   }
+   
 }
