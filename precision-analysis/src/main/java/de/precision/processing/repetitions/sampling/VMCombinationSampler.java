@@ -21,14 +21,12 @@ public class VMCombinationSampler {
    private final int warmup, allExecutions;
    private final PrecisionComparer comparer;
    private final SamplingConfig config;
-   private final StatisticsConfig statisticsConfig;
 
-   public VMCombinationSampler(final int warmup, final int allExecutions, final PrecisionComparer comparer, final SamplingConfig config, final StatisticsConfig statisticConfig) {
+   public VMCombinationSampler(final int warmup, final int allExecutions, final PrecisionComparer comparer, final SamplingConfig config) {
       this.warmup = warmup;
       this.allExecutions = allExecutions;
       this.comparer = comparer;
       this.config = config;
-      this.statisticsConfig = statisticConfig;
    }
 
    /**
@@ -63,9 +61,9 @@ public class VMCombinationSampler {
    }
 
    private void executeComparisons(final SamplingConfig config, final CompareData data) {
-      final SamplingExecutor samplingExecutor = new SamplingExecutor(config, statisticsConfig, data, comparer);
+      final SamplingExecutor samplingExecutor = new SamplingExecutor(config, data, comparer);
       samplingExecutor.executeComparisons(Relation.LESS_THAN);
-      final SamplingExecutor samplingExecutor2 = new SamplingExecutor(config, statisticsConfig, data.getPredecessor(), data.getPredecessor(), comparer);
+      final SamplingExecutor samplingExecutor2 = new SamplingExecutor(config, data.getPredecessor(), data.getPredecessor(), comparer);
       samplingExecutor2.executeComparisons(Relation.EQUAL);
    }
 

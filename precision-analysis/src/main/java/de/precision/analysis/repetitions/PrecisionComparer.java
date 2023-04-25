@@ -125,5 +125,8 @@ public class PrecisionComparer {
    public Map<String, MethodResult> getTestcaseResults() {
       return testcaseResults;
    }
-
+   
+   public StatisticsConfig getStatisticsConfig() {
+      return statisticsConfig;
+   }
 }

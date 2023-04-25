@@ -18,9 +18,10 @@ public class SamplingExecutor {
    private final CompareData data;
 
 
-   public SamplingExecutor(final SamplingConfig config, final StatisticsConfig statisticsConfig, final CompareData origin, final PrecisionComparer comparer) {
+   public SamplingExecutor(final SamplingConfig config, final CompareData origin, final PrecisionComparer comparer) {
       this.comparer = comparer;
       this.config = config;
+      StatisticsConfig statisticsConfig = comparer.getStatisticsConfig();
 
       CompareData withOutliers = selectPart(origin.getPredecessor(), origin.getCurrent(), config.getVms());
 
@@ -31,10 +32,11 @@ public class SamplingExecutor {
       }
    }
    
-   public SamplingExecutor(final SamplingConfig config, final StatisticsConfig statisticsConfig, final double[] predecessorData, final double[] currentData, final PrecisionComparer comparer) {
+   public SamplingExecutor(final SamplingConfig config, final double[] predecessorData, final double[] currentData, final PrecisionComparer comparer) {
       this.comparer = comparer;
       this.config = config;
-
+      StatisticsConfig statisticsConfig = comparer.getStatisticsConfig();
+      
       CompareData withOutliers = selectPart(predecessorData, currentData, config.getVms());
 
       if (statisticsConfig.getOutlierFactor() != 0) {
