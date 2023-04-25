@@ -5,14 +5,17 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.math3.stat.inference.TTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.dagere.kopeme.kopemedata.VMResult;
 import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.Relation;
+import de.dagere.peass.measurement.statistics.StatisticUtil;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
 import de.precision.analysis.repetitions.PrecisionComparer;
 import de.precision.analysis.repetitions.PrecisionConfigMixin;
@@ -72,12 +75,17 @@ public class GraalVMPrecisionDeterminer implements Runnable {
             for (int vmCount : new int[] { 5, 10, 15, 20, 25, 30 }) {
                SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark");
 
-               for (double type2error : new double[] { 0.01 }) {
+               int maxRuns = getMaximumPossibleRuns(dataOld, dataNew);
+               for (int runs = 0; runs < maxRuns; runs++) {
+                  final List<VMResult> fastShortened = StatisticUtil.shortenValues(dataOld.getFirstDatacollectorContent(), 0, runs);
+                  final List<VMResult> slowShortened = StatisticUtil.shortenValues(dataNew.getFirstDatacollectorContent(), 0, runs);
+                  CompareData shortenedData = new CompareData(fastShortened, slowShortened);
+                  
                   StatisticsConfig config = new StatisticsConfig();
-                  config.setType2error(type2error);
+//                  config.setType2error(type2error);
 
                   PrecisionComparer comparer = new PrecisionComparer(config, precisionConfigMixin.getConfig());
-                  SamplingExecutor samplingExecutor = new SamplingExecutor(samplingConfig, data, comparer);
+                  SamplingExecutor samplingExecutor = new SamplingExecutor(samplingConfig, shortenedData, comparer);
                   for (int i = 0; i < samplingConfig.getSamplingExecutions(); i++) {
                      samplingExecutor.executeComparisons(expected);
                   }
@@ -92,6 +100,17 @@ public class GraalVMPrecisionDeterminer implements Runnable {
       } catch (ParseException | IOException e1) {
          e1.printStackTrace();
       }
+   }
+
+   private int getMaximumPossibleRuns(Kopemedata dataOld, Kopemedata dataNew) {
+      int maxRuns = Integer.MAX_VALUE;
+      for (VMResult result : dataOld.getFirstDatacollectorContent()) {
+         maxRuns = Math.min(maxRuns, result.getFulldata().getValues().size());
+      }
+      for (VMResult result : dataNew.getFirstDatacollectorContent()) {
+         maxRuns = Math.min(maxRuns, result.getFulldata().getValues().size());
+      }
+      return maxRuns;
    }
 
    private Relation getRealRelation(CompareData data) {
