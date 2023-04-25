@@ -118,6 +118,14 @@ public class PrecisionComparer {
       final double recall = 100d * (((double) truepositive) / (truepositive + falsenegative));
       return recall;
    }
+   
+   public double getTrueNegativeRate(final StatisticalTests statisticMethod) {
+      final Map<StatisticalTestResult, Integer> methodResults = overallResults.getResults().get(statisticMethod);
+      final int truenegative = methodResults.get(StatisticalTestResult.TRUENEGATIVE);
+      final int falsenegative = methodResults.get(StatisticalTestResult.FALSENEGATIVE);
+      final double trueNegativeRate = 100d * (((double) truenegative) / (truenegative + falsenegative));
+      return trueNegativeRate;
+   }
 
    public double getFScore(final StatisticalTests statisticMethod) {
       double precision = getPrecision(statisticMethod);

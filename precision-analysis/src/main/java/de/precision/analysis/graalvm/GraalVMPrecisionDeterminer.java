@@ -24,11 +24,8 @@ import de.precision.analysis.repetitions.ExecutionData;
 import de.precision.analysis.repetitions.PrecisionComparer;
 import de.precision.analysis.repetitions.PrecisionConfigMixin;
 import de.precision.analysis.repetitions.PrecisionWriter;
-import de.precision.analysis.repetitions.StatisticalTests;
-import de.precision.analysis.repetitions.TestExecutors;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
 import de.precision.processing.repetitions.sampling.SamplingExecutor;
-import de.precision.processing.repetitions.sampling.VMCombinationSampler;
 import picocli.CommandLine;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
@@ -90,7 +87,9 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    }
 
    private void executeOneComparison(Comparison comparison, Kopemedata dataOld, Kopemedata dataNew, Relation expected) throws IOException {
-      try (BufferedWriter writer = new BufferedWriter(new FileWriter("comparison_" + comparison.getIdNew() + ".csv"))){
+      String fileName = (Relation.isUnequal(expected) ? "unequal_" : "equal_" )  + comparison.getIdNew() + ".csv";
+      File resultFile = new File("results/" + fileName);
+      try (BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile))){
          for (int vmCount : new int[] { 5, 10, 15, 20, 25, 30 }) {
             SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark");
 

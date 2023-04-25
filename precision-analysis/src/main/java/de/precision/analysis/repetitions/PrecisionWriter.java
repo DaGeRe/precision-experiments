@@ -54,18 +54,15 @@ public class PrecisionWriter {
    }
 
    private void writeData(final StatisticalTests staticalMethod, final Map<StatisticalTestResult, Integer> methodResult, final BufferedWriter writer) throws IOException {
-
       if (methodResult != null) {
-         final int selected = methodResult.get(StatisticalTestResult.SELECTED);
-         final int wronggreater = methodResult.get(StatisticalTestResult.WRONGGREATER);
          final double precision = comparer.getPrecision(staticalMethod);
          final double recall = comparer.getRecall(staticalMethod);
          final double fscore = comparer.getFScore(staticalMethod);
-         final double wrongGreaterSelectionRate = (selected > 0) ? ((double) wronggreater) / selected : 0;
+         final double trueNegativeRate = comparer.getTrueNegativeRate(staticalMethod);
          writer.write(df.format(precision) + ProcessConstants.DATAFILE_SEPARATOR +
                df.format(recall) + ProcessConstants.DATAFILE_SEPARATOR +
                df.format(fscore) + ProcessConstants.DATAFILE_SEPARATOR +
-               df.format(wrongGreaterSelectionRate) + ProcessConstants.DATAFILE_SEPARATOR);
+               df.format(trueNegativeRate) + ProcessConstants.DATAFILE_SEPARATOR);
       } else {
          writer.write(0.0 + ProcessConstants.DATAFILE_SEPARATOR +
                0.0 + ProcessConstants.DATAFILE_SEPARATOR +
