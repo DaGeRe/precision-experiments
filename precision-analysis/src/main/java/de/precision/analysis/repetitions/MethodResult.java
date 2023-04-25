@@ -12,12 +12,7 @@ import java.util.Map;
  */
 public class MethodResult {
 	
-	public static final String WRONGGREATER = "WRONGGREATER";
-	public static final String SELECTED = "SELECTED";
-	public static final String FALSENEGATIVE = "FALSENEGATIVE";
-	public static final String TRUEPOSITIVE = "TRUEPOSITIVE";
-
-	private final Map<StatisticalTests, Map<String, Integer>> results = new LinkedHashMap<>();
+	private final Map<StatisticalTests, Map<StatisticalTestResult, Integer>> results = new LinkedHashMap<>();
 
 	public MethodResult(StatisticalTests[] types) {
 		for (final StatisticalTests type : types){
@@ -25,30 +20,30 @@ public class MethodResult {
 		}
 //		results.put("MEAN", new HashMap<>());
 //		results.put("TTEST", new HashMap<>());
-		for (final Map<String, Integer> entry : getResults().values()) {
-			entry.put(TRUEPOSITIVE, 0);
-			entry.put(FALSENEGATIVE, 0);
-			entry.put(SELECTED, 0);
-			entry.put(WRONGGREATER, 0);
+		for (final Map<StatisticalTestResult, Integer> entry : getResults().values()) {
+			entry.put(StatisticalTestResult.TRUEPOSITIVE, 0);
+			entry.put(StatisticalTestResult.FALSENEGATIVE, 0);
+			entry.put(StatisticalTestResult.SELECTED, 0);
+			entry.put(StatisticalTestResult.WRONGGREATER, 0);
 		}
 	}
 
 	@Override
 	public String toString() {
 		String result = "";
-		for (final Map<String, Integer> value : getResults().values()) {
+		for (final Map<StatisticalTestResult, Integer> value : getResults().values()) {
 			result += value + ";";
 		}
 		return result;
 	}
 
-	public void increment(final StatisticalTests method, String type) {
-		final Map<String, Integer> methodMap = getResults().get(method);
+	public void increment(final StatisticalTests method, StatisticalTestResult type) {
+		final Map<StatisticalTestResult, Integer> methodMap = getResults().get(method);
 		final int increment = methodMap.get(type).intValue() + 1;
 		methodMap.put(type, increment);
 	}
 
-   public Map<StatisticalTests, Map<String, Integer>> getResults() {
+   public Map<StatisticalTests, Map<StatisticalTestResult, Integer>> getResults() {
       return results;
    }
 }

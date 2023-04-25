@@ -74,23 +74,23 @@ public class PrecisionComparer {
 
    private void calculateOverallResult(final Relation expectedRelation, final MethodResult myMethodResult, final StatisticalTests testName, final Relation testRelation) {
       if (testRelation == Relation.LESS_THAN) {
-         overallResults.increment(testName, MethodResult.SELECTED);
-         myMethodResult.increment(testName, MethodResult.SELECTED);
+         overallResults.increment(testName, StatisticalTestResult.SELECTED);
+         myMethodResult.increment(testName, StatisticalTestResult.SELECTED);
          if (Relation.LESS_THAN == expectedRelation) {
-            overallResults.increment(testName, MethodResult.TRUEPOSITIVE);
-            myMethodResult.increment(testName, MethodResult.TRUEPOSITIVE);
+            overallResults.increment(testName, StatisticalTestResult.TRUEPOSITIVE);
+            myMethodResult.increment(testName, StatisticalTestResult.TRUEPOSITIVE);
          } else {
             // System.out.println("False positive!");
          }
       } else {
          if (Relation.LESS_THAN == expectedRelation) {
-            overallResults.increment(testName, MethodResult.FALSENEGATIVE);
-            myMethodResult.increment(testName, MethodResult.FALSENEGATIVE);
+            overallResults.increment(testName, StatisticalTestResult.FALSENEGATIVE);
+            myMethodResult.increment(testName, StatisticalTestResult.FALSENEGATIVE);
          }
       }
       if (testRelation == Relation.GREATER_THAN) {
-         overallResults.increment(testName, MethodResult.WRONGGREATER);
-         myMethodResult.increment(testName, MethodResult.WRONGGREATER);
+         overallResults.increment(testName, StatisticalTestResult.WRONGGREATER);
+         myMethodResult.increment(testName, StatisticalTestResult.WRONGGREATER);
       }
    }
 
@@ -99,17 +99,17 @@ public class PrecisionComparer {
    }
 
    public double getPrecision(final StatisticalTests statisticMethod) {
-      final Map<String, Integer> methodResults = overallResults.getResults().get(statisticMethod);
-      final int selected = methodResults.get(MethodResult.SELECTED);
-      final int truepositive = methodResults.get(MethodResult.TRUEPOSITIVE);
+      final Map<StatisticalTestResult, Integer> methodResults = overallResults.getResults().get(statisticMethod);
+      final int selected = methodResults.get(StatisticalTestResult.SELECTED);
+      final int truepositive = methodResults.get(StatisticalTestResult.TRUEPOSITIVE);
       final double precision = 100d * ((selected > 0) ? ((double) truepositive) / selected : 0);
       return precision;
    }
 
    public double getRecall(final StatisticalTests statisticMethod) {
-      final Map<String, Integer> methodResults = overallResults.getResults().get(statisticMethod);
-      final int truepositive = methodResults.get(MethodResult.TRUEPOSITIVE);
-      final int falsenegative = methodResults.get(MethodResult.FALSENEGATIVE);
+      final Map<StatisticalTestResult, Integer> methodResults = overallResults.getResults().get(statisticMethod);
+      final int truepositive = methodResults.get(StatisticalTestResult.TRUEPOSITIVE);
+      final int falsenegative = methodResults.get(StatisticalTestResult.FALSENEGATIVE);
       final double recall = 100d * (((double) truepositive) / (truepositive + falsenegative));
       return recall;
    }
