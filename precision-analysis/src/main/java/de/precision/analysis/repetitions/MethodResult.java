@@ -18,11 +18,10 @@ public class MethodResult {
 		for (final StatisticalTests type : types){
 			getResults().put(type, new HashMap<>());
 		}
-//		results.put("MEAN", new HashMap<>());
-//		results.put("TTEST", new HashMap<>());
 		for (final Map<StatisticalTestResult, Integer> entry : getResults().values()) {
 			entry.put(StatisticalTestResult.TRUEPOSITIVE, 0);
 			entry.put(StatisticalTestResult.FALSENEGATIVE, 0);
+			entry.put(StatisticalTestResult.TRUENEGATIVE, 0);
 			entry.put(StatisticalTestResult.SELECTED, 0);
 			entry.put(StatisticalTestResult.WRONGGREATER, 0);
 		}

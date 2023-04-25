@@ -73,24 +73,29 @@ public class PrecisionComparer {
    }
 
    private void calculateOverallResult(final Relation expectedRelation, final MethodResult myMethodResult, final StatisticalTests testName, final Relation testRelation) {
-      if (testRelation == Relation.LESS_THAN) {
+      if (Relation.isUnequal(testRelation)) {
          overallResults.increment(testName, StatisticalTestResult.SELECTED);
          myMethodResult.increment(testName, StatisticalTestResult.SELECTED);
-         if (Relation.LESS_THAN == expectedRelation) {
+         if (Relation.isUnequal(expectedRelation)) {
             overallResults.increment(testName, StatisticalTestResult.TRUEPOSITIVE);
             myMethodResult.increment(testName, StatisticalTestResult.TRUEPOSITIVE);
          } else {
             // System.out.println("False positive!");
          }
       } else {
-         if (Relation.LESS_THAN == expectedRelation) {
+         if (Relation.isUnequal(expectedRelation)) {
             overallResults.increment(testName, StatisticalTestResult.FALSENEGATIVE);
             myMethodResult.increment(testName, StatisticalTestResult.FALSENEGATIVE);
+         } else {
+            overallResults.increment(testName, StatisticalTestResult.TRUENEGATIVE);
+            myMethodResult.increment(testName, StatisticalTestResult.TRUENEGATIVE);
          }
       }
       if (testRelation == Relation.GREATER_THAN) {
-         overallResults.increment(testName, StatisticalTestResult.WRONGGREATER);
-         myMethodResult.increment(testName, StatisticalTestResult.WRONGGREATER);
+         if (expectedRelation != Relation.GREATER_THAN) {
+            overallResults.increment(testName, StatisticalTestResult.WRONGGREATER);
+            myMethodResult.increment(testName, StatisticalTestResult.WRONGGREATER);
+         }
       }
    }
 

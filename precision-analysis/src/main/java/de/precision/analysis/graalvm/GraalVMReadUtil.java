@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import de.dagere.kopeme.kopemedata.DatacollectorResult;
 import de.dagere.kopeme.kopemedata.Fulldata;
@@ -32,17 +33,24 @@ public class GraalVMReadUtil {
          vmResult.getFulldata().setValues(values);
          try (BufferedReader reader = new BufferedReader(new FileReader(versionDataFile))){
             String line;
+            
+            SummaryStatistics statistics = new SummaryStatistics();
+            
             while ((line = reader.readLine()) != null) {
                String[] parts = line.split(",");
                if (!"index".equals(parts[0])) {
                   long startTime = Long.parseLong(parts[0]);
-                  long duration = Long.parseLong(parts[1]);
+                  long duration = Long.parseLong(parts[3]);
                   MeasuredValue measuredValue = new MeasuredValue();
                   measuredValue.setStartTime(startTime);
                   measuredValue.setValue(duration);
                   values.add(measuredValue);
+                  
+                  statistics.addValue(duration);
                }
             }
+            vmResult.setValue(statistics.getMean());
+            vmResult.setDeviation(statistics.getStandardDeviation());
          }
       }
       return data;
