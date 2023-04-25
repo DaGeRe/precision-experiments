@@ -14,19 +14,19 @@ public class TryTests {
    
    @Test
    public void tryMannWhitneyLess() {
-      final HashMap<String, Relation> relations = new HashMap<>();
+      final HashMap<StatisticalTests, Relation> relations = new HashMap<>();
       final CompareData data = new CompareData(BimodalTestUtil.buildValues(10, 10), BimodalTestUtil.buildValues(12, 12));
       TestExecutors.getMannWhitneyRelation(relations, data, new StatisticsConfig());
       
-      Assert.assertEquals(Relation.LESS_THAN, relations.get("MANNWHITNEY"));
+      Assert.assertEquals(Relation.LESS_THAN, relations.get(StatisticalTests.MANNWHITNEY));
    }
    
    @Test
    public void tryMannWhitneyEqual() {
-      final HashMap<String, Relation> relations = new HashMap<>();
+      final HashMap<StatisticalTests, Relation> relations = new HashMap<>();
       final CompareData data = new CompareData(BimodalTestUtil.buildValues(10, 10), BimodalTestUtil.buildValues(10, 10));
       TestExecutors.getMannWhitneyRelation(relations, data, new StatisticsConfig());
       
-      Assert.assertEquals(Relation.EQUAL, relations.get("MANNWHITNEY"));
+      Assert.assertEquals(Relation.EQUAL, relations.get(StatisticalTests.MANNWHITNEY));
    }
 }

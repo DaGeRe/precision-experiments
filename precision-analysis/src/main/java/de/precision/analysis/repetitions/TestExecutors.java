@@ -16,7 +16,7 @@ import de.dagere.peass.measurement.statistics.bimodal.CompareData;
 public class TestExecutors {
    private static final Logger LOG = LogManager.getLogger(TestExecutors.class);
 
-   public static void getMeanRelation(final Map<String, Relation> relations, final CompareData data) {
+   public static void getMeanRelation(final Map<StatisticalTests, Relation> relations, final CompareData data) {
       final double minChange = 0.997;
       if (data.getAvgPredecessor() < data.getAvgCurrent() * minChange) {
          relations.put(StatisticalTests.MEAN, Relation.LESS_THAN);
@@ -29,7 +29,7 @@ public class TestExecutors {
       }
    }
 
-   public static boolean getTTestRelation(final Map<String, Relation> relations, final CompareData data, final StatisticsConfig config) {
+   public static boolean getTTestRelation(final Map<StatisticalTests, Relation> relations, final CompareData data, final StatisticsConfig config) {
       final boolean tchange = new TTest().homoscedasticTTest(data.getPredecessor(), data.getCurrent(), config.getType1error());
       // final boolean tchange = new TTest().homoscedasticTTest(values.get(0), values.get(1), 0.01);
       if (tchange) {
@@ -40,7 +40,7 @@ public class TestExecutors {
       return tchange;
    }
 
-   public static boolean getTTestRelationBimodal(final Map<String, Relation> relations, final CompareData data, final StatisticsConfig statisticsConfig) {
+   public static boolean getTTestRelationBimodal(final Map<StatisticalTests, Relation> relations, final CompareData data, final StatisticsConfig statisticsConfig) {
       final BimodalityTester tester = new BimodalityTester(data);
       final boolean tchange = tester.isTChange(statisticsConfig.getType1error());
       if (tchange) {
@@ -52,7 +52,7 @@ public class TestExecutors {
       return tchange;
    }
 
-   public static void getMannWhitneyRelation(final Map<String, Relation> relations, final CompareData data, final StatisticsConfig config) {
+   public static void getMannWhitneyRelation(final Map<StatisticalTests, Relation> relations, final CompareData data, final StatisticsConfig config) {
       final double statistic = new MannWhitneyUTest().mannWhitneyUTest(data.getPredecessor(), data.getCurrent());
       LOG.trace(statistic);
       final boolean mannchange = statistic < config.getType1error(); // 2.33 - critical value for confidence level 0.99
@@ -63,7 +63,7 @@ public class TestExecutors {
       }
    }
 
-   public static void getConfidenceRelation(final CompareData cd, final Map<String, Relation> relations) {
+   public static void getConfidenceRelation(final CompareData cd, final Map<StatisticalTests, Relation> relations) {
       final Relation confidence = ConfidenceIntervalInterpretion.compare(cd, 90);
       relations.put(StatisticalTests.CONFIDENCE, confidence);
       LOG.trace("Confidence: " + confidence);

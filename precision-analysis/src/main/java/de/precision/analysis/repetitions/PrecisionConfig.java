@@ -4,12 +4,12 @@ public class PrecisionConfig {
    private final boolean removeOutliers;
    private final boolean printPicks;
    private final int threads;
-   private final String[] types;
+   private final StatisticalTests[] types;
    private final int iterationResolution;
    private final int vmResolution;
    private final int minVMs, maxVMs;
 
-   public PrecisionConfig(final boolean removeOutliers, final boolean printPicks, final int threads, final String[] types, 
+   public PrecisionConfig(final boolean removeOutliers, final boolean printPicks, final int threads, final StatisticalTests[] types, 
          final int iterationResolution, final int vmResolution, final int minVMs, final int maxVMs) {
       this.removeOutliers = removeOutliers;
       this.printPicks = printPicks;
@@ -33,7 +33,7 @@ public class PrecisionConfig {
       return threads;
    }
    
-   public String[] getTypes() {
+   public StatisticalTests[] getTypes() {
       return types;
    }
    

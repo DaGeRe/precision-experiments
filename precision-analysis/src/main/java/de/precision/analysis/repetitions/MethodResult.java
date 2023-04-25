@@ -17,10 +17,10 @@ public class MethodResult {
 	public static final String FALSENEGATIVE = "FALSENEGATIVE";
 	public static final String TRUEPOSITIVE = "TRUEPOSITIVE";
 
-	private final Map<String, Map<String, Integer>> results = new LinkedHashMap<>();
+	private final Map<StatisticalTests, Map<String, Integer>> results = new LinkedHashMap<>();
 
-	public MethodResult(String[] types) {
-		for (final String type : types){
+	public MethodResult(StatisticalTests[] types) {
+		for (final StatisticalTests type : types){
 			getResults().put(type, new HashMap<>());
 		}
 //		results.put("MEAN", new HashMap<>());
@@ -42,13 +42,13 @@ public class MethodResult {
 		return result;
 	}
 
-	public void increment(final String method, String type) {
+	public void increment(final StatisticalTests method, String type) {
 		final Map<String, Integer> methodMap = getResults().get(method);
 		final int increment = methodMap.get(type).intValue() + 1;
 		methodMap.put(type, increment);
 	}
 
-   public Map<String, Map<String, Integer>> getResults() {
+   public Map<StatisticalTests, Map<String, Integer>> getResults() {
       return results;
    }
 }

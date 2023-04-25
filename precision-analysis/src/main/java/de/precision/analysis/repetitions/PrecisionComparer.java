@@ -30,7 +30,7 @@ public class PrecisionComparer {
    }
 
    public void executeComparisons(final CompareData data, final Relation expectedRelation, final String testcaseName) {
-      final Map<String, Relation> relations = new LinkedHashMap<>();
+      final Map<StatisticalTests, Relation> relations = new LinkedHashMap<>();
 
       boolean ttest = TestExecutors.getTTestRelation(relations, data, statisticsConfig);
       if (precisionConfig.isPrintPicks()) {
@@ -56,23 +56,23 @@ public class PrecisionComparer {
       manageResults(expectedRelation, testcaseName, relations);
    }
 
-   private void manageResults(final Relation expectedRelation, final String testcaseName, final Map<String, Relation> relations) {
+   private void manageResults(final Relation expectedRelation, final String testcaseName, final Map<StatisticalTests, Relation> relations) {
       MethodResult myMethodResult = testcaseResults.get(testcaseName);
       if (myMethodResult == null) {
          myMethodResult = new MethodResult(precisionConfig.getTypes());
          testcaseResults.put(testcaseName, myMethodResult);
       }
 
-      for (final Map.Entry<String, Relation> relationByMethod : relations.entrySet()) {
+      for (final Map.Entry<StatisticalTests, Relation> relationByMethod : relations.entrySet()) {
          // System.out.println("Relation: " + relation.getValue() + "
          // Expected: " + );
-         final String testName = relationByMethod.getKey();
+         final StatisticalTests testName = relationByMethod.getKey();
          final Relation testRelation = relationByMethod.getValue();
          calculateOverallResult(expectedRelation, myMethodResult, testName, testRelation);
       }
    }
 
-   private void calculateOverallResult(final Relation expectedRelation, final MethodResult myMethodResult, final String testName, final Relation testRelation) {
+   private void calculateOverallResult(final Relation expectedRelation, final MethodResult myMethodResult, final StatisticalTests testName, final Relation testRelation) {
       if (testRelation == Relation.LESS_THAN) {
          overallResults.increment(testName, MethodResult.SELECTED);
          myMethodResult.increment(testName, MethodResult.SELECTED);
@@ -98,7 +98,7 @@ public class PrecisionComparer {
       return overallResults;
    }
 
-   public double getPrecision(final String statisticMethod) {
+   public double getPrecision(final StatisticalTests statisticMethod) {
       final Map<String, Integer> methodResults = overallResults.getResults().get(statisticMethod);
       final int selected = methodResults.get(MethodResult.SELECTED);
       final int truepositive = methodResults.get(MethodResult.TRUEPOSITIVE);
@@ -106,7 +106,7 @@ public class PrecisionComparer {
       return precision;
    }
 
-   public double getRecall(final String statisticMethod) {
+   public double getRecall(final StatisticalTests statisticMethod) {
       final Map<String, Integer> methodResults = overallResults.getResults().get(statisticMethod);
       final int truepositive = methodResults.get(MethodResult.TRUEPOSITIVE);
       final int falsenegative = methodResults.get(MethodResult.FALSENEGATIVE);
@@ -114,7 +114,7 @@ public class PrecisionComparer {
       return recall;
    }
 
-   public double getFScore(final String statisticMethod) {
+   public double getFScore(final StatisticalTests statisticMethod) {
       double precision = getPrecision(statisticMethod);
       double recall = getRecall(statisticMethod);
       final double precisionRecall = precision + recall;
