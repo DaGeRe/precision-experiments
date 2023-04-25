@@ -1,7 +1,9 @@
 package de.precision.analysis.graalvm;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -18,8 +20,10 @@ import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.StatisticUtil;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
+import de.precision.analysis.repetitions.ExecutionData;
 import de.precision.analysis.repetitions.PrecisionComparer;
 import de.precision.analysis.repetitions.PrecisionConfigMixin;
+import de.precision.analysis.repetitions.PrecisionWriter;
 import de.precision.analysis.repetitions.StatisticalTests;
 import de.precision.analysis.repetitions.TestExecutors;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
@@ -78,30 +82,36 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
          CompareData data = new CompareData(dataOld.getFirstDatacollectorContent(), dataNew.getFirstDatacollectorContent());
          Relation expected = getRealRelation(data);
-
          LOG.info("Expected relation: {}", expected);
 
+         executeOneComparison(comparison, dataOld, dataNew, expected);
+         
+      }
+   }
+
+   private void executeOneComparison(Comparison comparison, Kopemedata dataOld, Kopemedata dataNew, Relation expected) throws IOException {
+      try (BufferedWriter writer = new BufferedWriter(new FileWriter("comparison_" + comparison.getIdNew() + ".csv"))){
          for (int vmCount : new int[] { 5, 10, 15, 20, 25, 30 }) {
             SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark");
 
             int maxRuns = getMaximumPossibleRuns(dataOld, dataNew);
-            for (int runs = 0; runs < maxRuns; runs++) {
-               final List<VMResult> fastShortened = StatisticUtil.shortenValues(dataOld.getFirstDatacollectorContent(), 0, runs);
-               final List<VMResult> slowShortened = StatisticUtil.shortenValues(dataNew.getFirstDatacollectorContent(), 0, runs);
+            for (int iterations = 1; iterations < maxRuns; iterations++) {
+               ExecutionData executionData = new ExecutionData(vmCount, 0, iterations, 1);
+               
+               final List<VMResult> fastShortened = StatisticUtil.shortenValues(dataOld.getFirstDatacollectorContent(), 0, iterations);
+               final List<VMResult> slowShortened = StatisticUtil.shortenValues(dataNew.getFirstDatacollectorContent(), 0, iterations);
+               
                CompareData shortenedData = new CompareData(fastShortened, slowShortened);
                
                StatisticsConfig config = new StatisticsConfig();
-//                  config.setType2error(type2error);
 
                PrecisionComparer comparer = new PrecisionComparer(config, precisionConfigMixin.getConfig());
-               SamplingExecutor samplingExecutor = new SamplingExecutor(samplingConfig, shortenedData, comparer);
                for (int i = 0; i < samplingConfig.getSamplingExecutions(); i++) {
+                  SamplingExecutor samplingExecutor = new SamplingExecutor(samplingConfig, shortenedData, comparer);
                   samplingExecutor.executeComparisons(expected);
                }
                
-               double precision = comparer.getPrecision(StatisticalTests.TTEST);
-               double fscore = comparer.getFScore(StatisticalTests.TTEST);
-               System.out.println("Precision: " + precision + " F-Score: " +fscore);
+               new PrecisionWriter(comparer, executionData).writeTestcase(writer, comparer.getOverallResults().getResults());
             }
          }
       }
