@@ -9,6 +9,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.math3.stat.inference.TTest;
 import org.apache.logging.log4j.LogManager;
@@ -20,10 +22,16 @@ import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.StatisticUtil;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
+import de.precision.analysis.heatmap.Configuration;
+import de.precision.analysis.heatmap.GetMinimalFeasibleConfiguration;
+import de.precision.analysis.heatmap.MinimalFeasibleConfigurationDeterminer;
+import de.precision.analysis.heatmap.PrecisionData;
 import de.precision.analysis.repetitions.ExecutionData;
 import de.precision.analysis.repetitions.PrecisionComparer;
 import de.precision.analysis.repetitions.PrecisionConfigMixin;
 import de.precision.analysis.repetitions.PrecisionWriter;
+import de.precision.analysis.repetitions.StatisticalTestResult;
+import de.precision.analysis.repetitions.StatisticalTests;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
 import de.precision.processing.repetitions.sampling.SamplingExecutor;
 import picocli.CommandLine;
@@ -69,6 +77,7 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    }
 
    private void executeComparisons(ComparisonFinder finder) throws IOException, FileNotFoundException {
+      Configuration configuration = null;
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
          File folderPredecessor = new File(folder, "measurements/" + comparison.getIdOld());
          File folderCurrent = new File(folder, "measurements/" + comparison.getIdNew());
@@ -81,39 +90,63 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          Relation expected = getRealRelation(data);
          LOG.info("Expected relation: {}", expected);
 
-         executeOneComparison(comparison, dataOld, dataNew, expected);
-
+         Configuration currentConfiguration = executeOneComparison(comparison, dataOld, dataNew, expected);
+         if (configuration == null) {
+            configuration = currentConfiguration;
+         } else {
+            configuration = GetMinimalFeasibleConfiguration.mergeConfigurations(1, configuration, currentConfiguration);
+         }
       }
+      System.out.println("Final configuration: VMs: " + configuration.getVMs() + " Iterations: " + configuration.getIterations());
    }
 
-   private void executeOneComparison(Comparison comparison, Kopemedata dataOld, Kopemedata dataNew, Relation expected) throws IOException {
+   private Configuration executeOneComparison(Comparison comparison, Kopemedata dataOld, Kopemedata dataNew, Relation expected) throws IOException {
       String fileName = (Relation.isUnequal(expected) ? "unequal_" : "equal_") + comparison.getIdNew() + ".csv";
       File resultFile = new File("results/" + fileName);
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile))) {
-         for (int vmCount : new int[] { 5, 10, 15, 20, 25, 30 }) {
-            SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark");
-
-            int maxRuns = getMaximumPossibleRuns(dataOld, dataNew);
-            for (int iterations = 1; iterations < maxRuns; iterations++) {
-               ExecutionData executionData = new ExecutionData(vmCount, 0, iterations, 1);
-
-               final List<VMResult> fastShortened = StatisticUtil.shortenValues(dataOld.getFirstDatacollectorContent(), 0, iterations);
-               final List<VMResult> slowShortened = StatisticUtil.shortenValues(dataNew.getFirstDatacollectorContent(), 0, iterations);
-
-               CompareData shortenedData = new CompareData(fastShortened, slowShortened);
-
-               StatisticsConfig config = new StatisticsConfig();
-
-               PrecisionComparer comparer = new PrecisionComparer(config, precisionConfigMixin.getConfig());
-               for (int i = 0; i < samplingConfig.getSamplingExecutions(); i++) {
-                  SamplingExecutor samplingExecutor = new SamplingExecutor(samplingConfig, shortenedData, comparer);
-                  samplingExecutor.executeComparisons(expected);
-               }
-
-               new PrecisionWriter(comparer, executionData).writeTestcase(writer, comparer.getOverallResults().getResults());
-            }
+         PrecisionData data = executeComparisons(dataOld, dataNew, expected, writer);
+         MinimalFeasibleConfigurationDeterminer determiner = new MinimalFeasibleConfigurationDeterminer(99.0);
+         Map<Integer, Configuration> minimalFeasibleConfiguration = determiner.getMinimalFeasibleConfiguration(data);
+         Configuration currentConfig = minimalFeasibleConfiguration.get(1);
+         if (currentConfig != null) {
+            System.out.println("VMs: " + currentConfig.getVMs() + " Iterations: " + currentConfig.getIterations());
+            return currentConfig;
+         } else {
+            System.out.println("Did not find a suitable configuration!");
+            return null;
          }
       }
+   }
+
+   private PrecisionData executeComparisons(Kopemedata dataOld, Kopemedata dataNew, Relation expected, BufferedWriter writer) throws IOException {
+      PrecisionData data = new PrecisionData();
+      for (int vmCount : new int[] { 3, 5, 10, 15, 20, 25, 30 }) {
+         SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark");
+         int maxRuns = getMaximumPossibleRuns(dataOld, dataNew);
+         for (int iterations = 1; iterations < maxRuns; iterations++) {
+            ExecutionData executionData = new ExecutionData(vmCount, 0, iterations, 1);
+
+            final List<VMResult> fastShortened = StatisticUtil.shortenValues(dataOld.getFirstDatacollectorContent(), 0, iterations);
+            final List<VMResult> slowShortened = StatisticUtil.shortenValues(dataNew.getFirstDatacollectorContent(), 0, iterations);
+
+            CompareData shortenedData = new CompareData(fastShortened, slowShortened);
+
+            StatisticsConfig config = new StatisticsConfig();
+
+            PrecisionComparer comparer = new PrecisionComparer(config, precisionConfigMixin.getConfig());
+            for (int i = 0; i < samplingConfig.getSamplingExecutions(); i++) {
+               SamplingExecutor samplingExecutor = new SamplingExecutor(samplingConfig, shortenedData, comparer);
+               samplingExecutor.executeComparisons(expected);
+            }
+
+            PrecisionWriter precisionWriter = new PrecisionWriter(comparer, executionData);
+            precisionWriter.writeTestcase(writer, comparer.getOverallResults().getResults());
+
+            data.addData(1, vmCount, iterations,
+                  Relation.isUnequal(expected) ? comparer.getFScore(StatisticalTests.TTEST) : comparer.getTrueNegativeRate(StatisticalTests.TTEST));
+         }
+      }
+      return data;
    }
 
    private int getMaximumPossibleRuns(Kopemedata dataOld, Kopemedata dataNew) {

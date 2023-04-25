@@ -75,15 +75,20 @@ public class GetMinimalFeasibleConfiguration implements Callable<Void> {
                for (Integer repetitions : containedKeys) {
                   Configuration old = overallConfigs.get(repetitions);
                   Configuration current = currentConfig.get(repetitions);
-                  int newVMs = Math.max(old.getVMs(), current.getVMs());
-                  int newIterations = Math.max(old.getIterations(), current.getIterations());
-                  Configuration merged = new Configuration(repetitions, newVMs, newIterations);
+                  Configuration merged = mergeConfigurations(repetitions, old, current);
                   overallConfigs.put(repetitions, merged);
                }
             }
          }
       }
       return overallConfigs;
+   }
+
+   public static Configuration mergeConfigurations(Integer repetitions, Configuration old, Configuration current) {
+      int newVMs = Math.max(old.getVMs(), current.getVMs());
+      int newIterations = Math.max(old.getIterations(), current.getIterations());
+      Configuration merged = new Configuration(repetitions, newVMs, newIterations);
+      return merged;
    }
 
    private Configuration detectBestRepetitionCandidate(Map<Integer, Configuration> overallConfigs) {
