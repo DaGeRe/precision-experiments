@@ -82,26 +82,26 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          LOG.info("Expected relation: {}", expected);
 
          executeOneComparison(comparison, dataOld, dataNew, expected);
-         
+
       }
    }
 
    private void executeOneComparison(Comparison comparison, Kopemedata dataOld, Kopemedata dataNew, Relation expected) throws IOException {
-      String fileName = (Relation.isUnequal(expected) ? "unequal_" : "equal_" )  + comparison.getIdNew() + ".csv";
+      String fileName = (Relation.isUnequal(expected) ? "unequal_" : "equal_") + comparison.getIdNew() + ".csv";
       File resultFile = new File("results/" + fileName);
-      try (BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile))){
+      try (BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile))) {
          for (int vmCount : new int[] { 5, 10, 15, 20, 25, 30 }) {
             SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark");
 
             int maxRuns = getMaximumPossibleRuns(dataOld, dataNew);
             for (int iterations = 1; iterations < maxRuns; iterations++) {
                ExecutionData executionData = new ExecutionData(vmCount, 0, iterations, 1);
-               
+
                final List<VMResult> fastShortened = StatisticUtil.shortenValues(dataOld.getFirstDatacollectorContent(), 0, iterations);
                final List<VMResult> slowShortened = StatisticUtil.shortenValues(dataNew.getFirstDatacollectorContent(), 0, iterations);
-               
+
                CompareData shortenedData = new CompareData(fastShortened, slowShortened);
-               
+
                StatisticsConfig config = new StatisticsConfig();
 
                PrecisionComparer comparer = new PrecisionComparer(config, precisionConfigMixin.getConfig());
@@ -109,7 +109,7 @@ public class GraalVMPrecisionDeterminer implements Runnable {
                   SamplingExecutor samplingExecutor = new SamplingExecutor(samplingConfig, shortenedData, comparer);
                   samplingExecutor.executeComparisons(expected);
                }
-               
+
                new PrecisionWriter(comparer, executionData).writeTestcase(writer, comparer.getOverallResults().getResults());
             }
          }

@@ -35,10 +35,18 @@ do
 	foldername=$start/$base/${file%.*}
 	mkdir $foldername
 		
-	getHeatmapData 9 $foldername/100k_mean.csv $file
-	getHeatmapData 13 $foldername/100k_ttest.csv $file
-	getHeatmapData 21 $foldername/100k_confidence.csv $file
-	getHeatmapData 25 $foldername/100k_mann.csv $file
+	if [[ $file == unequal_* ]]
+	then
+		getHeatmapData 9 $foldername/100k_mean.csv $file
+		getHeatmapData 13 $foldername/100k_ttest.csv $file
+		getHeatmapData 21 $foldername/100k_confidence.csv $file
+		getHeatmapData 25 $foldername/100k_mann.csv $file
+	else
+		getHeatmapData 10 $foldername/100k_mean.csv $file
+		getHeatmapData 14 $foldername/100k_ttest.csv $file
+		getHeatmapData 22 $foldername/100k_confidence.csv $file
+		getHeatmapData 26 $foldername/100k_mann.csv $file
+	fi
 
 	cd $foldername
 
