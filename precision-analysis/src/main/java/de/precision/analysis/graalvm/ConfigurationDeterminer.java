@@ -35,11 +35,13 @@ public class ConfigurationDeterminer {
    private static final Logger LOG = LogManager.getLogger(ConfigurationDeterminer.class);
 
    private final int vmCount;
+   private final double type2error;
    private final File folder;
    private final PrecisionConfig precisionConfig;
 
-   public ConfigurationDeterminer(int vmCount, File folder, PrecisionConfig precisionConfig) {
+   public ConfigurationDeterminer(int vmCount, double type2error, File folder, PrecisionConfig precisionConfig) {
       this.vmCount = vmCount;
+      this.type2error = type2error;
       this.folder = folder;
       this.precisionConfig = precisionConfig;
    }
@@ -67,7 +69,7 @@ public class ConfigurationDeterminer {
       File resultFile = new File("results/" + fileName);
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile))) {
          PrecisionData data = executeComparisons(loader, writer);
-         MinimalFeasibleConfigurationDeterminer determiner = new MinimalFeasibleConfigurationDeterminer(99.0);
+         MinimalFeasibleConfigurationDeterminer determiner = new MinimalFeasibleConfigurationDeterminer(100 - type2error);
          Map<Integer, Configuration> minimalFeasibleConfiguration = determiner.getMinimalFeasibleConfiguration(data);
          Configuration currentConfig = minimalFeasibleConfiguration.get(1);
          if (currentConfig != null) {

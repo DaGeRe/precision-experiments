@@ -81,12 +81,14 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          System.out.println("Test comparisons: " + finder.getComparisonsTest().size());
 
          for (int vmCount = 5; vmCount < 30; vmCount +=5) {
-            ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(vmCount, folder, precisionConfigMixin.getConfig());
-            Configuration configuration = configurationDeterminer.executeComparisons(finder);
+            for (double type2error : new double[] {0.01, 0.1, 0.2}) {
+               ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(vmCount, type2error, folder, precisionConfigMixin.getConfig());
+               Configuration configuration = configurationDeterminer.executeComparisons(finder);
 
-            double falseNegativeRate = executeTesting(finder, configuration);
-            
-            model.addDetection(vmCount, vmCount, 0.01, falseNegativeRate, configuration);
+               double falseNegativeRate = executeTesting(finder, configuration);
+               
+               model.addDetection(vmCount, vmCount, type2error, falseNegativeRate, configuration);
+            }
          }
          
          Constants.OBJECTMAPPER.writeValue(new File("model.json"), model);
