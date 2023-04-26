@@ -69,109 +69,23 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          System.out.println("Training comparisons: " + finder.getComparisonsTraining().size());
          System.out.println("Test comparisons: " + finder.getComparisonsTest().size());
 
-         executeComparisons(finder);
+         ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(folder, precisionConfigMixin.getConfig());
+         Configuration configuration = configurationDeterminer.executeComparisons(finder);
 
+         PrecisionComparer comparer = new PrecisionComparer(new StatisticsConfig(), precisionConfigMixin.getConfig());
+         for (Comparison comparison : finder.getComparisonsTest().values()) {
+            DiffPairLoader loader = new DiffPairLoader(folder);
+            loader.loadDiffPair(comparison);
+            CompareData data = loader.getShortenedCompareData(configuration.getIterations());
+            SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
+            executor.executeComparisons(loader.getExpected());
+         }
+         System.out.println("F_1-score: " + comparer.getFScore(StatisticalTests.TTEST));
+         
       } catch (ParseException | IOException e1) {
          e1.printStackTrace();
       }
    }
 
-   private void executeComparisons(ComparisonFinder finder) throws IOException, FileNotFoundException {
-      Configuration configuration = null;
-      for (Comparison comparison : finder.getComparisonsTraining().values()) {
-         File folderPredecessor = new File(folder, "measurements/" + comparison.getIdOld());
-         File folderCurrent = new File(folder, "measurements/" + comparison.getIdNew());
-
-         System.out.println("Reading " + folderPredecessor + " " + folderCurrent);
-         Kopemedata dataOld = GraalVMReadUtil.readData(folderPredecessor);
-         Kopemedata dataNew = GraalVMReadUtil.readData(folderCurrent);
-
-         CompareData data = new CompareData(dataOld.getFirstDatacollectorContent(), dataNew.getFirstDatacollectorContent());
-         Relation expected = getRealRelation(data);
-         LOG.info("Expected relation: {}", expected);
-
-         Configuration currentConfiguration = executeOneComparison(comparison, dataOld, dataNew, expected);
-         if (configuration == null) {
-            configuration = currentConfiguration;
-         } else {
-            configuration = GetMinimalFeasibleConfiguration.mergeConfigurations(1, configuration, currentConfiguration);
-         }
-      }
-      System.out.println("Final configuration: VMs: " + configuration.getVMs() + " Iterations: " + configuration.getIterations());
-   }
-
-   private Configuration executeOneComparison(Comparison comparison, Kopemedata dataOld, Kopemedata dataNew, Relation expected) throws IOException {
-      String fileName = (Relation.isUnequal(expected) ? "unequal_" : "equal_") + comparison.getIdNew() + ".csv";
-      File resultFile = new File("results/" + fileName);
-      try (BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile))) {
-         PrecisionData data = executeComparisons(dataOld, dataNew, expected, writer);
-         MinimalFeasibleConfigurationDeterminer determiner = new MinimalFeasibleConfigurationDeterminer(99.0);
-         Map<Integer, Configuration> minimalFeasibleConfiguration = determiner.getMinimalFeasibleConfiguration(data);
-         Configuration currentConfig = minimalFeasibleConfiguration.get(1);
-         if (currentConfig != null) {
-            System.out.println("VMs: " + currentConfig.getVMs() + " Iterations: " + currentConfig.getIterations());
-            return currentConfig;
-         } else {
-            System.out.println("Did not find a suitable configuration!");
-            return null;
-         }
-      }
-   }
-
-   private PrecisionData executeComparisons(Kopemedata dataOld, Kopemedata dataNew, Relation expected, BufferedWriter writer) throws IOException {
-      PrecisionData data = new PrecisionData();
-      for (int vmCount : new int[] { 3, 5, 10, 15, 20, 25, 30 }) {
-         SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark");
-         int maxRuns = getMaximumPossibleRuns(dataOld, dataNew);
-         for (int iterations = 1; iterations < maxRuns; iterations++) {
-            ExecutionData executionData = new ExecutionData(vmCount, 0, iterations, 1);
-
-            final List<VMResult> fastShortened = StatisticUtil.shortenValues(dataOld.getFirstDatacollectorContent(), 0, iterations);
-            final List<VMResult> slowShortened = StatisticUtil.shortenValues(dataNew.getFirstDatacollectorContent(), 0, iterations);
-
-            CompareData shortenedData = new CompareData(fastShortened, slowShortened);
-
-            StatisticsConfig config = new StatisticsConfig();
-
-            PrecisionComparer comparer = new PrecisionComparer(config, precisionConfigMixin.getConfig());
-            for (int i = 0; i < samplingConfig.getSamplingExecutions(); i++) {
-               SamplingExecutor samplingExecutor = new SamplingExecutor(samplingConfig, shortenedData, comparer);
-               samplingExecutor.executeComparisons(expected);
-            }
-
-            PrecisionWriter precisionWriter = new PrecisionWriter(comparer, executionData);
-            precisionWriter.writeTestcase(writer, comparer.getOverallResults().getResults());
-
-            data.addData(1, vmCount, iterations,
-                  Relation.isUnequal(expected) ? comparer.getFScore(StatisticalTests.TTEST) : comparer.getTrueNegativeRate(StatisticalTests.TTEST));
-         }
-      }
-      return data;
-   }
-
-   private int getMaximumPossibleRuns(Kopemedata dataOld, Kopemedata dataNew) {
-      int maxRuns = Integer.MAX_VALUE;
-      for (VMResult result : dataOld.getFirstDatacollectorContent()) {
-         maxRuns = Math.min(maxRuns, result.getFulldata().getValues().size());
-      }
-      for (VMResult result : dataNew.getFirstDatacollectorContent()) {
-         maxRuns = Math.min(maxRuns, result.getFulldata().getValues().size());
-      }
-      return maxRuns;
-   }
-
-   private Relation getRealRelation(CompareData data) {
-      final boolean tchange = new TTest().homoscedasticTTest(data.getPredecessor(), data.getCurrent(), 0.01);
-      Relation expected;
-      if (tchange) {
-         if (data.getAvgPredecessor() > data.getAvgCurrent()) {
-            expected = Relation.GREATER_THAN;
-         } else {
-            expected = Relation.LESS_THAN;
-         }
-      } else {
-         expected = Relation.EQUAL;
-      }
-      return expected;
-   }
+   
 }
