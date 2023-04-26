@@ -31,13 +31,15 @@ import de.precision.processing.repetitions.sampling.SamplingConfig;
 import de.precision.processing.repetitions.sampling.SamplingExecutor;
 
 public class ConfigurationDeterminer {
-   
+
    private static final Logger LOG = LogManager.getLogger(ConfigurationDeterminer.class);
-   
+
+   private final int vmCount;
    private final File folder;
    private final PrecisionConfig precisionConfig;
 
-   public ConfigurationDeterminer(File folder, PrecisionConfig precisionConfig) {
+   public ConfigurationDeterminer(int vmCount, File folder, PrecisionConfig precisionConfig) {
+      this.vmCount = vmCount;
       this.folder = folder;
       this.precisionConfig = precisionConfig;
    }
@@ -52,7 +54,7 @@ public class ConfigurationDeterminer {
          Configuration currentConfiguration = executeOneComparison(comparison, loader);
          if (configuration == null) {
             configuration = currentConfiguration;
-         } else {
+         } else if (currentConfiguration != null) {
             configuration = GetMinimalFeasibleConfiguration.mergeConfigurations(1, configuration, currentConfiguration);
          }
       }
@@ -80,28 +82,26 @@ public class ConfigurationDeterminer {
 
    private PrecisionData executeComparisons(DiffPairLoader loader, BufferedWriter writer) throws IOException {
       PrecisionData data = new PrecisionData();
-      for (int vmCount : new int[] { 3, 5, 10, 15, 20, 25, 30 }) {
-         SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark");
-         int maxRuns = getMaximumPossibleRuns(loader.getDataOld(), loader.getDataNew());
-         for (int iterations = 1; iterations < maxRuns; iterations++) {
-            ExecutionData executionData = new ExecutionData(vmCount, 0, iterations, 1);
+      SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark");
+      int maxRuns = getMaximumPossibleRuns(loader.getDataOld(), loader.getDataNew());
+      for (int iterations = 1; iterations < maxRuns; iterations++) {
+         ExecutionData executionData = new ExecutionData(vmCount, 0, iterations, 1);
 
-            CompareData shortenedData = loader.getShortenedCompareData(iterations);
+         CompareData shortenedData = loader.getShortenedCompareData(iterations);
 
-            StatisticsConfig config = new StatisticsConfig();
+         StatisticsConfig config = new StatisticsConfig();
 
-            PrecisionComparer comparer = new PrecisionComparer(config, precisionConfig);
-            for (int i = 0; i < samplingConfig.getSamplingExecutions(); i++) {
-               SamplingExecutor samplingExecutor = new SamplingExecutor(samplingConfig, shortenedData, comparer);
-               samplingExecutor.executeComparisons(loader.getExpected());
-            }
-
-            PrecisionWriter precisionWriter = new PrecisionWriter(comparer, executionData);
-            precisionWriter.writeTestcase(writer, comparer.getOverallResults().getResults());
-
-            data.addData(1, vmCount, iterations,
-                  Relation.isUnequal(loader.getExpected()) ? comparer.getFScore(StatisticalTests.TTEST) : comparer.getTrueNegativeRate(StatisticalTests.TTEST));
+         PrecisionComparer comparer = new PrecisionComparer(config, precisionConfig);
+         for (int i = 0; i < samplingConfig.getSamplingExecutions(); i++) {
+            SamplingExecutor samplingExecutor = new SamplingExecutor(samplingConfig, shortenedData, comparer);
+            samplingExecutor.executeComparisons(loader.getExpected());
          }
+
+         PrecisionWriter precisionWriter = new PrecisionWriter(comparer, executionData);
+         precisionWriter.writeTestcase(writer, comparer.getOverallResults().getResults());
+
+         data.addData(1, vmCount, iterations,
+               Relation.isUnequal(loader.getExpected()) ? comparer.getFScore(StatisticalTests.TTEST) : comparer.getTrueNegativeRate(StatisticalTests.TTEST));
       }
       return data;
    }
@@ -117,5 +117,4 @@ public class ConfigurationDeterminer {
       return maxRuns;
    }
 
-   
 }

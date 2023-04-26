@@ -22,6 +22,8 @@ import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.StatisticUtil;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
+import de.dagere.peass.utils.Constants;
+import de.precision.analysis.graalvm.resultingData.RegressionDetectionModel;
 import de.precision.analysis.heatmap.Configuration;
 import de.precision.analysis.heatmap.GetMinimalFeasibleConfiguration;
 import de.precision.analysis.heatmap.MinimalFeasibleConfigurationDeterminer;
@@ -45,7 +47,10 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    @Option(names = { "-folder", "--folder" }, description = "Folder, that contains *all* data folders for the analysis", required = true)
    private File folder;
 
-   @Option(names = { "-endDate", "--endDate" }, description = "End date for the analysis", required = true)
+   @Option(names = { "-first", "--first" }, description = "Start date for the training")
+   private String first;
+   
+   @Option(names = { "-endDate", "--endDate" }, description = "End date for the training (subsequent data will be used for testing)", required = true)
    private String endDate;
 
    @Mixin
@@ -59,31 +64,49 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
    @Override
    public void run() {
+      RegressionDetectionModel model = new RegressionDetectionModel();
+      
       Date date;
       try {
          date = DateFormat.getInstance().parse(endDate);
          System.out.println("End date: " + date);
 
-         ComparisonFinder finder = new ComparisonFinder(folder, date);
-
+         model.setLast(endDate);
+         
+         ComparisonFinder finder = first == null ? new ComparisonFinder(folder, date) : new ComparisonFinder(folder, DateFormat.getInstance().parse(first), date);
+         System.out.println("Start date: " + finder.getStartDate().toString());
+         model.setFirst(finder.getStartDate().toString());
+         
          System.out.println("Training comparisons: " + finder.getComparisonsTraining().size());
          System.out.println("Test comparisons: " + finder.getComparisonsTest().size());
 
-         ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(folder, precisionConfigMixin.getConfig());
-         Configuration configuration = configurationDeterminer.executeComparisons(finder);
+         for (int vmCount = 5; vmCount < 30; vmCount +=5) {
+            ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(vmCount, folder, precisionConfigMixin.getConfig());
+            Configuration configuration = configurationDeterminer.executeComparisons(finder);
 
-         PrecisionComparer comparer = new PrecisionComparer(new StatisticsConfig(), precisionConfigMixin.getConfig());
-         for (Comparison comparison : finder.getComparisonsTest().values()) {
-            DiffPairLoader loader = new DiffPairLoader(folder);
-            loader.loadDiffPair(comparison);
-            CompareData data = loader.getShortenedCompareData(configuration.getIterations());
-            SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
-            executor.executeComparisons(loader.getExpected());
+            double falseNegativeRate = executeTesting(finder, configuration);
+            
+            model.addDetection(vmCount, vmCount, 0.01, falseNegativeRate, configuration);
          }
-         System.out.println("F_1-score: " + comparer.getFScore(StatisticalTests.TTEST) + " False negative: " + comparer.getFalseNegativeRate(StatisticalTests.TTEST));
+         
+         Constants.OBJECTMAPPER.writeValue(new File("model.json"), model);
          
       } catch (ParseException | IOException e1) {
          e1.printStackTrace();
       }
+   }
+
+   private double executeTesting(ComparisonFinder finder, Configuration configuration) throws FileNotFoundException, IOException {
+      PrecisionComparer comparer = new PrecisionComparer(new StatisticsConfig(), precisionConfigMixin.getConfig());
+      for (Comparison comparison : finder.getComparisonsTest().values()) {
+         DiffPairLoader loader = new DiffPairLoader(folder);
+         loader.loadDiffPair(comparison);
+         CompareData data = loader.getShortenedCompareData(configuration.getIterations());
+         SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
+         executor.executeComparisons(loader.getExpected());
+      }
+      double falseNegativeRate = comparer.getFalseNegativeRate(StatisticalTests.TTEST);
+      System.out.println("F_1-score: " + comparer.getFScore(StatisticalTests.TTEST) + " False negative: " + falseNegativeRate);
+      return falseNegativeRate;
    }
 }
