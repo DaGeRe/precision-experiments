@@ -80,12 +80,10 @@ public class GraalVMPrecisionDeterminer implements Runnable {
             SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
             executor.executeComparisons(loader.getExpected());
          }
-         System.out.println("F_1-score: " + comparer.getFScore(StatisticalTests.TTEST));
+         System.out.println("F_1-score: " + comparer.getFScore(StatisticalTests.TTEST) + " False negative: " + comparer.getFalseNegativeRate(StatisticalTests.TTEST));
          
       } catch (ParseException | IOException e1) {
          e1.printStackTrace();
       }
    }
-
-   
 }
