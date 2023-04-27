@@ -51,7 +51,7 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
    @Option(names = { "-first", "--first" }, description = "Start date for the training")
    private String first;
-   
+
    @Option(names = { "-endDate", "--endDate" }, description = "End date for the training (subsequent data will be used for testing)", required = true)
    private String endDate;
 
@@ -67,57 +67,53 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    @Override
    public void run() {
       RegressionDetectionModel model = new RegressionDetectionModel();
-      
+
       Date date;
       try {
          date = DateFormat.getInstance().parse(endDate);
          System.out.println("End date: " + date);
 
          model.setLast(endDate);
-         
+
          ComparisonFinder finder = first == null ? new ComparisonFinder(folder, date) : new ComparisonFinder(folder, DateFormat.getInstance().parse(first), date);
          System.out.println("Start date: " + finder.getStartDate().toString());
          model.setFirst(finder.getStartDate().toString());
-         
+
          System.out.println("Training comparisons: " + finder.getComparisonsTraining().size());
          System.out.println("Test comparisons: " + finder.getComparisonsTest().size());
 
-         for (int vmCount = 5; vmCount < 30; vmCount +=5) {
-            for (double type2error : new double[] {0.01, 0.1, 0.2, 0.5}) {
+         for (int vmCount = 5; vmCount < 30; vmCount += 5) {
+            for (double type2error : new double[] { 0.01, 0.1, 0.2, 0.5 }) {
                ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(vmCount, type2error, folder, precisionConfigMixin.getConfig());
                Configuration configuration = configurationDeterminer.executeComparisons(finder);
 
                double falseNegativeRate = executeTesting(finder, configuration);
-               
+
                model.addDetection(vmCount, vmCount, type2error, falseNegativeRate, configuration);
             }
          }
-         
+
          Constants.OBJECTMAPPER.writeValue(new File("model.json"), model);
-         
+
       } catch (ParseException | IOException e1) {
          e1.printStackTrace();
       }
    }
 
    private double executeTesting(ComparisonFinder finder, Configuration configuration) throws FileNotFoundException, IOException {
-      
-      SummaryStatistics statistics = new SummaryStatistics();
-      
-      for (int i = 0; i < 100; i++) {
-         PrecisionComparer comparer = new PrecisionComparer(new StatisticsConfig(), precisionConfigMixin.getConfig());
-         for (Comparison comparison : finder.getComparisonsTest().values()) {
-            DiffPairLoader loader = new DiffPairLoader(folder);
-            loader.loadDiffPair(comparison);
+      PrecisionComparer comparer = new PrecisionComparer(new StatisticsConfig(), precisionConfigMixin.getConfig());
+      for (Comparison comparison : finder.getComparisonsTest().values()) {
+         DiffPairLoader loader = new DiffPairLoader(folder);
+         loader.loadDiffPair(comparison);
+         for (int i = 0; i < 100; i++) {
             CompareData data = loader.getShortenedCompareData(configuration.getIterations());
             SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
             executor.executeComparisons(loader.getExpected());
          }
-         double falseNegativeRate = comparer.getFalseNegativeRate(StatisticalTests.TTEST);
-         System.out.println("F_1-score: " + comparer.getFScore(StatisticalTests.TTEST) + " False negative: " + falseNegativeRate);
-         statistics.addValue(falseNegativeRate);
       }
-     
-      return statistics.getMean();
+      double falseNegativeRate = comparer.getFalseNegativeRate(StatisticalTests.TTEST);
+      System.out.println("F_1-score: " + comparer.getFScore(StatisticalTests.TTEST) + " False negative: " + falseNegativeRate);
+
+      return falseNegativeRate;
    }
 }
