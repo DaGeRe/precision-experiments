@@ -8,10 +8,12 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.inference.TTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,7 +83,7 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          System.out.println("Test comparisons: " + finder.getComparisonsTest().size());
 
          for (int vmCount = 5; vmCount < 30; vmCount +=5) {
-            for (double type2error : new double[] {0.01, 0.1, 0.2}) {
+            for (double type2error : new double[] {0.01, 0.1, 0.2, 0.5}) {
                ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(vmCount, type2error, folder, precisionConfigMixin.getConfig());
                Configuration configuration = configurationDeterminer.executeComparisons(finder);
 
@@ -99,16 +101,23 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    }
 
    private double executeTesting(ComparisonFinder finder, Configuration configuration) throws FileNotFoundException, IOException {
-      PrecisionComparer comparer = new PrecisionComparer(new StatisticsConfig(), precisionConfigMixin.getConfig());
-      for (Comparison comparison : finder.getComparisonsTest().values()) {
-         DiffPairLoader loader = new DiffPairLoader(folder);
-         loader.loadDiffPair(comparison);
-         CompareData data = loader.getShortenedCompareData(configuration.getIterations());
-         SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
-         executor.executeComparisons(loader.getExpected());
+      
+      SummaryStatistics statistics = new SummaryStatistics();
+      
+      for (int i = 0; i < 100; i++) {
+         PrecisionComparer comparer = new PrecisionComparer(new StatisticsConfig(), precisionConfigMixin.getConfig());
+         for (Comparison comparison : finder.getComparisonsTest().values()) {
+            DiffPairLoader loader = new DiffPairLoader(folder);
+            loader.loadDiffPair(comparison);
+            CompareData data = loader.getShortenedCompareData(configuration.getIterations());
+            SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
+            executor.executeComparisons(loader.getExpected());
+         }
+         double falseNegativeRate = comparer.getFalseNegativeRate(StatisticalTests.TTEST);
+         System.out.println("F_1-score: " + comparer.getFScore(StatisticalTests.TTEST) + " False negative: " + falseNegativeRate);
+         statistics.addValue(falseNegativeRate);
       }
-      double falseNegativeRate = comparer.getFalseNegativeRate(StatisticalTests.TTEST);
-      System.out.println("F_1-score: " + comparer.getFScore(StatisticalTests.TTEST) + " False negative: " + falseNegativeRate);
-      return falseNegativeRate;
+     
+      return statistics.getMean();
    }
 }
