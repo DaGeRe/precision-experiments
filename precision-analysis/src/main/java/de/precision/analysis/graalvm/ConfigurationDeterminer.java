@@ -38,6 +38,7 @@ public class ConfigurationDeterminer {
    private final double type2error;
    private final File folder;
    private final PrecisionConfig precisionConfig;
+   private int equal = 0, unequal = 0;
 
    public ConfigurationDeterminer(int vmCount, double type2error, File folder, PrecisionConfig precisionConfig) {
       this.vmCount = vmCount;
@@ -52,6 +53,11 @@ public class ConfigurationDeterminer {
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
          loader.loadDiffPair(comparison);
          LOG.info("Expected relation: {}", loader.getExpected());
+         if (loader.getExpected() == Relation.EQUAL) {
+            equal++;
+         } else {
+            unequal++;
+         }
 
          Configuration currentConfiguration = executeOneComparison(comparison, loader);
          if (configuration == null) {
@@ -60,7 +66,7 @@ public class ConfigurationDeterminer {
             configuration = GetMinimalFeasibleConfiguration.mergeConfigurations(1, configuration, currentConfiguration);
          }
       }
-      System.out.println("Final configuration: VMs: " + configuration.getVMs() + " Iterations: " + configuration.getIterations());
+      LOG.info("Final configuration: VMs: " + configuration.getVMs() + " Iterations: " + configuration.getIterations());
       return configuration;
    }
 
@@ -73,11 +79,14 @@ public class ConfigurationDeterminer {
          Map<Integer, Configuration> minimalFeasibleConfiguration = determiner.getMinimalFeasibleConfiguration(data);
          Configuration currentConfig = minimalFeasibleConfiguration.get(1);
          if (currentConfig != null) {
-            System.out.println("VMs: " + currentConfig.getVMs() + " Iterations: " + currentConfig.getIterations());
+            LOG.info("VMs: " + currentConfig.getVMs() + " Iterations: " + currentConfig.getIterations());
             return currentConfig;
          } else {
-            System.out.println("Did not find a suitable configuration!");
-            return null;
+            LOG.info("Did not find a suitable configuration, setting to maximum");
+            List<VMResult> measuredData = loader.getDataOld().getFirstDatacollectorContent();
+            int iterations = measuredData.get(0).getFulldata().getValues().size();
+            int VMs = measuredData.size();
+            return new Configuration(1, VMs, iterations);
          }
       }
    }
@@ -91,9 +100,12 @@ public class ConfigurationDeterminer {
 
          CompareData shortenedData = loader.getShortenedCompareData(iterations);
 
-         StatisticsConfig config = new StatisticsConfig();
+         StatisticsConfig statisticsConfig = new StatisticsConfig();
+         if (!precisionConfig.isRemoveOutliers()) {
+            statisticsConfig.setOutlierFactor(0.0);
+         }
 
-         PrecisionComparer comparer = new PrecisionComparer(config, precisionConfig);
+         PrecisionComparer comparer = new PrecisionComparer(statisticsConfig, precisionConfig);
          for (int i = 0; i < samplingConfig.getSamplingExecutions(); i++) {
             SamplingExecutor samplingExecutor = new SamplingExecutor(samplingConfig, shortenedData, comparer);
             samplingExecutor.executeComparisons(loader.getExpected());
@@ -117,6 +129,14 @@ public class ConfigurationDeterminer {
          maxRuns = Math.min(maxRuns, result.getFulldata().getValues().size());
       }
       return maxRuns;
+   }
+
+   public int getEqual() {
+      return equal;
+   }
+
+   public int getUnequal() {
+      return unequal;
    }
 
 }

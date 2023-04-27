@@ -25,6 +25,7 @@ import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.StatisticUtil;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
 import de.dagere.peass.utils.Constants;
+import de.precision.analysis.graalvm.resultingData.Counts;
 import de.precision.analysis.graalvm.resultingData.RegressionDetectionModel;
 import de.precision.analysis.heatmap.Configuration;
 import de.precision.analysis.heatmap.GetMinimalFeasibleConfiguration;
@@ -58,6 +59,8 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    @Mixin
    private PrecisionConfigMixin precisionConfigMixin;
 
+   RegressionDetectionModel model = new RegressionDetectionModel();
+   
    public static void main(String[] args) {
       GraalVMPrecisionDeterminer plot = new GraalVMPrecisionDeterminer();
       CommandLine cli = new CommandLine(plot);
@@ -66,8 +69,7 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
    @Override
    public void run() {
-      RegressionDetectionModel model = new RegressionDetectionModel();
-
+      
       Date date;
       try {
          date = DateFormat.getInstance().parse(endDate);
@@ -87,6 +89,9 @@ public class GraalVMPrecisionDeterminer implements Runnable {
                ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(vmCount, type2error, folder, precisionConfigMixin.getConfig());
                Configuration configuration = configurationDeterminer.executeComparisons(finder);
 
+               Counts trainingCounts = new Counts(configurationDeterminer.getEqual(), configurationDeterminer.getUnequal());
+               model.setCountTraining(trainingCounts);
+
                double falseNegativeRate = executeTesting(finder, configuration);
 
                model.addDetection(vmCount, vmCount, type2error, falseNegativeRate, configuration);
@@ -101,19 +106,31 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    }
 
    private double executeTesting(ComparisonFinder finder, Configuration configuration) throws FileNotFoundException, IOException {
-      PrecisionComparer comparer = new PrecisionComparer(new StatisticsConfig(), precisionConfigMixin.getConfig());
+      Counts counts = new Counts();
+
+      StatisticsConfig statisticsConfig = new StatisticsConfig();
+      PrecisionComparer comparer = new PrecisionComparer(statisticsConfig, precisionConfigMixin.getConfig());
       for (Comparison comparison : finder.getComparisonsTest().values()) {
          DiffPairLoader loader = new DiffPairLoader(folder);
          loader.loadDiffPair(comparison);
-         for (int i = 0; i < 100; i++) {
+         if (loader.getExpected() == Relation.EQUAL) {
+            counts.setEqual(counts.getEqual() + 1);
+         } else {
+            counts.setUnequal(counts.getUnequal() + 1);
+         }
+
+         for (int i = 0; i < 1000; i++) {
             CompareData data = loader.getShortenedCompareData(configuration.getIterations());
             SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
             executor.executeComparisons(loader.getExpected());
          }
       }
       double falseNegativeRate = comparer.getFalseNegativeRate(StatisticalTests.TTEST);
-      System.out.println("F_1-score: " + comparer.getFScore(StatisticalTests.TTEST) + " False negative: " + falseNegativeRate);
+      double fScore = comparer.getFScore(StatisticalTests.TTEST);
+      LOG.info("F_1-score: " + fScore + " False negative: " + falseNegativeRate);
 
-      return falseNegativeRate;
+      model.setCountTesting(counts);
+      
+      return fScore;
    }
 }

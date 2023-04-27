@@ -3,12 +3,20 @@ package de.precision.analysis.heatmap;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import de.precision.analysis.graalvm.ConfigurationDeterminer;
+
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class MinimalFeasibleConfigurationDeterminer {
 
-   private double minimalF1Score = 99;
+   private static final Logger LOG = LogManager.getLogger(MinimalFeasibleConfigurationDeterminer.class);
+   
+   private final double minimalF1Score;
 
    public MinimalFeasibleConfigurationDeterminer(final double minimalF1Score) {
       this.minimalF1Score = minimalF1Score;
@@ -58,8 +66,12 @@ public class MinimalFeasibleConfigurationDeterminer {
          final SortedMap<Integer, Double> iterationReverseMap) {
       Configuration candidate = null;
       for (Entry<Integer, Double> iterationCount : iterationReverseMap.entrySet()) {
+         
+         LOG.trace("Checking " + iterationCount.getValue() + " against " + minimalF1Score);
+         
          if (iterationCount.getValue() > minimalF1Score) {
-            candidate = new Configuration(repetitions, vmCount.getKey(), iterationCount.getKey());
+            Integer iterations = iterationCount.getKey();
+            candidate = new Configuration(repetitions, vmCount.getKey(), iterations);
          } else {
             break;
          }

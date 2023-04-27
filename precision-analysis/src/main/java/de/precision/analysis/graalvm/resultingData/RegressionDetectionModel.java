@@ -8,6 +8,8 @@ public class RegressionDetectionModel {
    private PositiveDetections positive = new PositiveDetections();
    private String first;
    private String last;
+   private Counts countTraining;
+   private Counts countTesting;
 
    public String getFirst() {
       return first;
@@ -32,7 +34,23 @@ public class RegressionDetectionModel {
    public void setPositive(PositiveDetections positive) {
       this.positive = positive;
    }
-   
+
+   public Counts getCountTraining() {
+      return countTraining;
+   }
+
+   public void setCountTraining(Counts countTraining) {
+      this.countTraining = countTraining;
+   }
+
+   public Counts getCountTesting() {
+      return countTesting;
+   }
+
+   public void setCountTesting(Counts countTesting) {
+      this.countTesting = countTesting;
+   }
+
    public void addDetection(int vmsOld, int vmsNew, double type2error, double realError, Configuration configuration) {
       String key = vmsOld + "-" + vmsNew;
       LinkedHashMap<String, Double> quantile = positive.getQuantiles().get(key);
@@ -41,7 +59,7 @@ public class RegressionDetectionModel {
          positive.getQuantiles().put(key, quantile);
       }
       quantile.put("" + type2error, realError);
-      
+
       LinkedHashMap<String, Integer> iterations = positive.getIterations().get(key);
       if (iterations == null) {
          iterations = new LinkedHashMap<>();
