@@ -67,3 +67,10 @@ plot '100k_mann.csv' u 1:2:3 with image title 'Mann-Whitney'
 unset multiplot
 unset output
 
+
+set out 'result_ttest.pdf'
+set terminal pdf size 5,6
+set title 'T-Test'
+unset ylabel
+plot '100k_ttest.csv' u 1:2:3 with image title 'T-Test'
+unset output
