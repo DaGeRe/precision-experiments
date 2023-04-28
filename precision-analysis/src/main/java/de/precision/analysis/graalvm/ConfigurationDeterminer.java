@@ -38,13 +38,15 @@ public class ConfigurationDeterminer {
    private final double type2error;
    private final File folder;
    private final PrecisionConfig precisionConfig;
+   private final PrecisionFileManager precisionFileManager;
    private int equal = 0, unequal = 0;
 
-   public ConfigurationDeterminer(int vmCount, double type2error, File folder, PrecisionConfig precisionConfig) {
+   public ConfigurationDeterminer(int vmCount, double type2error, File folder, PrecisionConfig precisionConfig, PrecisionFileManager precisionFileManager) {
       this.vmCount = vmCount;
       this.type2error = type2error;
       this.folder = folder;
       this.precisionConfig = precisionConfig;
+      this.precisionFileManager = precisionFileManager;
    }
 
    public Configuration executeComparisons(ComparisonFinder finder) throws IOException, FileNotFoundException {
@@ -71,23 +73,20 @@ public class ConfigurationDeterminer {
    }
 
    private Configuration executeOneComparison(Comparison comparison, DiffPairLoader loader) throws IOException {
-      String fileName = (Relation.isUnequal(loader.getExpected()) ? "unequal_" : "equal_") + comparison.getIdNew() + ".csv";
-      File resultFile = new File("results/" + fileName);
-      try (BufferedWriter writer = new BufferedWriter(new FileWriter(resultFile))) {
-         PrecisionData data = executeComparisons(loader, writer);
-         MinimalFeasibleConfigurationDeterminer determiner = new MinimalFeasibleConfigurationDeterminer(100 - type2error);
-         Map<Integer, Configuration> minimalFeasibleConfiguration = determiner.getMinimalFeasibleConfiguration(data);
-         Configuration currentConfig = minimalFeasibleConfiguration.get(1);
-         if (currentConfig != null) {
-            LOG.info("VMs: " + currentConfig.getVMs() + " Iterations: " + currentConfig.getIterations());
-            return currentConfig;
-         } else {
-            LOG.info("Did not find a suitable configuration, setting to maximum");
-            List<VMResult> measuredData = loader.getDataOld().getFirstDatacollectorContent();
-            int iterations = measuredData.get(0).getFulldata().getValues().size();
-            int VMs = measuredData.size();
-            return new Configuration(1, VMs, iterations);
-         }
+      BufferedWriter writer = precisionFileManager.getFile(comparison.getIdNew(), loader.getExpected());
+      PrecisionData data = executeComparisons(loader, writer);
+      MinimalFeasibleConfigurationDeterminer determiner = new MinimalFeasibleConfigurationDeterminer(100 - type2error);
+      Map<Integer, Configuration> minimalFeasibleConfiguration = determiner.getMinimalFeasibleConfiguration(data);
+      Configuration currentConfig = minimalFeasibleConfiguration.get(1);
+      if (currentConfig != null) {
+         LOG.info("VMs: " + currentConfig.getVMs() + " Iterations: " + currentConfig.getIterations());
+         return currentConfig;
+      } else {
+         LOG.info("Did not find a suitable configuration, setting to maximum");
+         List<VMResult> measuredData = loader.getDataOld().getFirstDatacollectorContent();
+         int iterations = measuredData.get(0).getFulldata().getValues().size();
+         int VMs = measuredData.size();
+         return new Configuration(1, VMs, iterations);
       }
    }
 

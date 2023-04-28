@@ -44,7 +44,7 @@ public class ExecutionData {
       return warmup;
    }
 
-   public int getExecutions() {
+   public int getIterations() {
       return iterations;
    }
 

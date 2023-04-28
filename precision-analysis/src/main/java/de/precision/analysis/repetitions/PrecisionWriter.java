@@ -40,7 +40,7 @@ public class PrecisionWriter {
       synchronized (testcaseWriter) {
          testcaseWriter.write(executionData.getRepetitions() + ProcessConstants.DATAFILE_SEPARATOR +
                executionData.getVms() + ProcessConstants.DATAFILE_SEPARATOR +
-               executionData.getExecutions() + ProcessConstants.DATAFILE_SEPARATOR +
+               executionData.getIterations() + ProcessConstants.DATAFILE_SEPARATOR +
                executionData.getWarmup() + ProcessConstants.DATAFILE_SEPARATOR +
                executionData.getOverhead() + ProcessConstants.DATAFILE_SEPARATOR +
                executionData.getDuration() + ProcessConstants.DATAFILE_SEPARATOR);

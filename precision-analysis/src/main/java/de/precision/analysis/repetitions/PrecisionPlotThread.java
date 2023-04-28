@@ -91,7 +91,7 @@ public class PrecisionPlotThread {
       LOG.debug("Overhead in ms: {}", averageOverheadInMS);
       overhead += ((double) averageOverheadInMS) / 1000;
 
-      final int allExecutions = executionData.getWarmup() + executionData.getExecutions();
+      final int allExecutions = executionData.getWarmup() + executionData.getIterations();
 
       LOG.debug("VMs: {}", executionData.getVms());
 

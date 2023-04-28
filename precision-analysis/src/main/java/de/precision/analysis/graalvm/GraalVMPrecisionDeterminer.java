@@ -84,9 +84,11 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          System.out.println("Training comparisons: " + finder.getComparisonsTraining().size());
          System.out.println("Test comparisons: " + finder.getComparisonsTest().size());
 
+         PrecisionFileManager manager = new PrecisionFileManager();
+         
          for (int vmCount = 5; vmCount < 30; vmCount += 5) {
             for (double type2error : new double[] { 0.01, 0.1, 0.2, 0.5 }) {
-               ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(vmCount, type2error, folder, precisionConfigMixin.getConfig());
+               ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(vmCount, type2error, folder, precisionConfigMixin.getConfig(), manager);
                Configuration configuration = configurationDeterminer.executeComparisons(finder);
 
                Counts trainingCounts = new Counts(configurationDeterminer.getEqual(), configurationDeterminer.getUnequal());
@@ -97,7 +99,8 @@ public class GraalVMPrecisionDeterminer implements Runnable {
                model.addDetection(vmCount, vmCount, type2error, falseNegativeRate, configuration);
             }
          }
-
+         manager.cleanup();
+         
          Constants.OBJECTMAPPER.writeValue(new File("model.json"), model);
 
       } catch (ParseException | IOException e1) {
