@@ -106,7 +106,8 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          
          LOG.info("Waiting for thread completion...");
          pool.shutdown();
-         pool.awaitTermination(-1, TimeUnit.HOURS);
+         pool.awaitTermination(100, TimeUnit.HOURS);
+         LOG.info("Finished");
          
          manager.cleanup();
          

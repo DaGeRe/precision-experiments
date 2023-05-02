@@ -51,7 +51,7 @@ public class RegressionDetectionModel {
       this.countTesting = countTesting;
    }
 
-   public void addDetection(int vmsOld, int vmsNew, double type2error, double realError, Configuration configuration) {
+   public synchronized void addDetection(int vmsOld, int vmsNew, double type2error, double realError, Configuration configuration) {
       String key = vmsOld + "-" + vmsNew;
       LinkedHashMap<String, Double> quantile = positive.getQuantiles().get(key);
       if (quantile == null) {
