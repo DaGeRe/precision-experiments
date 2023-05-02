@@ -88,15 +88,8 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          
          for (int vmCount = 5; vmCount < 30; vmCount += 5) {
             for (double type2error : new double[] { 0.01, 0.1, 0.2, 0.5 }) {
-               ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(vmCount, type2error, folder, precisionConfigMixin.getConfig(), manager);
-               Configuration configuration = configurationDeterminer.executeComparisons(finder);
-
-               Counts trainingCounts = new Counts(configurationDeterminer.getEqual(), configurationDeterminer.getUnequal());
-               model.setCountTraining(trainingCounts);
-
-               double falseNegativeRate = executeTesting(finder, configuration);
-
-               model.addDetection(vmCount, vmCount, type2error, falseNegativeRate, configuration);
+               GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(model, folder, precisionConfigMixin.getConfig(), finder, manager);
+               precisionThread.getConfigurationAndTest(vmCount, type2error);
             }
          }
          manager.cleanup();
@@ -108,32 +101,4 @@ public class GraalVMPrecisionDeterminer implements Runnable {
       }
    }
 
-   private double executeTesting(ComparisonFinder finder, Configuration configuration) throws FileNotFoundException, IOException {
-      Counts counts = new Counts();
-
-      StatisticsConfig statisticsConfig = new StatisticsConfig();
-      PrecisionComparer comparer = new PrecisionComparer(statisticsConfig, precisionConfigMixin.getConfig());
-      for (Comparison comparison : finder.getComparisonsTest().values()) {
-         DiffPairLoader loader = new DiffPairLoader(folder);
-         loader.loadDiffPair(comparison);
-         if (loader.getExpected() == Relation.EQUAL) {
-            counts.setEqual(counts.getEqual() + 1);
-         } else {
-            counts.setUnequal(counts.getUnequal() + 1);
-         }
-
-         for (int i = 0; i < 1000; i++) {
-            CompareData data = loader.getShortenedCompareData(configuration.getIterations());
-            SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
-            executor.executeComparisons(loader.getExpected());
-         }
-      }
-      double falseNegativeRate = comparer.getFalseNegativeRate(StatisticalTests.TTEST);
-      double fScore = comparer.getFScore(StatisticalTests.TTEST);
-      LOG.info("F_1-score: " + fScore + " False negative: " + falseNegativeRate);
-
-      model.setCountTesting(counts);
-      
-      return fScore;
    }
-}
