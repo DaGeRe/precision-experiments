@@ -19,44 +19,7 @@ public class ComparisonFinder {
    private final Map<Integer, Comparison> comparisonsTest = new TreeMap<>();
    
    public ComparisonFinder(File folder, Date endDate) {
-      File diffsFile = new File(folder, "computations/iteration_time_ns/diffs.csv");
-      if (!diffsFile.exists()) {
-         throw new RuntimeException("File " + diffsFile.getAbsolutePath() + " needs to exist");
-      }
-      
-      Date currentStartDate = null;
-      try (BufferedReader reader = new BufferedReader(new FileReader(diffsFile))) {
-         String line;
-         while ((line = reader.readLine()) != null) {
-            String[] data = line.split(",");
-            if (!"None".equals(data[0]) && !"id".equals(data[0])) {
-               int idOld = Integer.parseInt(data[1]);
-               int idNew = Integer.parseInt(data[3]);
-               Date dateOld = DateFormat.getInstance().parse(data[2]);
-               Date dateNew = DateFormat.getInstance().parse(data[4]);
-
-               Comparison comparison = new Comparison(idOld, idNew, dateOld, dateNew);
-
-               if (currentStartDate == null || dateOld.before(currentStartDate)) {
-                  currentStartDate = dateOld;
-               }
-               
-               if (dateOld.before(endDate)) {
-                  comparisonsTraining.put(idOld, comparison);
-               } else {
-                  comparisonsTest.put(idOld, comparison);
-               }
-
-            }
-         }
-      } catch (FileNotFoundException e) {
-         e.printStackTrace();
-      } catch (IOException e) {
-         e.printStackTrace();
-      } catch (ParseException e) {
-         e.printStackTrace();
-      }
-      this.startDate = currentStartDate;
+      this(folder, new Date(Long.MIN_VALUE), endDate);
    }
    
    public ComparisonFinder(File folder, Date startDate, Date endDate) {
