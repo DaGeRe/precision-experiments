@@ -28,16 +28,21 @@ public class GraalVMPrecisionThread {
    private final PrecisionConfig precisionConfig;
    private final ComparisonFinder finder;
    private final PrecisionFileManager manager;
-   
-   public GraalVMPrecisionThread(RegressionDetectionModel model, File folder, PrecisionConfig precisionConfig, ComparisonFinder finder, PrecisionFileManager manager) {
+   private final int vmCount;
+   private final double type2error;
+
+   public GraalVMPrecisionThread(RegressionDetectionModel model, File folder, PrecisionConfig precisionConfig, ComparisonFinder finder, PrecisionFileManager manager, int vmCount,
+         double type2error) {
       this.model = model;
       this.folder = folder;
       this.precisionConfig = precisionConfig;
       this.finder = finder;
       this.manager = manager;
+      this.vmCount = vmCount;
+      this.type2error = type2error;
    }
 
-   public void getConfigurationAndTest(int vmCount, double type2error) throws IOException, FileNotFoundException {
+   public void getConfigurationAndTest() throws IOException, FileNotFoundException {
       ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(vmCount, type2error, folder, precisionConfig, manager);
       Configuration configuration = configurationDeterminer.executeComparisons(finder);
 

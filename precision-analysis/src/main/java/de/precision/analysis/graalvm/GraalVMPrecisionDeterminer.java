@@ -12,6 +12,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.inference.TTest;
@@ -85,18 +88,31 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          System.out.println("Test comparisons: " + finder.getComparisonsTest().size());
 
          PrecisionFileManager manager = new PrecisionFileManager();
+
+         ExecutorService pool = Executors.newFixedThreadPool(4);
          
          for (int vmCount = 5; vmCount < 30; vmCount += 5) {
             for (double type2error : new double[] { 0.01, 0.1, 0.2, 0.5 }) {
-               GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(model, folder, precisionConfigMixin.getConfig(), finder, manager);
-               precisionThread.getConfigurationAndTest(vmCount, type2error);
+               final GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(model, folder, precisionConfigMixin.getConfig(), finder, manager, vmCount, type2error);
+               pool.submit(() -> {
+                  try {
+                     precisionThread.getConfigurationAndTest();
+                  } catch (IOException e) {
+                     e.printStackTrace();
+                  }
+               });
             }
          }
+         
+         LOG.info("Waiting for thread completion...");
+         pool.shutdown();
+         pool.awaitTermination(-1, TimeUnit.HOURS);
+         
          manager.cleanup();
          
          Constants.OBJECTMAPPER.writeValue(new File("model.json"), model);
 
-      } catch (ParseException | IOException e1) {
+      } catch (ParseException | IOException | InterruptedException e1) {
          e1.printStackTrace();
       }
    }
