@@ -1,4 +1,4 @@
-package de.precision.analysis.repetitions;
+package de.precision.analysis.peassdata;
 
 import java.io.File;
 import java.io.FileFilter;

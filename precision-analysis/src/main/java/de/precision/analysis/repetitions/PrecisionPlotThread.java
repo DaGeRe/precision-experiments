@@ -98,8 +98,8 @@ public class PrecisionPlotThread {
       final List<VMResult> fastShortened = StatisticUtil.shortenValues(before.getDatacollectorResults().get(0).getResults(), executionData.getWarmup(), allExecutions);
       final List<VMResult> slowShortened = StatisticUtil.shortenValues(after.getDatacollectorResults().get(0).getResults(), executionData.getWarmup(), allExecutions);
 
-      writeValues(fastShortened, new File(writingData.getResultFolder(), "fast_" + executionData.getRepetitions() + ".csv"));
-      writeValues(slowShortened, new File(writingData.getResultFolder(), "slow_" + executionData.getRepetitions() + ".csv"));
+      HistogramValueWriter.writeValues(fastShortened, new File(writingData.getResultFolder(), "fast_" + executionData.getRepetitions() + ".csv"));
+      HistogramValueWriter.writeValues(slowShortened, new File(writingData.getResultFolder(), "slow_" + executionData.getRepetitions() + ".csv"));
 
       final VMCombinationSampler vmCombinationSampler = new VMCombinationSampler(executionData.getWarmup(), allExecutions, comparer, config);
       final double durationInS = (vmCombinationSampler.sampleArtificialVMCombinations(fastShortened, slowShortened)) / 1000;
@@ -109,15 +109,5 @@ public class PrecisionPlotThread {
       executionData.setDuration(duration);
       executionData.setOverhead(overhead);
    }
-
-   private void writeValues(final List<VMResult> values, final File destination) {
-      try (BufferedWriter writer = new BufferedWriter(new FileWriter(destination))) {
-         for (VMResult r : values) {
-            writer.write(r.getValue() + "\n");
-         }
-         writer.flush();
-      } catch (IOException e) {
-         e.printStackTrace();
-      }
-   }
 }
+ 

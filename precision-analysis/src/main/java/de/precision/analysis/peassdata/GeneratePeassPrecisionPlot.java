@@ -1,4 +1,4 @@
-package de.precision.analysis.repetitions;
+package de.precision.analysis.peassdata;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,6 +16,12 @@ import org.apache.logging.log4j.Logger;
 
 import de.dagere.kopeme.kopemedata.Kopemedata;
 import de.dagere.peass.folders.PeassFolders;
+import de.precision.analysis.repetitions.PrecisionConfig;
+import de.precision.analysis.repetitions.PrecisionConfigMixin;
+import de.precision.analysis.repetitions.PrecisionPlotHandler;
+import de.precision.analysis.repetitions.PrecisionWriter;
+import de.precision.analysis.repetitions.StatisticalTestList;
+import de.precision.analysis.repetitions.WritingData;
 import picocli.CommandLine;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;

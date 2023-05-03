@@ -9,6 +9,7 @@ import org.hamcrest.collection.IsIterableWithSize;
 import org.junit.jupiter.api.Test;
 
 import de.dagere.kopeme.kopemedata.Kopemedata;
+import de.precision.analysis.peassdata.RegularPeassdataReader;
 
 public class TestRegularPeassdataReader {
 
