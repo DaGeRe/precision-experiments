@@ -10,6 +10,28 @@ function getHeatmapData {
 		> $outname
 }
 
+function createHistograms {
+	start=$1
+	folder=$2
+	cd $folder
+	for file in histogram_*
+	do
+		echo "Handling: $file"
+		cd $start/$folder
+		cd $file
+		
+		if [ ! -f predecessor.csv ]
+		then
+			firstFileName=$(echo $file | tr -d "histogram_")
+			mv $firstFileName".csv" predecessor.csv
+			file2=$(ls | grep -v predecessor.csv)
+			mv $file2 current.csv
+		
+			gnuplot -c $start/plotGraalVMHistogram.plt
+		fi
+	done
+}
+
 if [ $# -eq 0 ]
 then
 	echo "Arguments missing"
@@ -56,3 +78,5 @@ do
 
 	cd $start
 done 
+
+createHistograms $start $1

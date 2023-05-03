@@ -94,8 +94,8 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
          ExecutorService pool = Executors.newFixedThreadPool(4);
          
-         for (int vmCount = 5; vmCount < 30; vmCount += 5) {
-            for (double type2error : new double[] { 0.01, 0.1, 0.2, 0.5 }) {
+         for (int vmCount : new int[] {5, 10, 20, 30} ) {
+            for (double type2error : new double[] { 0.01, 0.1, 0.5, 0.9 }) {
                final GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(model, folder, precisionConfigMixin.getConfig(), finder, manager, vmCount, type2error);
                pool.submit(() -> {
                   try {
