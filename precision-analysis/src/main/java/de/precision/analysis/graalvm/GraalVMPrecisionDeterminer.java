@@ -87,6 +87,9 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          System.out.println("Training comparisons: " + finder.getComparisonsTraining().size());
          System.out.println("Test comparisons: " + finder.getComparisonsTest().size());
 
+         File resultsFolder = new File("results");
+         resultsFolder.mkdirs();
+         
          PrecisionFileManager manager = new PrecisionFileManager();
 
          ExecutorService pool = Executors.newFixedThreadPool(4);
