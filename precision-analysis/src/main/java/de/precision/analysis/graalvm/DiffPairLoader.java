@@ -1,8 +1,6 @@
 package de.precision.analysis.graalvm;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.math3.stat.inference.TTest;
@@ -28,7 +26,7 @@ public class DiffPairLoader {
       this.folder = folder;
    }
 
-   public void loadDiffPair(Comparison comparison) throws FileNotFoundException, IOException {
+   public void loadDiffPair(Comparison comparison) {
       File folderPredecessor = new File(folder, "measurements/" + comparison.getIdOld());
       File folderCurrent = new File(folder, "measurements/" + comparison.getIdNew());
 

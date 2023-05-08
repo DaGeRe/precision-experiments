@@ -1,47 +1,20 @@
 package de.precision.analysis.graalvm;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.stat.inference.TTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.dagere.kopeme.kopemedata.Kopemedata;
-import de.dagere.kopeme.kopemedata.VMResult;
-import de.dagere.peass.config.StatisticsConfig;
-import de.dagere.peass.measurement.statistics.Relation;
-import de.dagere.peass.measurement.statistics.StatisticUtil;
-import de.dagere.peass.measurement.statistics.bimodal.CompareData;
 import de.dagere.peass.utils.Constants;
-import de.precision.analysis.graalvm.resultingData.Counts;
 import de.precision.analysis.graalvm.resultingData.RegressionDetectionModel;
-import de.precision.analysis.heatmap.Configuration;
-import de.precision.analysis.heatmap.GetMinimalFeasibleConfiguration;
-import de.precision.analysis.heatmap.MinimalFeasibleConfigurationDeterminer;
-import de.precision.analysis.heatmap.PrecisionData;
-import de.precision.analysis.repetitions.ExecutionData;
-import de.precision.analysis.repetitions.PrecisionComparer;
 import de.precision.analysis.repetitions.PrecisionConfigMixin;
-import de.precision.analysis.repetitions.PrecisionWriter;
-import de.precision.analysis.repetitions.StatisticalTestResult;
-import de.precision.analysis.repetitions.StatisticalTests;
-import de.precision.processing.repetitions.sampling.SamplingConfig;
-import de.precision.processing.repetitions.sampling.SamplingExecutor;
 import picocli.CommandLine;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
@@ -63,7 +36,7 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    private PrecisionConfigMixin precisionConfigMixin;
 
    RegressionDetectionModel model = new RegressionDetectionModel();
-   
+
    public static void main(String[] args) {
       GraalVMPrecisionDeterminer plot = new GraalVMPrecisionDeterminer();
       CommandLine cli = new CommandLine(plot);
@@ -72,7 +45,7 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
    @Override
    public void run() {
-      
+
       Date date;
       try {
          date = DateFormat.getInstance().parse(endDate);
@@ -89,31 +62,27 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
          File resultsFolder = new File("results");
          resultsFolder.mkdirs();
-         
+
          PrecisionFileManager manager = new PrecisionFileManager();
 
          ExecutorService pool = Executors.newFixedThreadPool(4);
-         
-         for (int vmCount : new int[] {5, 10, 20, 30} ) {
+
+         for (int vmCount : new int[] { 5, 10, 20, 30 }) {
             for (double type2error : new double[] { 0.01, 0.1, 0.5, 0.9 }) {
                final GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(model, folder, precisionConfigMixin.getConfig(), finder, manager, vmCount, type2error);
                pool.submit(() -> {
-                  try {
-                     precisionThread.getConfigurationAndTest();
-                  } catch (IOException e) {
-                     e.printStackTrace();
-                  }
+                  precisionThread.getConfigurationAndTest();
                });
             }
          }
-         
+
          LOG.info("Waiting for thread completion...");
          pool.shutdown();
          pool.awaitTermination(100, TimeUnit.HOURS);
          LOG.info("Finished");
-         
+
          manager.cleanup();
-         
+
          Constants.OBJECTMAPPER.writeValue(new File("model.json"), model);
 
       } catch (ParseException | IOException | InterruptedException e1) {
@@ -121,4 +90,4 @@ public class GraalVMPrecisionDeterminer implements Runnable {
       }
    }
 
-   }
+}

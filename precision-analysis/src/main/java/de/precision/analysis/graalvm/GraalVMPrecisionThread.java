@@ -1,8 +1,6 @@
 package de.precision.analysis.graalvm;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,7 +40,7 @@ public class GraalVMPrecisionThread {
       this.type2error = type2error;
    }
 
-   public void getConfigurationAndTest() throws IOException, FileNotFoundException {
+   public void getConfigurationAndTest() {
       ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(vmCount, type2error, folder, precisionConfig, manager);
       Configuration configuration = configurationDeterminer.executeComparisons(finder);
 
@@ -54,7 +52,7 @@ public class GraalVMPrecisionThread {
       model.addDetection(vmCount, vmCount, type2error, falseNegativeRate, configuration);
    }
 
-   private double executeTesting(ComparisonFinder finder, Configuration configuration) throws FileNotFoundException, IOException {
+   private double executeTesting(ComparisonFinder finder, Configuration configuration) {
       Counts counts = new Counts();
 
       StatisticsConfig statisticsConfig = new StatisticsConfig();

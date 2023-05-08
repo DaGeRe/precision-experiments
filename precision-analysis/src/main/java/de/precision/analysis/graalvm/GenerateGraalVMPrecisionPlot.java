@@ -1,28 +1,15 @@
 package de.precision.analysis.graalvm;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.commons.io.filefilter.WildcardFileFilter;
-
-import de.dagere.kopeme.kopemedata.DatacollectorResult;
-import de.dagere.kopeme.kopemedata.Fulldata;
 import de.dagere.kopeme.kopemedata.Kopemedata;
-import de.dagere.kopeme.kopemedata.MeasuredValue;
-import de.dagere.kopeme.kopemedata.TestMethod;
-import de.dagere.kopeme.kopemedata.VMResult;
 import de.precision.analysis.repetitions.PrecisionConfigMixin;
 import de.precision.analysis.repetitions.PrecisionPlotHandler;
 import de.precision.analysis.repetitions.PrecisionWriter;

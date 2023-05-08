@@ -20,7 +20,7 @@ import de.dagere.kopeme.kopemedata.TestMethod;
 import de.dagere.kopeme.kopemedata.VMResult;
 
 public class GraalVMReadUtil {
-   public static Kopemedata readData(File vmFolder) throws IOException, FileNotFoundException {
+   public static Kopemedata readData(File vmFolder) {
       Kopemedata data = new Kopemedata("unkownClazz");
       for (File versionDataFile : vmFolder.listFiles((FilenameFilter) new WildcardFileFilter("*-raw.csv"))) {
          try (BufferedReader reader = new BufferedReader(new FileReader(versionDataFile))){
@@ -46,6 +46,10 @@ public class GraalVMReadUtil {
             }
             vmResult.setValue(statistics.getMean());
             vmResult.setDeviation(statistics.getStandardDeviation());
+         } catch (FileNotFoundException e) {
+            e.printStackTrace();
+         } catch (IOException e) {
+            e.printStackTrace();
          }
       }
       return data;

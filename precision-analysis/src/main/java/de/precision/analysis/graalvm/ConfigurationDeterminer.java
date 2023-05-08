@@ -2,13 +2,10 @@ package de.precision.analysis.graalvm;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.math3.stat.inference.TTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,7 +13,6 @@ import de.dagere.kopeme.kopemedata.Kopemedata;
 import de.dagere.kopeme.kopemedata.VMResult;
 import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.Relation;
-import de.dagere.peass.measurement.statistics.StatisticUtil;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
 import de.precision.analysis.heatmap.Configuration;
 import de.precision.analysis.heatmap.GetMinimalFeasibleConfiguration;
@@ -49,23 +45,29 @@ public class ConfigurationDeterminer {
       this.precisionFileManager = precisionFileManager;
    }
 
-   public Configuration executeComparisons(ComparisonFinder finder) throws IOException, FileNotFoundException {
+   public Configuration executeComparisons(ComparisonFinder finder) {
       Configuration configuration = null;
       DiffPairLoader loader = new DiffPairLoader(folder);
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
-         loader.loadDiffPair(comparison);
-         LOG.info("Expected relation: {}", loader.getExpected());
-         if (loader.getExpected() == Relation.EQUAL) {
-            equal++;
-         } else {
-            unequal++;
-         }
+         try {
+            loader.loadDiffPair(comparison);
 
-         Configuration currentConfiguration = executeOneComparison(comparison, loader);
-         if (configuration == null) {
-            configuration = currentConfiguration;
-         } else if (currentConfiguration != null) {
-            configuration = GetMinimalFeasibleConfiguration.mergeConfigurations(1, configuration, currentConfiguration);
+            LOG.info("Expected relation: {}", loader.getExpected());
+            if (loader.getExpected() == Relation.EQUAL) {
+               equal++;
+            } else {
+               unequal++;
+            }
+
+            Configuration currentConfiguration = executeOneComparison(comparison, loader);
+            if (configuration == null) {
+               configuration = currentConfiguration;
+            } else if (currentConfiguration != null) {
+               configuration = GetMinimalFeasibleConfiguration.mergeConfigurations(1, configuration, currentConfiguration);
+            }
+         } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
          }
       }
       LOG.info("Final configuration: VMs: " + configuration.getVMs() + " Iterations: " + configuration.getIterations());
