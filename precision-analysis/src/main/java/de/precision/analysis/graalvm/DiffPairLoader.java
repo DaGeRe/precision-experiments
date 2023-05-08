@@ -50,6 +50,10 @@ public class DiffPairLoader {
    }
 
    private Relation getRealRelation(CompareData data) {
+      double relativeChange = Math.abs((data.getAvgCurrent() - data.getAvgPredecessor()) / data.getAvgPredecessor());
+      if (relativeChange < 0.02) {
+         return Relation.EQUAL;
+      }
       final boolean tchange = new TTest().homoscedasticTTest(data.getPredecessor(), data.getCurrent(), 0.01);
       Relation expected;
       if (tchange) {

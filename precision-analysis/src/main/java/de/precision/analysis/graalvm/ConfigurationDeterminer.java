@@ -49,46 +49,45 @@ public class ConfigurationDeterminer {
       Configuration configuration = null;
       DiffPairLoader loader = new DiffPairLoader(folder);
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
-         try {
-            loader.loadDiffPair(comparison);
+         loader.loadDiffPair(comparison);
 
-            LOG.info("Expected relation: {}", loader.getExpected());
-            if (loader.getExpected() == Relation.EQUAL) {
-               equal++;
-            } else {
-               unequal++;
-            }
+         LOG.info("Expected relation: {}", loader.getExpected());
+         if (loader.getExpected() == Relation.EQUAL) {
+            equal++;
+         } else {
+            unequal++;
+         }
 
-            Configuration currentConfiguration = executeOneComparison(comparison, loader);
-            if (configuration == null) {
-               configuration = currentConfiguration;
-            } else if (currentConfiguration != null) {
-               configuration = GetMinimalFeasibleConfiguration.mergeConfigurations(1, configuration, currentConfiguration);
-            }
-         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+         Configuration currentConfiguration = executeOneComparison(comparison, loader);
+         if (configuration == null) {
+            configuration = currentConfiguration;
+         } else if (currentConfiguration != null) {
+            configuration = GetMinimalFeasibleConfiguration.mergeConfigurations(1, configuration, currentConfiguration);
          }
       }
       LOG.info("Final configuration: VMs: " + configuration.getVMs() + " Iterations: " + configuration.getIterations());
       return configuration;
    }
 
-   private Configuration executeOneComparison(Comparison comparison, DiffPairLoader loader) throws IOException {
-      BufferedWriter writer = precisionFileManager.getFile(comparison.getIdNew(), loader.getExpected());
-      PrecisionData data = executeComparisons(loader, writer);
-      MinimalFeasibleConfigurationDeterminer determiner = new MinimalFeasibleConfigurationDeterminer(100 - type2error);
-      Map<Integer, Configuration> minimalFeasibleConfiguration = determiner.getMinimalFeasibleConfiguration(data);
-      Configuration currentConfig = minimalFeasibleConfiguration.get(1);
-      if (currentConfig != null) {
-         LOG.info("VMs: " + currentConfig.getVMs() + " Iterations: " + currentConfig.getIterations());
-         return currentConfig;
-      } else {
-         LOG.info("Did not find a suitable configuration, setting to maximum");
-         List<VMResult> measuredData = loader.getDataOld().getFirstDatacollectorContent();
-         int iterations = measuredData.get(0).getFulldata().getValues().size();
-         int VMs = measuredData.size();
-         return new Configuration(1, VMs, iterations);
+   private Configuration executeOneComparison(Comparison comparison, DiffPairLoader loader) {
+      try {
+         BufferedWriter writer = precisionFileManager.getFile(comparison.getIdNew(), loader.getExpected());
+         PrecisionData data = executeComparisons(loader, writer);
+         MinimalFeasibleConfigurationDeterminer determiner = new MinimalFeasibleConfigurationDeterminer(100 - type2error);
+         Map<Integer, Configuration> minimalFeasibleConfiguration = determiner.getMinimalFeasibleConfiguration(data);
+         Configuration currentConfig = minimalFeasibleConfiguration.get(1);
+         if (currentConfig != null) {
+            LOG.info("VMs: " + currentConfig.getVMs() + " Iterations: " + currentConfig.getIterations());
+            return currentConfig;
+         } else {
+            LOG.info("Did not find a suitable configuration, setting to maximum");
+            List<VMResult> measuredData = loader.getDataOld().getFirstDatacollectorContent();
+            int iterations = measuredData.get(0).getFulldata().getValues().size();
+            int VMs = measuredData.size();
+            return new Configuration(1, VMs, iterations);
+         }
+      } catch (IOException e) {
+         throw new RuntimeException(e);
       }
    }
 
