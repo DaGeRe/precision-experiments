@@ -1,15 +1,17 @@
 package de.precision.analysis.graalvm.resultingData;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import de.precision.analysis.heatmap.Configuration;
 
 public class RegressionDetectionModel {
-   private PositiveDetections positive = new PositiveDetections();
    private String first;
    private String last;
    private Counts countTraining;
    private Counts countTesting;
+   
+   private PositiveDetections positive = new PositiveDetections();
 
    public String getFirst() {
       return first;
@@ -51,7 +53,8 @@ public class RegressionDetectionModel {
       this.countTesting = countTesting;
    }
 
-   public synchronized void addDetection(int vmsOld, int vmsNew, double type2error, double realError, Configuration configuration) {
+   public synchronized void addDetection(int vmsOld, int vmsNew, double type2error, double realError, 
+         ConfigurationResult result) {
       String key = vmsOld + "-" + vmsNew;
       LinkedHashMap<String, Double> quantile = positive.getQuantiles().get(key);
       if (quantile == null) {
@@ -60,11 +63,11 @@ public class RegressionDetectionModel {
       }
       quantile.put("" + type2error, realError);
 
-      LinkedHashMap<String, Integer> iterations = positive.getIterations().get(key);
+      LinkedHashMap<String, ConfigurationResult> iterations = positive.getIterations().get(key);
       if (iterations == null) {
          iterations = new LinkedHashMap<>();
          positive.getIterations().put(key, iterations);
       }
-      iterations.put("" + type2error, configuration.getIterations());
+      iterations.put("" + type2error, result);
    }
 }

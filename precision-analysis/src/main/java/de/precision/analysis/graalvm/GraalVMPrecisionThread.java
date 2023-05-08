@@ -1,6 +1,8 @@
 package de.precision.analysis.graalvm;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,11 +10,13 @@ import org.apache.logging.log4j.Logger;
 import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
+import de.precision.analysis.graalvm.resultingData.ConfigurationResult;
 import de.precision.analysis.graalvm.resultingData.Counts;
 import de.precision.analysis.graalvm.resultingData.RegressionDetectionModel;
 import de.precision.analysis.heatmap.Configuration;
 import de.precision.analysis.repetitions.PrecisionComparer;
 import de.precision.analysis.repetitions.PrecisionConfig;
+import de.precision.analysis.repetitions.StatisticalTestResult;
 import de.precision.analysis.repetitions.StatisticalTests;
 import de.precision.processing.repetitions.sampling.SamplingConfig;
 import de.precision.processing.repetitions.sampling.SamplingExecutor;
@@ -47,12 +51,13 @@ public class GraalVMPrecisionThread {
       Counts trainingCounts = new Counts(configurationDeterminer.getEqual(), configurationDeterminer.getUnequal());
       model.setCountTraining(trainingCounts);
 
-      double falseNegativeRate = executeTesting(finder, configuration);
-
-      model.addDetection(vmCount, vmCount, type2error, falseNegativeRate, configuration);
+      executeTesting(finder, configuration);
    }
 
-   private double executeTesting(ComparisonFinder finder, Configuration configuration) {
+   private void executeTesting(ComparisonFinder finder, Configuration configuration) {
+      Map<String, Integer> falseNegativeDetections = new HashMap<>();
+      Map<String, Integer> falsePositiveDetections = new HashMap<>();
+      
       Counts counts = new Counts();
 
       StatisticsConfig statisticsConfig = new StatisticsConfig();
@@ -66,19 +71,32 @@ public class GraalVMPrecisionThread {
             counts.setUnequal(counts.getUnequal() + 1);
          }
 
+         Map<StatisticalTestResult, Integer> oldResults = comparer.getOverallResults().getResults().get(StatisticalTests.TTEST);
+         int falseNegatives = oldResults.get(StatisticalTestResult.FALSENEGATIVE);
+         int falsePositives = oldResults.get(StatisticalTestResult.SELECTED) - oldResults.get(StatisticalTestResult.TRUEPOSITIVE);
          for (int i = 0; i < 1000; i++) {
             CompareData data = loader.getShortenedCompareData(configuration.getIterations());
             SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
             executor.executeComparisons(loader.getExpected());
          }
+         if (loader.getExpected() == Relation.EQUAL) {
+            int falsePositiveNew = oldResults.get(StatisticalTestResult.SELECTED) - oldResults.get(StatisticalTestResult.TRUEPOSITIVE);
+            int falsePositivesThisRun = falsePositiveNew - falsePositives;
+            falsePositiveDetections.put(comparison.getName(), falsePositivesThisRun);
+         } else {
+            int falseNegativesThisRun = oldResults.get(StatisticalTestResult.FALSENEGATIVE) - falseNegatives;
+            falseNegativeDetections.put(comparison.getName(), falseNegativesThisRun);
+         }
+         
       }
       double falseNegativeRate = comparer.getFalseNegativeRate(StatisticalTests.TTEST);
       double fScore = comparer.getFScore(StatisticalTests.TTEST);
       LOG.info("F_1-score: " + fScore + " False negative: " + falseNegativeRate);
 
       model.setCountTesting(counts);
+      ConfigurationResult configurationResult = new ConfigurationResult(configuration.getRepetitions(), falsePositiveDetections, falseNegativeDetections);
+      model.addDetection(vmCount, vmCount, type2error, fScore, configurationResult);
       
-      return fScore;
    }
 
 }

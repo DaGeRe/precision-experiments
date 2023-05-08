@@ -30,6 +30,10 @@ class Comparison {
    public Date getDateNew() {
       return dateNew;
    }
+
+   public String getName() {
+      return idNew + "-" + idOld;
+   }
    
    
 
