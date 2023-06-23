@@ -22,7 +22,7 @@ import de.dagere.kopeme.kopemedata.VMResult;
 public class GraalVMReadUtil {
    public static Kopemedata readData(File vmFolder) {
       Kopemedata data = new Kopemedata("unkownClazz");
-      for (File versionDataFile : vmFolder.listFiles((FilenameFilter) new WildcardFileFilter("*-raw.csv"))) {
+      for (File versionDataFile : vmFolder.listFiles((FilenameFilter) new WildcardFileFilter("*.csv"))) {
          try (BufferedReader reader = new BufferedReader(new FileReader(versionDataFile))){
             String line;
             

@@ -27,8 +27,8 @@ public class DiffPairLoader {
    }
 
    public void loadDiffPair(Comparison comparison) {
-      File folderPredecessor = new File(folder, "measurements/" + comparison.getIdOld());
-      File folderCurrent = new File(folder, "measurements/" + comparison.getIdNew());
+      File folderPredecessor = comparison.getOldFolder().listFiles()[0].listFiles()[0];
+      File folderCurrent = comparison.getNewFolder().listFiles()[0].listFiles()[0];
 
       System.out.println("Reading " + folderPredecessor + " " + folderCurrent);
       dataOld = GraalVMReadUtil.readData(folderPredecessor);

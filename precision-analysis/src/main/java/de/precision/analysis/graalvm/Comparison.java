@@ -1,26 +1,19 @@
 package de.precision.analysis.graalvm;
 
+import java.io.File;
 import java.util.Date;
 
 class Comparison {
-   private final int idOld;
-   private final int idNew;
+   private final File oldFolder;
+   private final File newFolder;
    private final Date dateOld;
    private final Date dateNew;
 
-   public Comparison(int idOld, int idNew, Date dateOld, Date dateNew) {
-      this.idOld = idOld;
-      this.idNew = idNew;
+   public Comparison(File oldFolder, File newFolder, Date dateOld, Date dateNew) {
+      this.oldFolder = oldFolder;
+      this.newFolder = newFolder;
       this.dateOld = dateOld;
       this.dateNew = dateNew;
-   }
-
-   public int getIdOld() {
-      return idOld;
-   }
-
-   public int getIdNew() {
-      return idNew;
    }
 
    public Date getDateOld() {
@@ -30,9 +23,21 @@ class Comparison {
    public Date getDateNew() {
       return dateNew;
    }
+   
+   public File getNewFolder() {
+      return newFolder;
+   }
+   
+   public File getOldFolder() {
+      return oldFolder;
+   }
 
    public String getName() {
-      return idNew + "-" + idOld;
+      return oldFolder.getName() + "-" + newFolder.getName();
+   }
+
+   public int getIdNew() {
+      return Integer.parseInt(newFolder.getName());
    }
    
    
