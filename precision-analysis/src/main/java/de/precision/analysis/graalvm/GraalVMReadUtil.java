@@ -28,7 +28,9 @@ public class GraalVMReadUtil {
             
             SummaryStatistics statistics = new SummaryStatistics();
             
-            line = reader.readLine();
+            String headline = reader.readLine();
+            
+            int columnIndex = getColumnIndex(headline);
             
             line = reader.readLine();
             
@@ -36,12 +38,13 @@ public class GraalVMReadUtil {
             String benchmarkName = firstParts[1];
             VMResult vmResult = createNewVMResult(data, benchmarkName, vmFolder.getName());
             List<MeasuredValue> values = vmResult.getFulldata().getValues();
-            readPartData(statistics, values, firstParts);
+            int lineIndex = 0;
+            readPartData(statistics, values, firstParts, lineIndex++, columnIndex);
 
             while ((line = reader.readLine()) != null) {
                String[] parts = line.split(",");
                if (!"index".equals(parts[0])) {
-                  readPartData(statistics, values, parts);
+                  readPartData(statistics, values, parts, lineIndex++, columnIndex);
                }
             }
             vmResult.setValue(statistics.getMean());
@@ -55,9 +58,21 @@ public class GraalVMReadUtil {
       return data;
    }
 
-   private static void readPartData(SummaryStatistics statistics, List<MeasuredValue> values, String[] parts) {
-      long startTime = Long.parseLong(parts[0]);
-      long duration = Long.parseLong(parts[3]);
+   private static int getColumnIndex(String headline) {
+      String[] headlineParts = headline.split(",");
+      int columnIndex = -1;
+      for (int i = 0; i < headlineParts.length; i++) {
+         if (headlineParts[i].contains("iteration_time_ns")) {
+            columnIndex = i;
+            break;
+         }
+      }
+      return columnIndex;
+   }
+
+   private static void readPartData(SummaryStatistics statistics, List<MeasuredValue> values, String[] parts, int lineIndex, int columnIndex) {
+      long startTime = lineIndex;
+      long duration = Long.parseLong(parts[columnIndex]);
       MeasuredValue measuredValue = new MeasuredValue();
       measuredValue.setStartTime(startTime);
       measuredValue.setValue(duration);
