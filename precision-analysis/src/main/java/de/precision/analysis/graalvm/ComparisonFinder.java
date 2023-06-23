@@ -1,19 +1,12 @@
 package de.precision.analysis.graalvm;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 public class ComparisonFinder {
 
@@ -29,17 +22,23 @@ public class ComparisonFinder {
    public ComparisonFinder(File folder, Date startDate, Date endDate) {
       this.startDate = startDate;
 
+      TreeMap<Integer, File> files = detectCommitFolders(folder);
+      
+      generateComparisons(files);
+   }
+
+   private TreeMap<Integer, File> detectCommitFolders(File folder) {
       TreeMap<Integer, File> files = new TreeMap<>();
       
       System.out.println(folder.getAbsolutePath());
       FilenameFilter onlyNumberFilter = (FilenameFilter) new RegexFileFilter("[0-9]+");
       for (File machineFile : folder.listFiles(onlyNumberFilter)) {
-         for (File XFile : machineFile.listFiles(onlyNumberFilter)) {
-            for (File YFile : XFile.listFiles(onlyNumberFilter)) {
-               for (File ZFile : YFile.listFiles(onlyNumberFilter)) {
-                  for (File AFile : ZFile.listFiles(onlyNumberFilter)) {
-                     for (File BFile : AFile.listFiles(onlyNumberFilter)) {
-                        for (File commitFile : BFile.listFiles(onlyNumberFilter)) {
+         for (File configurationIdFile : machineFile.listFiles(onlyNumberFilter)) {
+            for (File suiteIdFile : configurationIdFile.listFiles(onlyNumberFilter)) {
+               for (File benchmarkIdFile : suiteIdFile.listFiles(onlyNumberFilter)) {
+                  for (File platformTypeFile : benchmarkIdFile.listFiles(onlyNumberFilter)) {
+                     for (File repositoryFile : platformTypeFile.listFiles(onlyNumberFilter)) {
+                        for (File commitFile : repositoryFile.listFiles(onlyNumberFilter)) {
                            int commitName = Integer.parseInt(commitFile.getName());
                            files.put(commitName, commitFile);
                         }
@@ -49,7 +48,10 @@ public class ComparisonFinder {
             }
          }
       }
-      
+      return files;
+   }
+
+   private void generateComparisons(TreeMap<Integer, File> files) {
       File predecessor = null;
       int i = 0;
       for (File current : files.values()) {
