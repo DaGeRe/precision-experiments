@@ -32,7 +32,8 @@ public class TestExecutors {
    public static boolean getTTestRelation(final Map<StatisticalTests, Relation> relations, final CompareData data, final StatisticsConfig config) {
       final boolean tchange = new TTest().homoscedasticTTest(data.getPredecessor(), data.getCurrent(), config.getType1error());
       // final boolean tchange = new TTest().homoscedasticTTest(values.get(0), values.get(1), 0.01);
-      if (tchange) {
+      double relativeChange = Math.abs(data.getAvgPredecessor() - data.getAvgCurrent()) / data.getAvgCurrent();
+      if (tchange && relativeChange > 0.02) {
          relations.put(StatisticalTests.TTEST, data.getAvgPredecessor() < data.getAvgCurrent() ? Relation.LESS_THAN : Relation.GREATER_THAN);
       } else {
          relations.put(StatisticalTests.TTEST, Relation.EQUAL);

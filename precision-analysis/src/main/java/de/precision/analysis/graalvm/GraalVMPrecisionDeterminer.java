@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 import de.dagere.peass.utils.Constants;
 import de.precision.analysis.graalvm.resultingData.RegressionDetectionModel;
+import de.precision.analysis.graalvm.resultingData.SimpleModel;
 import de.precision.analysis.repetitions.PrecisionConfigMixin;
 import picocli.CommandLine;
 import picocli.CommandLine.Mixin;
@@ -35,7 +36,7 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    @Mixin
    private PrecisionConfigMixin precisionConfigMixin;
 
-   RegressionDetectionModel model = new RegressionDetectionModel();
+   SimpleModel model = new SimpleModel();
 
    public static void main(String[] args) {
       GraalVMPrecisionDeterminer plot = new GraalVMPrecisionDeterminer();
@@ -67,14 +68,14 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
          ExecutorService pool = Executors.newFixedThreadPool(4);
 
-         for (int vmCount : new int[] { 5, 10, 20, 30 }) {
-            for (double type2error : new double[] { 0.01, 0.1, 0.5, 0.9 }) {
-               final GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(model, folder, precisionConfigMixin.getConfig(), finder, manager, vmCount, type2error);
-               pool.submit(() -> {
-                  precisionThread.getConfigurationAndTest();
-               });
-            }
+         // for (int vmCount : new int[] { 5, 10, 20, 30 }) {
+         for (double type2error : new double[] { 0.01, 0.1, 0.5, 0.9 }) {
+            final GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(model, folder, precisionConfigMixin.getConfig(), finder, manager, type2error);
+            pool.submit(() -> {
+               precisionThread.getConfigurationAndTest();
+            });
          }
+         // }
 
          LOG.info("Waiting for thread completion...");
          pool.shutdown();
