@@ -30,7 +30,7 @@ public class GraalVMReadUtil {
             
             String headline = reader.readLine();
             
-            int columnIndex = getColumnIndex(headline);
+            int columnIndex = getColumnIndex(headline, "iteration_time_ns");
             
             line = reader.readLine();
             
@@ -58,11 +58,11 @@ public class GraalVMReadUtil {
       return data;
    }
 
-   private static int getColumnIndex(String headline) {
+   static int getColumnIndex(String headline, String columnName) {
       String[] headlineParts = headline.split(",");
       int columnIndex = -1;
       for (int i = 0; i < headlineParts.length; i++) {
-         if (headlineParts[i].contains("iteration_time_ns")) {
+         if (headlineParts[i].contains(columnName)) {
             columnIndex = i;
             break;
          }

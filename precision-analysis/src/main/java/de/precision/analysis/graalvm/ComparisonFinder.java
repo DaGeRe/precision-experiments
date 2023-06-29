@@ -3,13 +3,19 @@ package de.precision.analysis.graalvm;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.io.filefilter.RegexFileFilter;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ComparisonFinder {
 
+   private static final Logger LOG = LogManager.getLogger(ComparisonFinder.class);
+   
    private final Date startDate;
 
    private final Map<Integer, Comparison> comparisonsTraining = new TreeMap<>();
@@ -29,6 +35,8 @@ public class ComparisonFinder {
 
    private TreeMap<Integer, File> detectCommitFolders(File folder) {
       TreeMap<Integer, File> files = new TreeMap<>();
+
+      Map<File, Date> fileDates = new MetadataFileReader(folder).getFileDates();
       
       System.out.println(folder.getAbsolutePath());
       FilenameFilter onlyNumberFilter = (FilenameFilter) new RegexFileFilter("[0-9]+");
@@ -40,7 +48,14 @@ public class ComparisonFinder {
                      for (File repositoryFile : platformTypeFile.listFiles(onlyNumberFilter)) {
                         for (File commitFile : repositoryFile.listFiles(onlyNumberFilter)) {
                            int commitName = Integer.parseInt(commitFile.getName());
-                           files.put(commitName, commitFile);
+                           Date date = fileDates.get(commitFile);
+                           if (date == null) {
+                              LOG.warn("File {} has no date according to metadata", commitFile);
+                              files.put(commitName, commitFile);
+                           }
+                           if (date != null && date.after(startDate)) {
+                              files.put(commitName, commitFile);
+                           }
                         }
                      }
                   }
