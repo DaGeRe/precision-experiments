@@ -15,8 +15,9 @@ import org.apache.logging.log4j.Logger;
 public class ComparisonFinder {
 
    private static final Logger LOG = LogManager.getLogger(ComparisonFinder.class);
-   
+
    private final Date startDate;
+   private final Date endDate;
 
    private final Map<Integer, Comparison> comparisonsTraining = new TreeMap<>();
    private final Map<Integer, Comparison> comparisonsTest = new TreeMap<>();
@@ -27,17 +28,17 @@ public class ComparisonFinder {
 
    public ComparisonFinder(File folder, Date startDate, Date endDate) {
       this.startDate = startDate;
+      this.endDate = endDate;
 
-      TreeMap<Integer, File> files = detectCommitFolders(folder);
-      
-      generateComparisons(files);
+      detectCommitFolders(folder);
    }
 
-   private TreeMap<Integer, File> detectCommitFolders(File folder) {
-      TreeMap<Integer, File> files = new TreeMap<>();
+   private void detectCommitFolders(File folder) {
+      TreeMap<Integer, File> trainingFiles = new TreeMap<>();
+      TreeMap<Integer, File> testFiles = new TreeMap<>();
 
       Map<File, Date> fileDates = new MetadataFileReader(folder).getFileDates();
-      
+
       System.out.println(folder.getAbsolutePath());
       FilenameFilter onlyNumberFilter = (FilenameFilter) new RegexFileFilter("[0-9]+");
       for (File machineFile : folder.listFiles(onlyNumberFilter)) {
@@ -46,15 +47,24 @@ public class ComparisonFinder {
                for (File benchmarkIdFile : suiteIdFile.listFiles(onlyNumberFilter)) {
                   for (File platformTypeFile : benchmarkIdFile.listFiles(onlyNumberFilter)) {
                      for (File repositoryFile : platformTypeFile.listFiles(onlyNumberFilter)) {
-                        for (File commitFile : repositoryFile.listFiles(onlyNumberFilter)) {
-                           int commitName = Integer.parseInt(commitFile.getName());
-                           Date date = fileDates.get(commitFile);
-                           if (date == null) {
-                              LOG.warn("File {} has no date according to metadata", commitFile);
-                              files.put(commitName, commitFile);
-                           }
-                           if (date != null && date.after(startDate)) {
-                              files.put(commitName, commitFile);
+                        for (File platformInstallationIdFile : repositoryFile.listFiles(onlyNumberFilter)) {
+                           for (File versionIdFile : platformInstallationIdFile.listFiles(onlyNumberFilter)) {
+                              int commitName = Integer.parseInt(versionIdFile.getName());
+                              Date date = fileDates.get(versionIdFile);
+                              if (date == null) {
+                                 LOG.warn("File {} has no date according to metadata", versionIdFile);
+                                 trainingFiles.put(commitName, versionIdFile);
+                              }
+
+                              System.out.println("Date: " + date + " " + startDate);
+
+                              if (date != null && date.after(startDate)) {
+                                 if (date.before(endDate)) {
+                                    trainingFiles.put(commitName, versionIdFile);
+                                 } else {
+                                    testFiles.put(commitName, versionIdFile);
+                                 }
+                              }
                            }
                         }
                      }
@@ -63,15 +73,17 @@ public class ComparisonFinder {
             }
          }
       }
-      return files;
+
+      generateComparisons(trainingFiles, comparisonsTraining);
+      generateComparisons(testFiles, comparisonsTest);
    }
 
-   private void generateComparisons(TreeMap<Integer, File> files) {
+   private void generateComparisons(TreeMap<Integer, File> files, Map<Integer, Comparison> comparisonMap) {
       File predecessor = null;
       int i = 0;
       for (File current : files.values()) {
          if (predecessor != null) {
-            comparisonsTraining.put(i++, new Comparison(predecessor, current, null, null));
+            comparisonMap.put(i++, new Comparison(predecessor, current, null, null));
             System.out.println("Comparison " + predecessor.getName() + " " + current.getName());
          }
          predecessor = current;

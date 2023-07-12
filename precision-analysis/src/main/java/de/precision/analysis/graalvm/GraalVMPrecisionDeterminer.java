@@ -72,7 +72,11 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          for (double type2error : new double[] { 0.01, 0.1, 0.2, 0.5, 0.75, 0.9 }) {
             final GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(model, folder, precisionConfigMixin.getConfig(), finder, manager, type2error);
             pool.submit(() -> {
-               precisionThread.getConfigurationAndTest();
+               try {
+                  precisionThread.getConfigurationAndTest();
+               } catch (Throwable t) {
+                  t.printStackTrace();
+               }
             });
          }
          // }

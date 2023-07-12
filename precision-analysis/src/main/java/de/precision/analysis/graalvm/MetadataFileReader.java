@@ -30,7 +30,7 @@ public class MetadataFileReader {
          try (BufferedReader reader = new BufferedReader(new FileReader(metadataFile))){
             
             String headline = reader.readLine();
-            int pathIndex = GraalVMReadUtil.getColumnIndex(headline, "path");
+            int pathIndex = GraalVMReadUtil.getColumnIndex(headline, "extracted_path");
             int timeIndex = GraalVMReadUtil.getColumnIndex(headline, "version_time");
             
             String line;
@@ -43,7 +43,7 @@ public class MetadataFileReader {
                String time = parts[timeIndex];
                Date date = METADATA_TIME_FORMAT.parse(time);
                
-               fileDates.put(file, date);
+               fileDates.put(file.getParentFile(), date);
             }
          } catch (IOException | ParseException e) {
             e.printStackTrace();
