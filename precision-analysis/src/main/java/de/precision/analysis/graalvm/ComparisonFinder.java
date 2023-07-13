@@ -81,13 +81,17 @@ public class ComparisonFinder {
    private void generateComparisons(TreeMap<Integer, File> files, Map<Integer, Comparison> comparisonMap) {
       File predecessor = null;
       int i = 0;
+      
+      LOG.info("Files: " + files.size());
+      
       for (File current : files.values()) {
          if (predecessor != null) {
             comparisonMap.put(i++, new Comparison(predecessor, current, null, null));
-            System.out.println("Comparison " + predecessor.getName() + " " + current.getName());
+            LOG.info("Comparison " + predecessor.getName() + " " + current.getName());
          }
          predecessor = current;
       }
+      LOG.info("Comparisons: " + comparisonMap.size());
    }
 
    public Map<Integer, Comparison> getComparisonsTraining() {
