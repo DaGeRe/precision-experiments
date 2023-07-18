@@ -49,8 +49,14 @@ public class PrecisionComparer {
          TestExecutors.getConfidenceRelation(data, relations);
       }
 
-      TestExecutors.getMeanRelation(relations, data);
-      TestExecutors.getMannWhitneyRelation(relations, data, statisticsConfig);
+      if (Arrays.asList(precisionConfig.getTypes()).contains(StatisticalTests.MEAN)) {
+         TestExecutors.getMeanRelation(relations, data);
+      }
+      
+      if (Arrays.asList(precisionConfig.getTypes()).contains(StatisticalTests.MANNWHITNEY)) {
+         TestExecutors.getMannWhitneyRelation(relations, data, statisticsConfig);
+      }
+      
       // TestExecutors.getGTestRelation(beforeShortened, afterShortened, relations, data);
 
       manageResults(expectedRelation, testcaseName, relations);
@@ -118,7 +124,7 @@ public class PrecisionComparer {
       final double recall = 100d * (((double) truepositive) / (truepositive + falsenegative));
       return recall;
    }
-   
+
    public double getFalseNegativeRate(final StatisticalTests statisticMethod) {
       final Map<StatisticalTestResult, Integer> methodResults = overallResults.getResults().get(statisticMethod);
       final int truenegative = methodResults.get(StatisticalTestResult.TRUENEGATIVE);
@@ -126,7 +132,7 @@ public class PrecisionComparer {
       final double falseNegativeRate = 100d * (((double) falsenegative) / (truenegative + falsenegative));
       return falseNegativeRate;
    }
-   
+
    public double getTrueNegativeRate(final StatisticalTests statisticMethod) {
       final Map<StatisticalTestResult, Integer> methodResults = overallResults.getResults().get(statisticMethod);
       final int truenegative = methodResults.get(StatisticalTestResult.TRUENEGATIVE);
@@ -146,7 +152,7 @@ public class PrecisionComparer {
    public Map<String, MethodResult> getTestcaseResults() {
       return testcaseResults;
    }
-   
+
    public StatisticsConfig getStatisticsConfig() {
       return statisticsConfig;
    }

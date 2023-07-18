@@ -3,7 +3,8 @@ package de.precision.analysis.repetitions;
 public enum StatisticalTestList {
    ALL(new StatisticalTests[] { StatisticalTests.MEAN, StatisticalTests.TTEST, StatisticalTests.TTEST2, StatisticalTests.CONFIDENCE, StatisticalTests.MANNWHITNEY }), 
       ALL_NO_BIMODAL(new StatisticalTests[] { StatisticalTests.MEAN, StatisticalTests.TTEST, StatisticalTests.CONFIDENCE, StatisticalTests.MANNWHITNEY }),
-      ALL_NO_BIMODAL_NO_CONFIDENCE(new StatisticalTests[] { StatisticalTests.MEAN, StatisticalTests.TTEST, StatisticalTests.MANNWHITNEY });
+      ALL_NO_BIMODAL_NO_CONFIDENCE(new StatisticalTests[] { StatisticalTests.MEAN, StatisticalTests.TTEST, StatisticalTests.MANNWHITNEY }),
+      ONLY_TTEST(new StatisticalTests[] {StatisticalTests.TTEST });
 
    private StatisticalTests[] tests;
 

@@ -91,7 +91,7 @@ public class ConfigurationDeterminer {
 
    private PrecisionData executeComparisons(DiffPairLoader loader, BufferedWriter writer) throws IOException {
       PrecisionData data = new PrecisionData();
-      for (int vmCount = 5; vmCount < 30; vmCount +=5) {
+      for (int vmCount = 10; vmCount < 20; vmCount +=1) {
          SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark", 10000);
          int maxRuns = getMaximumPossibleRuns(loader.getDataOld(), loader.getDataNew());
          for (int iterations = 1; iterations < maxRuns; iterations++) {

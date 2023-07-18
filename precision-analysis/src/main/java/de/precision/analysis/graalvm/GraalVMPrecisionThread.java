@@ -58,10 +58,10 @@ public class GraalVMPrecisionThread {
       
       System.out.println(configuration.getIterations() + " " + configuration.getVMs());
       
-      executeTesting(finder, configuration);
+      executeTesting(finder, configuration, graalConfig);
    }
 
-   private void executeTesting(ComparisonFinder finder, Configuration configuration) {
+   private void executeTesting(ComparisonFinder finder, Configuration configuration, GraalConfiguration graalConfig) {
       Map<String, Integer> falseNegativeDetections = new HashMap<>();
       Map<String, Integer> falsePositiveDetections = new HashMap<>();
       
@@ -69,7 +69,7 @@ public class GraalVMPrecisionThread {
 
       StatisticsConfig statisticsConfig = new StatisticsConfig();
       PrecisionComparer comparer = new PrecisionComparer(statisticsConfig, precisionConfig);
-      for (Comparison comparison : finder.getComparisonsTest().values()) {
+      for (Comparison comparison : finder.getComparisonsTraining().values()) {
          DiffPairLoader loader = new DiffPairLoader(folder);
          loader.loadDiffPair(comparison);
          if (loader.getExpected() == Relation.EQUAL) {
@@ -100,6 +100,8 @@ public class GraalVMPrecisionThread {
       double fScore = comparer.getFScore(StatisticalTests.TTEST);
       LOG.info("F_1-score: " + fScore + " False negative: " + falseNegativeRate);
 
+      graalConfig.setType2error(falseNegativeRate);
+      
 //      model.setCountTesting(counts);
 //      ConfigurationResult configurationResult = new ConfigurationResult(configuration.getRepetitions(), falsePositiveDetections, falseNegativeDetections);
 //      model.addDetection(vmCount, vmCount, type2error, fScore, configurationResult);
