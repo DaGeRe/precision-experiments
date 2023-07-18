@@ -101,6 +101,7 @@ public class GraalVMPrecisionThread {
       LOG.info("F_1-score: " + fScore + " False negative: " + falseNegativeRate);
 
       graalConfig.setType2error(falseNegativeRate);
+      graalConfig.setType2error_above1percent(comparer.getFalseNegativeRateAbove1Percent(StatisticalTests.TTEST));
       
 //      model.setCountTesting(counts);
 //      ConfigurationResult configurationResult = new ConfigurationResult(configuration.getRepetitions(), falsePositiveDetections, falseNegativeDetections);

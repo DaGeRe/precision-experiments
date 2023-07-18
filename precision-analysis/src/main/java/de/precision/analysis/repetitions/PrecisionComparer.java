@@ -59,10 +59,11 @@ public class PrecisionComparer {
       
       // TestExecutors.getGTestRelation(beforeShortened, afterShortened, relations, data);
 
-      manageResults(expectedRelation, testcaseName, relations);
+      double relativeDifference = (data.getAvgCurrent() - data.getAvgPredecessor() ) / data.getAvgPredecessor();
+      manageResults(expectedRelation, testcaseName, relations, relativeDifference > 0.01);
    }
 
-   private void manageResults(final Relation expectedRelation, final String testcaseName, final Map<StatisticalTests, Relation> relations) {
+   private void manageResults(final Relation expectedRelation, final String testcaseName, final Map<StatisticalTests, Relation> relations, boolean isAbove1Percent) {
       MethodResult myMethodResult = testcaseResults.get(testcaseName);
       if (myMethodResult == null) {
          myMethodResult = new MethodResult(precisionConfig.getTypes());
@@ -74,11 +75,11 @@ public class PrecisionComparer {
          // Expected: " + );
          final StatisticalTests testName = relationByMethod.getKey();
          final Relation testRelation = relationByMethod.getValue();
-         calculateOverallResult(expectedRelation, myMethodResult, testName, testRelation);
+         calculateOverallResult(expectedRelation, myMethodResult, testName, testRelation, isAbove1Percent);
       }
    }
 
-   private void calculateOverallResult(final Relation expectedRelation, final MethodResult myMethodResult, final StatisticalTests testName, final Relation testRelation) {
+   private void calculateOverallResult(final Relation expectedRelation, final MethodResult myMethodResult, final StatisticalTests testName, final Relation testRelation, boolean isAbove1Percent) {
       if (Relation.isUnequal(testRelation)) {
          overallResults.increment(testName, StatisticalTestResult.SELECTED);
          myMethodResult.increment(testName, StatisticalTestResult.SELECTED);
@@ -92,6 +93,10 @@ public class PrecisionComparer {
          if (Relation.isUnequal(expectedRelation)) {
             overallResults.increment(testName, StatisticalTestResult.FALSENEGATIVE);
             myMethodResult.increment(testName, StatisticalTestResult.FALSENEGATIVE);
+            if (isAbove1Percent) {
+               overallResults.increment(testName, StatisticalTestResult.FALSENEGATIVE_ABOVE_1_PERCENT);
+               myMethodResult.increment(testName, StatisticalTestResult.FALSENEGATIVE_ABOVE_1_PERCENT);
+            }
          } else {
             overallResults.increment(testName, StatisticalTestResult.TRUENEGATIVE);
             myMethodResult.increment(testName, StatisticalTestResult.TRUENEGATIVE);
@@ -155,5 +160,13 @@ public class PrecisionComparer {
 
    public StatisticsConfig getStatisticsConfig() {
       return statisticsConfig;
+   }
+
+   public double getFalseNegativeRateAbove1Percent(StatisticalTests statisticMethod) {
+      final Map<StatisticalTestResult, Integer> methodResults = overallResults.getResults().get(statisticMethod);
+      final int truenegative = methodResults.get(StatisticalTestResult.TRUENEGATIVE);
+      final int falsenegative = methodResults.get(StatisticalTestResult.FALSENEGATIVE_ABOVE_1_PERCENT);
+      final double falseNegativeRate = 100d * (((double) falsenegative) / (truenegative + falsenegative));
+      return falseNegativeRate;
    }
 }
