@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import de.dagere.kopeme.kopemedata.DatacollectorResult;
@@ -20,20 +19,33 @@ import de.dagere.kopeme.kopemedata.TestMethod;
 import de.dagere.kopeme.kopemedata.VMResult;
 
 public class GraalVMReadUtil {
-   public static Kopemedata readData(File vmFolder) {
+   public static Kopemedata readData(File vmFolder, boolean clean) {
       Kopemedata data = new Kopemedata("unkownClazz");
-      for (File versionDataFile : vmFolder.listFiles((FilenameFilter) new WildcardFileFilter("*.csv"))) {
-         try (BufferedReader reader = new BufferedReader(new FileReader(versionDataFile))){
+
+      FilenameFilter filter = new FilenameFilter() {
+         @Override
+         public boolean accept(File dir, String name) {
+            System.out.println("Testing " + name + " clean: " + clean);
+            if (clean) {
+               return name.endsWith("_cleaned.csv");
+            } else {
+               return name.endsWith(".csv") && !name.endsWith("_cleaned.csv");
+            }
+         }
+      };
+
+      for (File versionDataFile : vmFolder.listFiles(filter)) {
+         try (BufferedReader reader = new BufferedReader(new FileReader(versionDataFile))) {
             String line;
-            
+
             SummaryStatistics statistics = new SummaryStatistics();
-            
+
             String headline = reader.readLine();
-            
+
             int columnIndex = getColumnIndex(headline, "iteration_time_ns");
-            
+
             line = reader.readLine();
-            
+
             String[] firstParts = line.split(",");
             String benchmarkName = firstParts[1];
             VMResult vmResult = createNewVMResult(data, benchmarkName, vmFolder.getName());
@@ -83,13 +95,13 @@ public class GraalVMReadUtil {
    private static VMResult createNewVMResult(Kopemedata data, String benchmarkName, String commitName) {
       data.getMethods().add(new TestMethod(benchmarkName));
       data.getMethods().get(0).getDatacollectorResults().add(new DatacollectorResult("time"));
-      
+
       VMResult vmResult = new VMResult();
       data.getFirstDatacollectorContent().add(vmResult);
       vmResult.setFulldata(new Fulldata());
       vmResult.setCommit(commitName);
       LinkedList<MeasuredValue> values = new LinkedList<>();
-      
+
       vmResult.getFulldata().setValues(values);
       return vmResult;
    }

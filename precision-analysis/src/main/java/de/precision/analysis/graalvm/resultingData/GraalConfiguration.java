@@ -2,8 +2,8 @@ package de.precision.analysis.graalvm.resultingData;
 
 public class GraalConfiguration {
    int warmup, runs, iterations;
-   double type2error;
-   double type2error_above1percent;
+   
+   double type2error, type2error_above1percent;
 
    public int getWarmup() {
       return warmup;

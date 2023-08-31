@@ -31,21 +31,21 @@ public class ConfigurationDeterminer {
    private static final Logger LOG = LogManager.getLogger(ConfigurationDeterminer.class);
 
    private final double type2error;
-   private final File folder;
+   private final boolean cleaned;
    private final PrecisionConfig precisionConfig;
    private final PrecisionFileManager precisionFileManager;
    private int equal = 0, unequal = 0;
 
-   public ConfigurationDeterminer(double type2error, File folder, PrecisionConfig precisionConfig, PrecisionFileManager precisionFileManager) {
+   public ConfigurationDeterminer(boolean cleaned, double type2error, PrecisionConfig precisionConfig, PrecisionFileManager precisionFileManager) {
       this.type2error = type2error;
-      this.folder = folder;
+      this.cleaned = cleaned;
       this.precisionConfig = precisionConfig;
       this.precisionFileManager = precisionFileManager;
    }
 
    public Configuration executeComparisons(ComparisonFinder finder) {
       Configuration configuration = null;
-      DiffPairLoader loader = new DiffPairLoader(folder);
+      DiffPairLoader loader = new DiffPairLoader(cleaned);
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
          loader.loadDiffPair(comparison);
 

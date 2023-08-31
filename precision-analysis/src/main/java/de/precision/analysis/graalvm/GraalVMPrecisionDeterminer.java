@@ -12,6 +12,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.fasterxml.jackson.core.exc.StreamWriteException;
+import com.fasterxml.jackson.databind.DatabindException;
+
 import de.dagere.peass.utils.Constants;
 import de.precision.analysis.graalvm.resultingData.RegressionDetectionModel;
 import de.precision.analysis.graalvm.resultingData.SimpleModel;
@@ -36,7 +39,7 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    @Mixin
    private PrecisionConfigMixin precisionConfigMixin;
 
-   SimpleModel model = new SimpleModel();
+   
 
    public static void main(String[] args) {
       GraalVMPrecisionDeterminer plot = new GraalVMPrecisionDeterminer();
@@ -47,52 +50,58 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    @Override
    public void run() {
 
-      Date date;
       try {
-         date = DateFormat.getInstance().parse(endDate);
+         Date date = DateFormat.getInstance().parse(endDate);
          System.out.println("End date: " + date);
 
-         model.setLast(endDate);
-
          ComparisonFinder finder = first == null ? new ComparisonFinder(folder, date) : new ComparisonFinder(folder, DateFormat.getInstance().parse(first), date);
-         System.out.println("Start date: " + finder.getStartDate().toString());
-         model.setFirst(finder.getStartDate().toString());
-
-         System.out.println("Training comparisons: " + finder.getComparisonsTraining().size());
-         System.out.println("Test comparisons: " + finder.getComparisonsTest().size());
-
-         File resultsFolder = new File("results");
-         resultsFolder.mkdirs();
-
-         PrecisionFileManager manager = new PrecisionFileManager();
-
-         ExecutorService pool = Executors.newFixedThreadPool(4);
-
-         // for (int vmCount : new int[] { 5, 10, 20, 30 }) {
-         for (double type2error : new double[] { 0.01, 0.1, 0.2, 0.5, 0.75, 0.9 }) {
-            final GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(model, folder, precisionConfigMixin.getConfig(), finder, manager, type2error);
-            pool.submit(() -> {
-               try {
-                  precisionThread.getConfigurationAndTest();
-               } catch (Throwable t) {
-                  t.printStackTrace();
-               }
-            });
-         }
-         // }
-
-         LOG.info("Waiting for thread completion...");
-         pool.shutdown();
-         pool.awaitTermination(100, TimeUnit.HOURS);
-         LOG.info("Finished");
-
-         manager.cleanup();
-
-         Constants.OBJECTMAPPER.writeValue(new File("model.json"), model);
+         
+         createModel(true, date, finder);
+         createModel(false, date, finder);
 
       } catch (ParseException | IOException | InterruptedException e1) {
          e1.printStackTrace();
       }
+   }
+
+   private void createModel(boolean cleaned, Date date, ComparisonFinder finder) throws ParseException, InterruptedException, IOException, StreamWriteException, DatabindException {
+      SimpleModel model = new SimpleModel();
+      model.setLast(endDate);
+      
+      System.out.println("Start date: " + finder.getStartDate().toString());
+      model.setFirst(finder.getStartDate().toString());
+
+      System.out.println("Training comparisons: " + finder.getComparisonsTraining().size());
+      System.out.println("Test comparisons: " + finder.getComparisonsTest().size());
+
+      File resultsFolder = new File("results");
+      resultsFolder.mkdirs();
+
+      PrecisionFileManager manager = new PrecisionFileManager();
+
+      ExecutorService pool = Executors.newFixedThreadPool(4);
+
+      // for (int vmCount : new int[] { 5, 10, 20, 30 }) {
+      for (double type2error : new double[] { 0.01, 0.1, 0.2, 0.5, 0.75, 0.9 }) {
+         final GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(cleaned, model, folder, precisionConfigMixin.getConfig(), finder, manager, type2error);
+         pool.submit(() -> {
+            try {
+               precisionThread.getConfigurationAndTest();
+            } catch (Throwable t) {
+               t.printStackTrace();
+            }
+         });
+      }
+      // }
+
+      LOG.info("Waiting for thread completion...");
+      pool.shutdown();
+      pool.awaitTermination(100, TimeUnit.HOURS);
+      LOG.info("Finished");
+
+      manager.cleanup();
+
+      Constants.OBJECTMAPPER.writeValue(cleaned ? new File("model_cleaned.json") : new File("model.json"), model);
    }
 
 }

@@ -18,12 +18,12 @@ public class DiffPairLoader {
 
    private static final Logger LOG = LogManager.getLogger(DiffPairLoader.class);
 
-   private final File folder;
+   private final boolean cleaned;
    private Kopemedata dataOld, dataNew;
    private Relation expected;
 
-   public DiffPairLoader(File folder) {
-      this.folder = folder;
+   public DiffPairLoader(boolean cleaned) {
+      this.cleaned = cleaned;
    }
 
    public void loadDiffPair(Comparison comparison) {
@@ -31,8 +31,8 @@ public class DiffPairLoader {
       File folderCurrent = comparison.getNewFolder();
 
       System.out.println("Reading " + folderPredecessor + " " + folderCurrent);
-      dataOld = GraalVMReadUtil.readData(folderPredecessor);
-      dataNew = GraalVMReadUtil.readData(folderCurrent);
+      dataOld = GraalVMReadUtil.readData(folderPredecessor, cleaned);
+      dataNew = GraalVMReadUtil.readData(folderCurrent, cleaned);
       
       CompareData data = new CompareData(dataOld.getFirstDatacollectorContent(), dataNew.getFirstDatacollectorContent());
       expected = getRealRelation(data);
