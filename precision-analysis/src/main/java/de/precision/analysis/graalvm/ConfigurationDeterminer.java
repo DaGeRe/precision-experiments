@@ -69,7 +69,7 @@ public class ConfigurationDeterminer {
 
    private Configuration executeOneComparison(Comparison comparison, DiffPairLoader loader) {
       try {
-         BufferedWriter writer = precisionFileManager.getFile(comparison.getIdNew(), loader.getExpected());
+         BufferedWriter writer = precisionFileManager.getFile(comparison.getVersionIdNew(), loader.getExpected());
          PrecisionData data = executeComparisons(loader, writer);
          MinimalFeasibleConfigurationDeterminer determiner = new MinimalFeasibleConfigurationDeterminer(100 - type2error);
          Map<Integer, Configuration> minimalFeasibleConfiguration = determiner.getMinimalFeasibleConfiguration(data);

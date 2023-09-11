@@ -10,7 +10,7 @@ class Comparison {
    private final File newFolder;
    private final Date dateOld;
    private final Date dateNew;
-   
+
    private Relation relation;
 
    public Comparison(File oldFolder, File newFolder, Date dateOld, Date dateNew) {
@@ -27,11 +27,11 @@ class Comparison {
    public Date getDateNew() {
       return dateNew;
    }
-   
+
    public File getNewFolder() {
       return newFolder;
    }
-   
+
    public File getOldFolder() {
       return oldFolder;
    }
@@ -40,14 +40,21 @@ class Comparison {
       return oldFolder.getName() + "-" + newFolder.getName();
    }
 
-   public int getIdNew() {
+   public int getVersionIdNew() {
       return Integer.parseInt(newFolder.getName());
    }
-   
-   public int getIdOld() {
+
+   public int getVersionIdOld() {
       return Integer.parseInt(oldFolder.getName());
    }
-   
+
+   public int getPlatformIdNew() {
+      String[] parts = newFolder.getAbsolutePath().split("/");
+
+      String platformString = parts[parts.length - 2];
+      return Integer.parseInt(platformString);
+   }
+
    public void setRelation(Relation relation) {
       this.relation = relation;
    }
@@ -55,6 +62,5 @@ class Comparison {
    public Relation getRelation() {
       return relation;
    }
-   
 
 }

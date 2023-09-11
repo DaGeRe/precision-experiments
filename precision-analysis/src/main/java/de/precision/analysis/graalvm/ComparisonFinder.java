@@ -86,7 +86,12 @@ public class ComparisonFinder {
       
       for (File current : files.values()) {
          if (predecessor != null) {
-            comparisonMap.put(i++, new Comparison(predecessor, current, null, null));
+            int id = i++;
+            Comparison comparison = new Comparison(predecessor, current, null, null);
+            if (comparisonMap.containsKey(id)) {
+               throw new RuntimeException("Id was created twice: " + id);
+            }
+            comparisonMap.put(id, comparison);
             LOG.info("Comparison " + predecessor.getName() + " " + current.getName());
          }
          predecessor = current;
