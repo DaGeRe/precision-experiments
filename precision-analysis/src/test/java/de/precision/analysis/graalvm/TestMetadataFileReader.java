@@ -14,7 +14,7 @@ public class TestMetadataFileReader {
    
    @Test
    public void testBasicReading() throws ParseException {
-      File folder = new File("src/test/resources");
+      File folder = new File("src/test/resources/graalvm-example-data");
       Map<File, Date> fileDates = new MetadataFileReader(folder).getFileDates();
 
       Date exampleDate1 = fileDates.get(new File("/home/reichelt/workspaces/dissworkspace/repos/graalvm/2022-01/measurement/30/39/74/7743930"));

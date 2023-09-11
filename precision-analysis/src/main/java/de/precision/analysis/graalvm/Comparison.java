@@ -3,11 +3,15 @@ package de.precision.analysis.graalvm;
 import java.io.File;
 import java.util.Date;
 
+import de.dagere.peass.measurement.statistics.Relation;
+
 class Comparison {
    private final File oldFolder;
    private final File newFolder;
    private final Date dateOld;
    private final Date dateNew;
+   
+   private Relation relation;
 
    public Comparison(File oldFolder, File newFolder, Date dateOld, Date dateNew) {
       this.oldFolder = oldFolder;
@@ -40,6 +44,17 @@ class Comparison {
       return Integer.parseInt(newFolder.getName());
    }
    
+   public int getIdOld() {
+      return Integer.parseInt(oldFolder.getName());
+   }
+   
+   public void setRelation(Relation relation) {
+      this.relation = relation;
+   }
+
+   public Relation getRelation() {
+      return relation;
+   }
    
 
 }
