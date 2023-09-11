@@ -39,9 +39,21 @@ repositories {
 	}
 }
 
+tasks.named('test', Test) {
+    useJUnitPlatform()
+
+    maxHeapSize = '1G'
+
+    testLogging {
+        events "passed"
+    }
+}
 
 dependencies {
    implementation group: 'de.dagere.peass', name: 'analysis', version: '0.3.9'
    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+
+   testImplementation 'org.mockito:mockito-core:4.11.0'
+   
    testImplementation group: 'de.dagere.peass', name: 'measurement', version: '0.3.8-SNAPSHOT', classifier: 'tests'
 }
