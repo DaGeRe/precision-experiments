@@ -19,8 +19,8 @@ public class ComparisonFinder {
    private final Date startDate;
    private final Date endDate;
 
-   private final Map<Integer, Comparison> comparisonsTraining = new TreeMap<>();
-   private final Map<Integer, Comparison> comparisonsTest = new TreeMap<>();
+   private final Map<String, Comparison> comparisonsTraining = new TreeMap<>();
+   private final Map<String, Comparison> comparisonsTest = new TreeMap<>();
 
    public ComparisonFinder(File folder, Date endDate) {
       this(folder, new Date(Long.MIN_VALUE), endDate);
@@ -78,9 +78,9 @@ public class ComparisonFinder {
       generateComparisons(testFiles, comparisonsTest);
    }
 
-   private void generateComparisons(TreeMap<Integer, File> files, Map<Integer, Comparison> comparisonMap) {
+   private void generateComparisons(TreeMap<Integer, File> files, Map<String, Comparison> comparisonMap) {
       File predecessor = null;
-      int i = 0;
+//      int i = 0;
       
       LOG.info("Files: " + files.size());
       
@@ -99,11 +99,11 @@ public class ComparisonFinder {
       LOG.info("Comparisons: " + comparisonMap.size());
    }
 
-   public Map<Integer, Comparison> getComparisonsTraining() {
+   public Map<String, Comparison> getComparisonsTraining() {
       return comparisonsTraining;
    }
 
-   public Map<Integer, Comparison> getComparisonsTest() {
+   public Map<String, Comparison> getComparisonsTest() {
       return comparisonsTest;
    }
 

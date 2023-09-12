@@ -25,8 +25,8 @@ public class MetadiffReader {
          String headline = reader.readLine();
          
          int idIndex = GraalVMReadUtil.getColumnIndex(headline, "id");
-         int versionOldIndex = GraalVMReadUtil.getColumnIndex(headline, "version_old");
-         int versionNewIndex = GraalVMReadUtil.getColumnIndex(headline, "version_new");
+         int runOldIndex = GraalVMReadUtil.getColumnIndex(headline, "run_id_old");
+         int runNewIndex = GraalVMReadUtil.getColumnIndex(headline, "run_id_new");
          int pValueIndex = GraalVMReadUtil.getColumnIndex(headline, "p_value");
          int effectSizeIndex = GraalVMReadUtil.getColumnIndex(headline, "size_effect");
 
@@ -34,15 +34,17 @@ public class MetadiffReader {
          while ((line = reader.readLine()) != null) {
             String[] parts = line.split(",");
 
-            int id = Integer.parseInt(parts[idIndex]);
-            int versionOld = Integer.parseInt(parts[versionOldIndex]);
-            int versionNew = Integer.parseInt(parts[versionNewIndex]);
+            String runOld = parts[runOldIndex];
+            String runNew = parts[runNewIndex];
             double pValue = Double.parseDouble(parts[pValueIndex]);
             double effectSize = Double.parseDouble(parts[effectSizeIndex]);
 
-            Map<Integer, Comparison> comparisonsTraining = finder.getComparisonsTraining();
-            Comparison current = comparisonsTraining.get(id);
+            Map<String, Comparison> comparisonsTraining = finder.getComparisonsTraining();
+            Comparison current = comparisonsTraining.get(runOld + "_" + runNew);
 
+            System.out.println("Checking " + runOld + "_" + runNew);
+            System.out.println(current != null);
+            
             if (current != null) {
                if (pValue < 0.01) {
                   if (effectSize > 0) {
