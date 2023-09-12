@@ -37,8 +37,10 @@ public class ComparisonFinder {
       TreeMap<Integer, File> trainingFiles = new TreeMap<>();
       TreeMap<Integer, File> testFiles = new TreeMap<>();
 
-      Map<File, Date> fileDates = new MetadataFileReader(folder).getFileDates();
-
+      MetadataFileReader metadataFileReader = new MetadataFileReader(folder);
+      Map<File, Date> fileDates = metadataFileReader.getFileDates();
+      Map<File, String> fileIds = metadataFileReader.getFileIds();
+      
       System.out.println(folder.getAbsolutePath());
       FilenameFilter onlyNumberFilter = (FilenameFilter) new RegexFileFilter("[0-9]+");
       for (File machineFile : folder.listFiles(onlyNumberFilter)) {
@@ -74,11 +76,11 @@ public class ComparisonFinder {
          }
       }
 
-      generateComparisons(trainingFiles, comparisonsTraining);
-      generateComparisons(testFiles, comparisonsTest);
+      generateComparisons(trainingFiles, comparisonsTraining, fileIds);
+      generateComparisons(testFiles, comparisonsTest, fileIds);
    }
 
-   private void generateComparisons(TreeMap<Integer, File> files, Map<String, Comparison> comparisonMap) {
+   private void generateComparisons(TreeMap<Integer, File> files, Map<String, Comparison> comparisonMap, Map<File, String> fileIds) {
       File predecessor = null;
 //      int i = 0;
       
@@ -86,12 +88,14 @@ public class ComparisonFinder {
       
       for (File current : files.values()) {
          if (predecessor != null) {
-            int id = i++;
+            String runOld = fileIds.get(predecessor);
+            String runNew = fileIds.get(current);
             Comparison comparison = new Comparison(predecessor, current, null, null);
-            if (comparisonMap.containsKey(id)) {
-               throw new RuntimeException("Id was created twice: " + id);
+            String comparisonId = runOld + "_" + runNew;
+            if (comparisonMap.containsKey(comparisonId)) {
+               throw new RuntimeException("Id was created twice: " + comparisonId);
             }
-            comparisonMap.put(id, comparison);
+            comparisonMap.put(comparisonId, comparison);
             LOG.info("Comparison " + predecessor.getName() + " " + current.getName());
          }
          predecessor = current;

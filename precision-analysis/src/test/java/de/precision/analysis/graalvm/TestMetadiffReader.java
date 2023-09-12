@@ -12,10 +12,14 @@ import de.dagere.peass.measurement.statistics.Relation;
 
 public class TestMetadiffReader {
 
+   private static final File DATA_FOLDER = new File("src/test/resources/graalvm-example-data");
+   
    @Test
    public void testDefaultReading() {
-      File fileToRead = new File("src/test/resources/graalvm-example-data/2022-01_metadiff.csv");
-      MetadiffReader reader = new MetadiffReader(fileToRead);
+      File fileToRead = new File(DATA_FOLDER, "2022-01_metadiff.csv");
+      File metadataFile = new File(DATA_FOLDER, "2022-01_metadata.csv");
+      
+      MetadiffReader reader = new MetadiffReader(fileToRead, metadataFile);
 
       Comparison equalExample = new Comparison(new File("/dev/null/6/43/5/113/26/23/34966/71728"), new File("/dev/null/6/43/5/113/26/23/35058/71848"), null, null);
       Comparison unequalExample = new Comparison(new File("/dev/null/6/34/7/129/26/23/35058/71848"),new File("/dev/null/6/43/7/130/26/23/35232/72041"),  null, null);

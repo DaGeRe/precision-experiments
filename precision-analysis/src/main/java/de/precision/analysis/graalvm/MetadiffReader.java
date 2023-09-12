@@ -13,18 +13,18 @@ import de.dagere.peass.measurement.statistics.Relation;
 
 public class MetadiffReader {
 
-   private final File fileToRead;
+   private final File metadiffFile;
+   private final File metadataFile;
 
-   public MetadiffReader(File fileToRead) {
-      this.fileToRead = fileToRead;
+   public MetadiffReader(File metadiffFile, File metadataFile) {
+      this.metadiffFile = metadiffFile;
+      this.metadataFile = metadataFile;
    }
 
    public void setRelations(ComparisonFinder finder) {
-
-      try (BufferedReader reader = new BufferedReader(new FileReader(fileToRead))) {
+      try (BufferedReader reader = new BufferedReader(new FileReader(metadiffFile))) {
          String headline = reader.readLine();
          
-         int idIndex = GraalVMReadUtil.getColumnIndex(headline, "id");
          int runOldIndex = GraalVMReadUtil.getColumnIndex(headline, "run_id_old");
          int runNewIndex = GraalVMReadUtil.getColumnIndex(headline, "run_id_new");
          int pValueIndex = GraalVMReadUtil.getColumnIndex(headline, "p_value");
@@ -40,9 +40,13 @@ public class MetadiffReader {
             double effectSize = Double.parseDouble(parts[effectSizeIndex]);
 
             Map<String, Comparison> comparisonsTraining = finder.getComparisonsTraining();
-            Comparison current = comparisonsTraining.get(runOld + "_" + runNew);
-
-            System.out.println("Checking " + runOld + "_" + runNew);
+            String comparisonId = runOld + "_" + runNew;
+            Comparison current = comparisonsTraining.get(comparisonId);
+            if (current == null) {
+               current = finder.getComparisonsTest().get(comparisonId);
+            }
+            
+            System.out.println("Checking " + comparisonId);
             System.out.println(current != null);
             
             if (current != null) {
