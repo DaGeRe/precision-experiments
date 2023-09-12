@@ -55,6 +55,9 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          System.out.println("End date: " + date);
 
          ComparisonFinder finder = first == null ? new ComparisonFinder(folder, date) : new ComparisonFinder(folder, DateFormat.getInstance().parse(first), date);
+         MetadiffReader reader = new MetadiffReader(folder);
+         reader.setRelations(finder);
+         
          
          createModel(true, date, finder);
          createModel(false, date, finder);

@@ -3,7 +3,6 @@ package de.precision.analysis.graalvm;
 import java.io.File;
 import java.util.List;
 
-import org.apache.commons.math3.stat.inference.TTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,8 +33,7 @@ public class DiffPairLoader {
       dataOld = GraalVMReadUtil.readData(folderPredecessor, cleaned);
       dataNew = GraalVMReadUtil.readData(folderCurrent, cleaned);
       
-      CompareData data = new CompareData(dataOld.getFirstDatacollectorContent(), dataNew.getFirstDatacollectorContent());
-      expected = getRealRelation(data);
+      expected = comparison.getRelation();
       
       writeHistogramCSVs(folderPredecessor, folderCurrent);
    }
@@ -47,25 +45,6 @@ public class DiffPairLoader {
          HistogramValueWriter.writeValues(dataOld.getFirstDatacollectorContent(), new File(histogramData, folderPredecessor.getName() + ".csv"));
          HistogramValueWriter.writeValues(dataNew.getFirstDatacollectorContent(), new File(histogramData, folderCurrent.getName() + ".csv"));
       }
-   }
-
-   private Relation getRealRelation(CompareData data) {
-      double relativeChange = Math.abs((data.getAvgCurrent() - data.getAvgPredecessor()) / data.getAvgPredecessor());
-      if (relativeChange < 0.02) {
-         return Relation.EQUAL;
-      }
-      final boolean tchange = new TTest().homoscedasticTTest(data.getPredecessor(), data.getCurrent(), 0.01);
-      Relation expected;
-      if (tchange) {
-         if (data.getAvgPredecessor() > data.getAvgCurrent()) {
-            expected = Relation.GREATER_THAN;
-         } else {
-            expected = Relation.LESS_THAN;
-         }
-      } else {
-         expected = Relation.EQUAL;
-      }
-      return expected;
    }
    
    public CompareData getShortenedCompareData(int iterations) {
