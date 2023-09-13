@@ -6,6 +6,9 @@ import java.util.Date;
 import de.dagere.peass.measurement.statistics.Relation;
 
 class Comparison {
+   
+   private final String name;
+   
    private final File oldFolder;
    private final File newFolder;
    private final Date dateOld;
@@ -13,7 +16,8 @@ class Comparison {
 
    private Relation relation;
 
-   public Comparison(File oldFolder, File newFolder, Date dateOld, Date dateNew) {
+   public Comparison(String name, File oldFolder, File newFolder, Date dateOld, Date dateNew) {
+      this.name = name;
       this.oldFolder = oldFolder;
       this.newFolder = newFolder;
       this.dateOld = dateOld;
@@ -48,7 +52,7 @@ class Comparison {
    }
 
    public String getName() {
-      return oldFolder.getName() + "-" + newFolder.getName();
+      return name;
    }
 
    public int getVersionIdNew() {

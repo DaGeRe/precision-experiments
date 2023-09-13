@@ -6,13 +6,17 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.dagere.kopeme.kopemedata.Kopemedata;
 import de.dagere.kopeme.kopemedata.VMResult;
 import de.dagere.peass.config.StatisticsConfig;
+import de.dagere.peass.measurement.dataloading.MultipleVMTestUtil;
 import de.dagere.peass.measurement.statistics.Relation;
+import de.dagere.peass.measurement.statistics.StatisticUtil;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
 import de.precision.analysis.heatmap.Configuration;
 import de.precision.analysis.heatmap.GetMinimalFeasibleConfiguration;
@@ -47,7 +51,7 @@ public class ConfigurationDeterminer {
       Configuration configuration = null;
       DiffPairLoader loader = new DiffPairLoader(cleaned);
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
-         System.out.println("Folder existing");
+         LOG.debug("Folder existing");
          loader.loadDiffPair(comparison);
 
          LOG.info("Expected relation: {}", loader.getExpected());
@@ -77,13 +81,19 @@ public class ConfigurationDeterminer {
          Map<Integer, Configuration> minimalFeasibleConfiguration = determiner.getMinimalFeasibleConfiguration(data);
          Configuration currentConfig = minimalFeasibleConfiguration.get(1);
          if (currentConfig != null) {
-            LOG.info("VMs: " + currentConfig.getVMs() + " Iterations: " + currentConfig.getIterations());
+            LOG.info("Found configuration, VMs: " + currentConfig.getVMs() + " Iterations: " + currentConfig.getIterations());
             return currentConfig;
          } else {
-            LOG.info("Did not find a suitable configuration, setting to maximum");
-            List<VMResult> measuredData = loader.getDataOld().getFirstDatacollectorContent();
+            LOG.info("Did not find a suitable configuration with type 2 error {}, setting to maximum", type2error);
+            List<VMResult> vmResults = loader.getDataOld().getFirstDatacollectorContent();
+            List<VMResult> measuredData = vmResults;
             int iterations = measuredData.get(0).getFulldata().getValues().size();
             int VMs = measuredData.size();
+            LOG.info("Maximum here: VMS: {} Iterations: {}", VMs, iterations);
+            
+            printDebug(MultipleVMTestUtil.getAverages(loader.getDataOld().getFirstDatacollectorContent()), "old");
+            printDebug(MultipleVMTestUtil.getAverages(loader.getDataNew().getFirstDatacollectorContent()), "new");
+            
             return new Configuration(1, VMs, iterations);
          }
       } catch (IOException e) {
@@ -91,11 +101,19 @@ public class ConfigurationDeterminer {
       }
    }
 
+   private void printDebug(List<Double> meanOld, String classifier) {
+      final double[] dataOld = ArrayUtils.toPrimitive(meanOld.toArray(new Double[0]));
+      DescriptiveStatistics statistics = new DescriptiveStatistics(dataOld);
+      LOG.info("Mean {}: {}", classifier, statistics.getMean());
+   }
+
    private PrecisionData executeComparisons(DiffPairLoader loader, BufferedWriter writer) throws IOException {
       PrecisionData data = new PrecisionData();
-      for (int vmCount = 5; vmCount < 20; vmCount += 1) {
+      for (int vmCount = 5; vmCount < 80; vmCount += 5) {
          SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark", 10000);
          int maxRuns = getMaximumPossibleRuns(loader.getDataOld(), loader.getDataNew());
+         
+         double previous = Double.MAX_VALUE;
          for (int iterations = 1; iterations < maxRuns; iterations++) {
             ExecutionData executionData = new ExecutionData(vmCount, 0, iterations, 1);
 
@@ -115,8 +133,12 @@ public class ConfigurationDeterminer {
             PrecisionWriter precisionWriter = new PrecisionWriter(comparer, executionData);
             precisionWriter.writeTestcase(writer, comparer.getOverallResults().getResults());
 
-            data.addData(1, vmCount, iterations,
-                  Relation.isUnequal(loader.getExpected()) ? comparer.getFScore(StatisticalTests.TTEST) : comparer.getTrueNegativeRate(StatisticalTests.TTEST));
+            double value = Relation.isUnequal(loader.getExpected()) ? comparer.getFScore(StatisticalTests.MANNWHITNEY) : comparer.getTrueNegativeRate(StatisticalTests.MANNWHITNEY);
+            data.addData(1, vmCount, iterations, value);
+            if (value < type2error && previous < type2error) {
+               break;
+            }
+            previous = value;
          }
       }
       return data;

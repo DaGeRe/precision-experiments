@@ -64,7 +64,7 @@ public class MetadiffReader {
 
                if (folderOld != null && folderNew != null && 
                      folderOld.exists() && folderNew.exists()) {
-                  Comparison comparison = new Comparison(folderOld, folderNew, dateOld, dateNew);
+                  Comparison comparison = new Comparison(comparisonId, folderOld, folderNew, dateOld, dateNew);
                   comparisons.put(comparisonId, comparison);
 
                   if (pValue < 0.01) {
@@ -125,9 +125,9 @@ public class MetadiffReader {
                if (current != null) {
                   if (pValue < 0.01) {
                      if (effectSize > 0) {
-                        current.setRelation(Relation.LESS_THAN);
-                     } else {
                         current.setRelation(Relation.GREATER_THAN);
+                     } else {
+                        current.setRelation(Relation.LESS_THAN);
                      }
                   } else {
                      current.setRelation(Relation.EQUAL);

@@ -22,7 +22,7 @@ public class ComparisonFinder {
    public ComparisonFinder(Map<String, Comparison> comparisons, Date startDate, Date endDate, File folder) {
 
       for (Map.Entry<String, Comparison> comparison : comparisons.entrySet()) {
-         System.out.println("Reading: " + comparison.getKey());
+         LOG.debug("Reading: " + comparison.getKey());
          Date date = comparison.getValue().getDateNew();
          if (date.before(endDate)) {
             comparisonsTraining.put(comparison.getKey(), comparison.getValue());
