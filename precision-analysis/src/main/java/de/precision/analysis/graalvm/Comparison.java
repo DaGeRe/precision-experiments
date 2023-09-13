@@ -18,6 +18,17 @@ class Comparison {
       this.newFolder = newFolder;
       this.dateOld = dateOld;
       this.dateNew = dateNew;
+      if (oldFolder == null || newFolder == null) {
+         System.out.println("Old folder: " + oldFolder);
+         System.out.println("New folder: " + newFolder);
+         throw new RuntimeException("New or old folder was new, but thats not allowed");
+      }
+      if (!oldFolder.exists()) {
+         throw new RuntimeException("Old folder does not exist: " + oldFolder.getAbsolutePath());
+      }
+      if (!newFolder.exists()) {
+         throw new RuntimeException("New folder does not exist: " + newFolder.getAbsolutePath());
+      }
    }
 
    public Date getDateOld() {

@@ -3,6 +3,7 @@ package de.precision.analysis.graalvm;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -22,6 +23,28 @@ public class ComparisonFinder {
    private final Map<String, Comparison> comparisonsTraining = new TreeMap<>();
    private final Map<String, Comparison> comparisonsTest = new TreeMap<>();
 
+   public ComparisonFinder(Map<String, Comparison> comparisons, Date startDate, Date endDate, File folder) {
+//      this.startDate = startDate;
+      this.endDate = endDate;
+
+      for (Map.Entry<String, Comparison> comparison : comparisons.entrySet()) {
+         System.out.println("Reading: " + comparison.getKey());
+         Date date = comparison.getValue().getDateNew();
+         if (date.before(endDate)) {
+            comparisonsTraining.put(comparison.getKey(), comparison.getValue());
+         } else {
+            comparisonsTest.put(comparison.getKey(), comparison.getValue());
+         }
+      }
+      if (startDate != null) {
+         this.startDate = startDate;
+      } else {
+         Comparison comparison = comparisonsTraining.values().iterator().next();
+         this.startDate = comparison.getDateOld();
+         System.out.println("Setting to... " + this.startDate + " " + comparison.getName());
+      }
+   }
+
    public ComparisonFinder(File folder, Date endDate) {
       this(folder, new Date(Long.MIN_VALUE), endDate);
    }
@@ -40,7 +63,7 @@ public class ComparisonFinder {
       MetadataFileReader metadataFileReader = new MetadataFileReader(folder);
       Map<File, Date> fileDates = metadataFileReader.getFileDates();
       Map<File, String> fileIds = metadataFileReader.getFileIds();
-      
+
       System.out.println(folder.getAbsolutePath());
       FilenameFilter onlyNumberFilter = (FilenameFilter) new RegexFileFilter("[0-9]+");
       for (File machineFile : folder.listFiles(onlyNumberFilter)) {
@@ -82,10 +105,10 @@ public class ComparisonFinder {
 
    private void generateComparisons(TreeMap<Integer, File> files, Map<String, Comparison> comparisonMap, Map<File, String> fileIds) {
       File predecessor = null;
-//      int i = 0;
-      
+      // int i = 0;
+
       LOG.info("Files: " + files.size());
-      
+
       for (File current : files.values()) {
          if (predecessor != null) {
             String runOld = fileIds.get(predecessor);

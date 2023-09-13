@@ -18,6 +18,7 @@ public class MetadataFileReader {
    public static SimpleDateFormat METADATA_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
    
    private final File folder;
+   private final Map<String, File> fileById = new LinkedHashMap<>();
    private final Map<File, String> fileIds = new LinkedHashMap<>();
    private final Map<File, Date> fileDates = new LinkedHashMap<>();
 
@@ -51,6 +52,7 @@ public class MetadataFileReader {
                
                fileIds.put(file.getParentFile(), runId);
                fileDates.put(file.getParentFile(), date);
+               fileById.put(runId, file.getParentFile());
             }
          } catch (IOException | ParseException e) {
             e.printStackTrace();
@@ -65,5 +67,10 @@ public class MetadataFileReader {
    
    public Map<File, Date> getFileDates(){
       return fileDates;
+   }
+
+
+   public File getFileById(String id) {
+      return fileById.get(id);
    }
 }

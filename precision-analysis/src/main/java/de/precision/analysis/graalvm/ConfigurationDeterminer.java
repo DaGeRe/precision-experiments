@@ -47,6 +47,7 @@ public class ConfigurationDeterminer {
       Configuration configuration = null;
       DiffPairLoader loader = new DiffPairLoader(cleaned);
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
+         System.out.println("Folder existing");
          loader.loadDiffPair(comparison);
 
          LOG.info("Expected relation: {}", loader.getExpected());
@@ -62,6 +63,7 @@ public class ConfigurationDeterminer {
          } else if (currentConfiguration != null) {
             configuration = GetMinimalFeasibleConfiguration.mergeConfigurations(1, configuration, currentConfiguration);
          }
+
       }
       LOG.info("Final configuration: VMs: " + configuration.getVMs() + " Iterations: " + configuration.getIterations());
       return configuration;
@@ -91,7 +93,7 @@ public class ConfigurationDeterminer {
 
    private PrecisionData executeComparisons(DiffPairLoader loader, BufferedWriter writer) throws IOException {
       PrecisionData data = new PrecisionData();
-      for (int vmCount = 5; vmCount < 20; vmCount +=1) {
+      for (int vmCount = 5; vmCount < 20; vmCount += 1) {
          SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark", 10000);
          int maxRuns = getMaximumPossibleRuns(loader.getDataOld(), loader.getDataNew());
          for (int iterations = 1; iterations < maxRuns; iterations++) {

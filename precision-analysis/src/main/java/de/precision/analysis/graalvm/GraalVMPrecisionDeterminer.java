@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -16,7 +17,6 @@ import com.fasterxml.jackson.core.exc.StreamWriteException;
 import com.fasterxml.jackson.databind.DatabindException;
 
 import de.dagere.peass.utils.Constants;
-import de.precision.analysis.graalvm.resultingData.RegressionDetectionModel;
 import de.precision.analysis.graalvm.resultingData.SimpleModel;
 import de.precision.analysis.repetitions.PrecisionConfigMixin;
 import picocli.CommandLine;
@@ -54,10 +54,11 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          Date date = DateFormat.getInstance().parse(endDate);
          System.out.println("End date: " + date);
 
-         ComparisonFinder finder = first == null ? new ComparisonFinder(folder, date) : new ComparisonFinder(folder, DateFormat.getInstance().parse(first), date);
+//         ComparisonFinder finder = first == null ? new ComparisonFinder(folder, date) : new ComparisonFinder(folder, DateFormat.getInstance().parse(first), date);
          MetadiffReader reader = new MetadiffReader(folder);
-         reader.setRelations(finder);
          
+         Map<String, Comparison> comparisons = reader.getComparisons();
+         ComparisonFinder finder = new ComparisonFinder(comparisons, null, date, folder);
          
          createModel(true, date, finder);
          createModel(false, date, finder);

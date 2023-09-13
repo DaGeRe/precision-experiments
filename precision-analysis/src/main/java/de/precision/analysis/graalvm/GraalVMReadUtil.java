@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.dagere.kopeme.kopemedata.DatacollectorResult;
 import de.dagere.kopeme.kopemedata.Fulldata;
@@ -19,13 +21,16 @@ import de.dagere.kopeme.kopemedata.TestMethod;
 import de.dagere.kopeme.kopemedata.VMResult;
 
 public class GraalVMReadUtil {
+
+   private static final Logger LOG = LogManager.getLogger(GraalVMReadUtil.class);
+
    public static Kopemedata readData(File vmFolder, boolean clean) {
       Kopemedata data = new Kopemedata("unkownClazz");
 
       FilenameFilter filter = new FilenameFilter() {
          @Override
          public boolean accept(File dir, String name) {
-            System.out.println("Testing " + name + " clean: " + clean);
+            LOG.trace("Testing {} clean: {}", name, clean);
             if (clean) {
                return name.endsWith("_cleaned.csv");
             } else {
