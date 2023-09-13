@@ -27,6 +27,9 @@ public class MetadiffReader {
 
    public MetadiffReader(File metadiffFolder) {
       this.metadiffFolder = metadiffFolder;
+      if (!metadiffFolder.isDirectory()) {
+         throw new RuntimeException("A directory containing the *_metadiff.csv and *_metadata.csv files is expected!");
+      }
 
       metadataReader = new MetadataFileReader(metadiffFolder);
    }
@@ -117,8 +120,7 @@ public class MetadiffReader {
                   current = finder.getComparisonsTest().get(comparisonId);
                }
 
-               System.out.println("Checking " + comparisonId);
-               System.out.println(current != null);
+               LOG.info("Checking {} Null: {}", comparisonId, current != null);
 
                if (current != null) {
                   if (pValue < 0.01) {
