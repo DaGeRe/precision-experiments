@@ -13,7 +13,7 @@ public class SimpleModel {
    private Counts countTesting;
    
    private Map<String, Double> trainingComparisons = new TreeMap<>();
-   private Map<String, Integer> testComparisonFNR = new TreeMap<>();
+   private Map<Double, Map<String, Integer>> testComparisonFNR = new TreeMap<>();
    
    Map<Double, GraalConfiguration> runs_iterations = new TreeMap<>();
 
@@ -65,11 +65,15 @@ public class SimpleModel {
       this.trainingComparisons = trainingComparisons;
    }
 
-   public Map<String, Integer> getTestComparisonFNR() {
+   public Map<Double, Map<String, Integer>> getTestComparisonFNR() {
       return testComparisonFNR;
    }
 
-   public void setTestComparisonFNR(Map<String, Integer> testComparisonFNR) {
+   public void setTestComparisonFNR(Map<Double, Map<String, Integer>> testComparisonFNR) {
       this.testComparisonFNR = testComparisonFNR;
+   }
+   
+   public void addComparison(double type2error, Map<String, Integer> fnr) {
+      testComparisonFNR.put(type2error, fnr);
    }
 }
