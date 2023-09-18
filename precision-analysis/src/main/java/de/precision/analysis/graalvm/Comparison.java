@@ -15,6 +15,7 @@ class Comparison {
    private final Date dateNew;
 
    private Relation relation;
+   private double pValue;
 
    public Comparison(String name, File oldFolder, File newFolder, Date dateOld, Date dateNew) {
       this.name = name;
@@ -76,6 +77,14 @@ class Comparison {
 
    public Relation getRelation() {
       return relation;
+   }
+   
+   public void setPValue(double pValue) {
+      this.pValue = pValue;
+   }
+   
+   public double getPValue() {
+      return pValue;
    }
 
 }

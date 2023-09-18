@@ -67,6 +67,7 @@ public class MetadiffReader {
                   Comparison comparison = new Comparison(comparisonId, folderOld, folderNew, dateOld, dateNew);
                   comparisons.put(comparisonId, comparison);
 
+                  comparison.setPValue(pValue);
                   if (pValue < 0.01) {
                      if (effectSize > 0) {
                         comparison.setRelation(Relation.LESS_THAN);
@@ -77,7 +78,6 @@ public class MetadiffReader {
                      comparison.setRelation(Relation.EQUAL);
                   }
                } else {
-                  
                   if (comparisonId.startsWith("6-") && folderOld != null && folderNew != null) {
                      LOG.trace("Did not find " + comparisonId);
                      LOG.trace(folderOld.getAbsolutePath() + " " + folderOld.exists());
@@ -86,7 +86,6 @@ public class MetadiffReader {
                }
 
             }
-
          } catch (IOException e) {
             e.printStackTrace();
          }
@@ -123,6 +122,7 @@ public class MetadiffReader {
                LOG.info("Checking {} Null: {}", comparisonId, current != null);
 
                if (current != null) {
+                  current.setPValue(pValue);
                   if (pValue < 0.01) {
                      if (effectSize > 0) {
                         current.setRelation(Relation.GREATER_THAN);

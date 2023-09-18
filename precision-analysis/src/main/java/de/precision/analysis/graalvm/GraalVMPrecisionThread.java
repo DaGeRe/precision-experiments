@@ -43,17 +43,17 @@ public class GraalVMPrecisionThread {
 
    public void getConfigurationAndTest() {
       ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(cleaned, type2error, precisionConfig, manager, samplingExecutions);
+      
       Configuration configuration = configurationDeterminer.determineConfiguration(finder);
-
+      
+      buildModelDebugData(configurationDeterminer);
+      
       GraalConfiguration graalConfig = buildConfig(configurationDeterminer, configuration);
 
       executeTesting(configuration, graalConfig, StatisticalTests.TTEST);
    }
 
    private GraalConfiguration buildConfig(ConfigurationDeterminer configurationDeterminer, Configuration configuration) {
-      Counts trainingCounts = new Counts(configurationDeterminer.getEqual(), configurationDeterminer.getUnequal());
-      model.setCountTraining(trainingCounts);
-
       GraalConfiguration graalConfig = new GraalConfiguration();
       graalConfig.setRuns(configuration.getVMs());
       graalConfig.setIterations(configuration.getIterations());
@@ -63,6 +63,15 @@ public class GraalVMPrecisionThread {
       LOG.info("Runs: {} Iterations: {}", configuration.getVMs(), configuration.getIterations());
       
       return graalConfig;
+   }
+
+   private void buildModelDebugData(ConfigurationDeterminer configurationDeterminer) {
+      Counts trainingCounts = new Counts(configurationDeterminer.getEqual(), configurationDeterminer.getUnequal());
+      model.setCountTraining(trainingCounts);
+      
+      for (Comparison comparison : finder.getComparisonsTraining().values()) {
+         model.getTrainingComparisons().put(comparison.getName(), comparison.getPValue());
+      }
    }
 
    private void executeTesting(Configuration configuration, GraalConfiguration graalConfig, StatisticalTests statisticalTest) {
@@ -97,6 +106,7 @@ public class GraalVMPrecisionThread {
          } else {
             int falseNegativesThisRun = oldResults.get(StatisticalTestResult.FALSENEGATIVE) - falseNegatives;
             falseNegativeDetections.put(comparison.getName(), falseNegativesThisRun);
+            LOG.debug("False negative: {} Count: {}", comparison.getName(), falseNegativesThisRun);
          }
 
       }
@@ -110,6 +120,7 @@ public class GraalVMPrecisionThread {
       graalConfig.setType2error_above1percent(comparer.getFalseNegativeRateAbove1Percent(statisticalTest));
       
       model.setCountTesting(counts);
+      model.getTestComparisonFNR().putAll(falseNegativeDetections);
       
 //      model.setCountTesting(counts);
 //      ConfigurationResult configurationResult = new ConfigurationResult(configuration.getRepetitions(), falsePositiveDetections, falseNegativeDetections);

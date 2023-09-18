@@ -12,6 +12,9 @@ public class SimpleModel {
    private Counts countTraining;
    private Counts countTesting;
    
+   private Map<String, Double> trainingComparisons = new TreeMap<>();
+   private Map<String, Integer> testComparisonFNR = new TreeMap<>();
+   
    Map<Double, GraalConfiguration> runs_iterations = new TreeMap<>();
 
    public String getFirst() {
@@ -52,5 +55,21 @@ public class SimpleModel {
    
    public void setCountTesting(Counts countTesting) {
       this.countTesting = countTesting;
+   }
+
+   public Map<String, Double> getTrainingComparisons() {
+      return trainingComparisons;
+   }
+
+   public void setTrainingComparisons(Map<String, Double> trainingComparisons) {
+      this.trainingComparisons = trainingComparisons;
+   }
+
+   public Map<String, Integer> getTestComparisonFNR() {
+      return testComparisonFNR;
+   }
+
+   public void setTestComparisonFNR(Map<String, Integer> testComparisonFNR) {
+      this.testComparisonFNR = testComparisonFNR;
    }
 }
