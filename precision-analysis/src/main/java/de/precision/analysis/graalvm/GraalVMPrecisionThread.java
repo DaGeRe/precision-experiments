@@ -1,6 +1,5 @@
 package de.precision.analysis.graalvm;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,10 +9,8 @@ import org.apache.logging.log4j.Logger;
 import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
-import de.precision.analysis.graalvm.resultingData.ConfigurationResult;
 import de.precision.analysis.graalvm.resultingData.Counts;
 import de.precision.analysis.graalvm.resultingData.GraalConfiguration;
-import de.precision.analysis.graalvm.resultingData.RegressionDetectionModel;
 import de.precision.analysis.graalvm.resultingData.SimpleModel;
 import de.precision.analysis.heatmap.Configuration;
 import de.precision.analysis.repetitions.PrecisionComparer;
@@ -29,16 +26,15 @@ public class GraalVMPrecisionThread {
 
    private final boolean cleaned;
    private final SimpleModel model;
-   private final File folder;
    private final PrecisionConfig precisionConfig;
    private final ComparisonFinder finder;
    private final PrecisionFileManager manager;
    private final double type2error;
+   private final int samplingExecutions = 10000;
 
-   public GraalVMPrecisionThread(boolean cleaned, SimpleModel model, File folder, PrecisionConfig precisionConfig, ComparisonFinder finder, PrecisionFileManager manager, double type2error) {
+   public GraalVMPrecisionThread(boolean cleaned, SimpleModel model, PrecisionConfig precisionConfig, ComparisonFinder finder, PrecisionFileManager manager, double type2error) {
       this.cleaned = cleaned;
       this.model = model;
-      this.folder = folder;
       this.precisionConfig = precisionConfig;
       this.finder = finder;
       this.manager = manager;
@@ -46,9 +42,15 @@ public class GraalVMPrecisionThread {
    }
 
    public void getConfigurationAndTest() {
-      ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(cleaned, type2error, precisionConfig, manager);
-      Configuration configuration = configurationDeterminer.executeComparisons(finder);
+      ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(cleaned, type2error, precisionConfig, manager, samplingExecutions);
+      Configuration configuration = configurationDeterminer.determineConfiguration(finder);
 
+      GraalConfiguration graalConfig = buildConfig(configurationDeterminer, configuration);
+
+      executeTesting(finder, configuration, graalConfig, StatisticalTests.TTEST);
+   }
+
+   private GraalConfiguration buildConfig(ConfigurationDeterminer configurationDeterminer, Configuration configuration) {
       Counts trainingCounts = new Counts(configurationDeterminer.getEqual(), configurationDeterminer.getUnequal());
       model.setCountTraining(trainingCounts);
 
@@ -57,12 +59,13 @@ public class GraalVMPrecisionThread {
       graalConfig.setIterations(configuration.getIterations());
       graalConfig.setWarmup(0);
       model.getRuns_iterations().put(type2error, graalConfig);
-
+      
       LOG.info("Runs: {} Iterations: {}", configuration.getVMs(), configuration.getIterations());
-      executeTesting(finder, configuration, graalConfig);
+      
+      return graalConfig;
    }
 
-   private void executeTesting(ComparisonFinder finder, Configuration configuration, GraalConfiguration graalConfig) {
+   private void executeTesting(ComparisonFinder finder, Configuration configuration, GraalConfiguration graalConfig, StatisticalTests statisticalTest) {
       Map<String, Integer> falseNegativeDetections = new HashMap<>();
       Map<String, Integer> falsePositiveDetections = new HashMap<>();
 
@@ -79,10 +82,10 @@ public class GraalVMPrecisionThread {
             counts.setUnequal(counts.getUnequal() + 1);
          }
 
-         Map<StatisticalTestResult, Integer> oldResults = comparer.getOverallResults().getResults().get(StatisticalTests.TTEST);
+         Map<StatisticalTestResult, Integer> oldResults = comparer.getOverallResults().getResults().get(statisticalTest);
          int falseNegatives = oldResults.get(StatisticalTestResult.FALSENEGATIVE);
          int falsePositives = oldResults.get(StatisticalTestResult.SELECTED) - oldResults.get(StatisticalTestResult.TRUEPOSITIVE);
-         for (int i = 0; i < 1000; i++) {
+         for (int i = 0; i < samplingExecutions; i++) {
             CompareData data = loader.getShortenedCompareData(configuration.getIterations());
             SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
             executor.executeComparisons(loader.getExpected());
@@ -97,14 +100,14 @@ public class GraalVMPrecisionThread {
          }
 
       }
-      double falseNegativeRate = comparer.getFalseNegativeRate(StatisticalTests.TTEST);
-      double fScore = comparer.getFScore(StatisticalTests.TTEST);
+      double falseNegativeRate = comparer.getFalseNegativeRate(statisticalTest);
+      double fScore = comparer.getFScore(statisticalTest);
       LOG.info("Goal type 2 error: {}", type2error);
       LOG.info("Simulated false negative rate: {} F_1-score: {}", falseNegativeRate, fScore);
       LOG.info("Iterations: {} Runs: {}", graalConfig.getIterations(), graalConfig.getRuns());
 
       graalConfig.setType2error(falseNegativeRate);
-      graalConfig.setType2error_above1percent(comparer.getFalseNegativeRateAbove1Percent(StatisticalTests.TTEST));
+      graalConfig.setType2error_above1percent(comparer.getFalseNegativeRateAbove1Percent(statisticalTest));
       
 //      model.setCountTesting(counts);
 //      ConfigurationResult configurationResult = new ConfigurationResult(configuration.getRepetitions(), falsePositiveDetections, falseNegativeDetections);

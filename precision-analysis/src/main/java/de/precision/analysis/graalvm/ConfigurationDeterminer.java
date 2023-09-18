@@ -1,7 +1,6 @@
 package de.precision.analysis.graalvm;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,6 @@ import de.dagere.kopeme.kopemedata.VMResult;
 import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.dataloading.MultipleVMTestUtil;
 import de.dagere.peass.measurement.statistics.Relation;
-import de.dagere.peass.measurement.statistics.StatisticUtil;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
 import de.precision.analysis.heatmap.Configuration;
 import de.precision.analysis.heatmap.GetMinimalFeasibleConfiguration;
@@ -39,15 +37,19 @@ public class ConfigurationDeterminer {
    private final PrecisionConfig precisionConfig;
    private final PrecisionFileManager precisionFileManager;
    private int equal = 0, unequal = 0;
+   private final int samplingExecutions;
+   private final StatisticalTests statisticalTest = StatisticalTests.MANNWHITNEY;
 
-   public ConfigurationDeterminer(boolean cleaned, double type2error, PrecisionConfig precisionConfig, PrecisionFileManager precisionFileManager) {
+   public ConfigurationDeterminer(boolean cleaned, double type2error, PrecisionConfig precisionConfig, PrecisionFileManager precisionFileManager,
+         int samplingExecutions) {
       this.type2error = type2error;
       this.cleaned = cleaned;
       this.precisionConfig = precisionConfig;
       this.precisionFileManager = precisionFileManager;
+      this.samplingExecutions = samplingExecutions;
    }
 
-   public Configuration executeComparisons(ComparisonFinder finder) {
+   public Configuration determineConfiguration(ComparisonFinder finder) {
       Configuration configuration = null;
       DiffPairLoader loader = new DiffPairLoader(cleaned);
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
@@ -110,7 +112,7 @@ public class ConfigurationDeterminer {
    private PrecisionData executeComparisons(DiffPairLoader loader, BufferedWriter writer) throws IOException {
       PrecisionData data = new PrecisionData();
       for (int vmCount = 5; vmCount < 80; vmCount += 5) {
-         SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark", 10000);
+         SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark", samplingExecutions);
          int maxRuns = getMaximumPossibleRuns(loader.getDataOld(), loader.getDataNew());
          
          double previous = Double.MAX_VALUE;
@@ -133,7 +135,7 @@ public class ConfigurationDeterminer {
             PrecisionWriter precisionWriter = new PrecisionWriter(comparer, executionData);
             precisionWriter.writeTestcase(writer, comparer.getOverallResults().getResults());
 
-            double value = Relation.isUnequal(loader.getExpected()) ? comparer.getFScore(StatisticalTests.MANNWHITNEY) : comparer.getTrueNegativeRate(StatisticalTests.MANNWHITNEY);
+            double value = Relation.isUnequal(loader.getExpected()) ? comparer.getFScore(statisticalTest) : comparer.getTrueNegativeRate(statisticalTest);
             data.addData(1, vmCount, iterations, value);
             if (value < type2error && previous < type2error) {
                break;
