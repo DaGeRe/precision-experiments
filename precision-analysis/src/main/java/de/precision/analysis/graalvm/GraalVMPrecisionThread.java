@@ -47,7 +47,7 @@ public class GraalVMPrecisionThread {
 
       GraalConfiguration graalConfig = buildConfig(configurationDeterminer, configuration);
 
-      executeTesting(finder, configuration, graalConfig, StatisticalTests.TTEST);
+      executeTesting(configuration, graalConfig, StatisticalTests.TTEST);
    }
 
    private GraalConfiguration buildConfig(ConfigurationDeterminer configurationDeterminer, Configuration configuration) {
@@ -65,7 +65,7 @@ public class GraalVMPrecisionThread {
       return graalConfig;
    }
 
-   private void executeTesting(ComparisonFinder finder, Configuration configuration, GraalConfiguration graalConfig, StatisticalTests statisticalTest) {
+   private void executeTesting(Configuration configuration, GraalConfiguration graalConfig, StatisticalTests statisticalTest) {
       Map<String, Integer> falseNegativeDetections = new HashMap<>();
       Map<String, Integer> falsePositiveDetections = new HashMap<>();
 
@@ -108,6 +108,8 @@ public class GraalVMPrecisionThread {
 
       graalConfig.setType2error(falseNegativeRate);
       graalConfig.setType2error_above1percent(comparer.getFalseNegativeRateAbove1Percent(statisticalTest));
+      
+      model.setCountTesting(counts);
       
 //      model.setCountTesting(counts);
 //      ConfigurationResult configurationResult = new ConfigurationResult(configuration.getRepetitions(), falsePositiveDetections, falseNegativeDetections);

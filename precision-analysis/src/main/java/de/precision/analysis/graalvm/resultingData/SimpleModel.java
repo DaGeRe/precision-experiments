@@ -10,6 +10,7 @@ public class SimpleModel {
    private String last;
    
    private Counts countTraining;
+   private Counts countTesting;
    
    Map<Double, GraalConfiguration> runs_iterations = new TreeMap<>();
 
@@ -43,5 +44,13 @@ public class SimpleModel {
    
    public void setCountTraining(Counts countTraining) {
       this.countTraining = countTraining;
+   }
+   
+   public Counts getCountTesting() {
+      return countTesting;
+   }
+   
+   public void setCountTesting(Counts countTesting) {
+      this.countTesting = countTesting;
    }
 }
