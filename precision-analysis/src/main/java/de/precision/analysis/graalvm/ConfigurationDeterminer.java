@@ -69,7 +69,7 @@ public class ConfigurationDeterminer {
          }
 
       }
-      LOG.info("Final configuration: VMs: " + configuration.getVMs() + " Iterations: " + configuration.getIterations());
+      LOG.info("Final configuration: VMs: {} Iterations: {}", configuration.getVMs(), configuration.getIterations());
       return configuration;
    }
 
@@ -81,7 +81,7 @@ public class ConfigurationDeterminer {
          Map<Integer, Configuration> minimalFeasibleConfiguration = determiner.getMinimalFeasibleConfiguration(data);
          Configuration currentConfig = minimalFeasibleConfiguration.get(1);
          if (currentConfig != null) {
-            LOG.info("Found configuration, VMs: " + currentConfig.getVMs() + " Iterations: " + currentConfig.getIterations());
+            LOG.info("Found configuration, Runs: {} Iterations: {}", currentConfig.getVMs(), currentConfig.getIterations());
             return currentConfig;
          } else {
             LOG.info("Did not find a suitable configuration with type 2 error {}, setting to maximum", type2error);

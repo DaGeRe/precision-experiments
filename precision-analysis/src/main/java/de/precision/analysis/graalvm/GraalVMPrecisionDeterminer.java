@@ -83,7 +83,7 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
       PrecisionFileManager manager = new PrecisionFileManager();
 
-      ExecutorService pool = Executors.newFixedThreadPool(4);
+      ExecutorService pool = Executors.newFixedThreadPool(precisionConfigMixin.getThreads());
 
       // for (int vmCount : new int[] { 5, 10, 20, 30 }) {
       for (double type2error : new double[] { 0.01, 0.1, 0.2, 0.5, 0.75, 0.9 }) {

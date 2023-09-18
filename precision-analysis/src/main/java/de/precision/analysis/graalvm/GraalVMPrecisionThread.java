@@ -58,7 +58,7 @@ public class GraalVMPrecisionThread {
       graalConfig.setWarmup(0);
       model.getRuns_iterations().put(type2error, graalConfig);
 
-      System.out.println(configuration.getIterations() + " " + configuration.getVMs());
+      LOG.info("Runs: {} Iterations: {}", configuration.getVMs(), configuration.getIterations());
       executeTesting(finder, configuration, graalConfig);
    }
 
@@ -99,7 +99,9 @@ public class GraalVMPrecisionThread {
       }
       double falseNegativeRate = comparer.getFalseNegativeRate(StatisticalTests.TTEST);
       double fScore = comparer.getFScore(StatisticalTests.TTEST);
-      LOG.info("F_1-score: " + fScore + " False negative: " + falseNegativeRate);
+      LOG.info("Goal type 2 error: {}", type2error);
+      LOG.info("Simulated false negative rate: {} F_1-score: {}", falseNegativeRate, fScore);
+      LOG.info("Iterations: {} Runs: {}", graalConfig.getIterations(), graalConfig.getRuns());
 
       graalConfig.setType2error(falseNegativeRate);
       graalConfig.setType2error_above1percent(comparer.getFalseNegativeRateAbove1Percent(StatisticalTests.TTEST));
