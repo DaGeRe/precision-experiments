@@ -27,17 +27,17 @@ public class TestMetadiffReader {
       File folder2 = new File(tempDir, "6/43/5/113/26/23/35058/71848");
       folder1.mkdirs();
       folder2.mkdirs();
-      equalExample = new Comparison(folder1, folder2, null, null);
+      equalExample = new Comparison("71728-71848", folder1, folder2, null, null);
       File folder3 = new File(tempDir, "6/34/7/129/26/23/35058/71848");
       File folder4 = new File(tempDir, "6/43/7/130/26/23/35232/72041");
       folder3.mkdirs();
       folder4.mkdirs();
-      unequalExample = new Comparison(folder3, folder4, null, null);
+      unequalExample = new Comparison("71848-72041", folder3, folder4, null, null);
       File folder5 = new File(tempDir, "1");
       File folder6 = new File(tempDir, "2");
       folder5.mkdirs();
       folder6.mkdirs();
-      notFoundExample = new Comparison(folder5, folder6, null, null);
+      notFoundExample = new Comparison("1-2", folder5, folder6, null, null);
    }
    
    @Test
@@ -58,7 +58,7 @@ public class TestMetadiffReader {
       reader.setRelations(finder);
 
       Assert.assertEquals(Relation.EQUAL, equalExample.getRelation());
-      Assert.assertEquals(Relation.LESS_THAN, unequalExample.getRelation());
+      Assert.assertEquals(Relation.GREATER_THAN, unequalExample.getRelation());
       Assert.assertNull(notFoundExample.getRelation());
    }
 
