@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -51,7 +52,8 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    public void run() {
 
       try {
-         Date date = DateFormat.getInstance().parse(endDate);
+         SimpleDateFormat sdf=new SimpleDateFormat("dd.MM.yy HH:mm:ss");
+         Date date = sdf.parse(endDate);
          System.out.println("End date: " + date);
 
 //         ComparisonFinder finder = first == null ? new ComparisonFinder(folder, date) : new ComparisonFinder(folder, DateFormat.getInstance().parse(first), date);
