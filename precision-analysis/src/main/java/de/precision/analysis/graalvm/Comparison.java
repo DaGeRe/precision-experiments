@@ -16,13 +16,15 @@ class Comparison {
 
    private Relation relation;
    private double pValue;
+   private final int benchmark;
 
-   public Comparison(String name, File oldFolder, File newFolder, Date dateOld, Date dateNew) {
+   public Comparison(String name, File oldFolder, File newFolder, Date dateOld, Date dateNew, int benchmark) {
       this.name = name;
       this.oldFolder = oldFolder;
       this.newFolder = newFolder;
       this.dateOld = dateOld;
       this.dateNew = dateNew;
+      this.benchmark = benchmark;
       if (oldFolder == null || newFolder == null) {
          System.out.println("Old folder: " + oldFolder);
          System.out.println("New folder: " + newFolder);
@@ -86,5 +88,8 @@ class Comparison {
    public double getPValue() {
       return pValue;
    }
-
+   
+   public int getBenchmark() {
+      return benchmark;
+   }
 }

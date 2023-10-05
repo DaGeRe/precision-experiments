@@ -34,8 +34,8 @@ public class MetadiffReader {
       metadataReader = new MetadataFileReader(metadiffFolder);
    }
 
-   public Map<String, Comparison> getComparisons() {
-      Map<String, Comparison> comparisons = new LinkedHashMap<>();
+   public ComparisonCollection getComparisons() {
+      ComparisonCollection comparisons = new ComparisonCollection();
 
       for (File metadiffFile : metadiffFolder.listFiles((FilenameFilter) new WildcardFileFilter("*_metadiff.csv"))) {
          try (BufferedReader reader = new BufferedReader(new FileReader(metadiffFile))) {
@@ -45,6 +45,7 @@ public class MetadiffReader {
             int runNewIndex = GraalVMReadUtil.getColumnIndex(headline, "run_id_new");
             int pValueIndex = GraalVMReadUtil.getColumnIndex(headline, "p_value");
             int effectSizeIndex = GraalVMReadUtil.getColumnIndex(headline, "size_effect");
+            int benchmarkIndex = GraalVMReadUtil.getColumnIndex(headline, "benchmark");
 
             String line;
             while ((line = reader.readLine()) != null) {
@@ -54,6 +55,7 @@ public class MetadiffReader {
                String runNew = parts[runNewIndex];
                double pValue = Double.parseDouble(parts[pValueIndex]);
                double effectSize = Double.parseDouble(parts[effectSizeIndex]);
+               final int benchmark = Integer.parseInt(parts[benchmarkIndex]);
 
                String comparisonId = runOld + "_" + runNew;
 
@@ -64,8 +66,9 @@ public class MetadiffReader {
 
                if (folderOld != null && folderNew != null && 
                      folderOld.exists() && folderNew.exists()) {
-                  Comparison comparison = new Comparison(comparisonId, folderOld, folderNew, dateOld, dateNew);
-                  comparisons.put(comparisonId, comparison);
+                  Comparison comparison = new Comparison(comparisonId, folderOld, folderNew, dateOld, dateNew, benchmark);
+                  
+                  comparisons.addComparison(benchmark, comparisonId, comparison);
 
                   comparison.setPValue(pValue);
                   if (pValue < 0.01) {

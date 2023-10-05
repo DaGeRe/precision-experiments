@@ -40,8 +40,6 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    @Mixin
    private PrecisionConfigMixin precisionConfigMixin;
 
-   
-
    public static void main(String[] args) {
       GraalVMPrecisionDeterminer plot = new GraalVMPrecisionDeterminer();
       CommandLine cli = new CommandLine(plot);
@@ -52,28 +50,33 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    public void run() {
 
       try {
-         SimpleDateFormat sdf=new SimpleDateFormat("dd.MM.yy HH:mm:ss");
+         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
          Date date = sdf.parse(endDate);
          System.out.println("End date: " + date);
 
-//         ComparisonFinder finder = first == null ? new ComparisonFinder(folder, date) : new ComparisonFinder(folder, DateFormat.getInstance().parse(first), date);
+         // ComparisonFinder finder = first == null ? new ComparisonFinder(folder, date) : new ComparisonFinder(folder, DateFormat.getInstance().parse(first), date);
          MetadiffReader reader = new MetadiffReader(folder);
-         
-         Map<String, Comparison> comparisons = reader.getComparisons();
-         ComparisonFinder finder = new ComparisonFinder(comparisons, null, date, folder);
-         
-         createModel(true, date, finder);
-         createModel(false, date, finder);
+
+         ComparisonCollection comparisons = reader.getComparisons();
+
+         for (Map.Entry<Integer, Map<String, Comparison>> benchmarkData : comparisons.getComparisons().entrySet()) {
+            Map<String, Comparison> thisBenchmarkComparisons = benchmarkData.getValue();
+            ComparisonFinder finder = new ComparisonFinder(thisBenchmarkComparisons, null, date, folder);
+
+            createModel(true, date, finder, benchmarkData.getKey());
+            createModel(false, date, finder, benchmarkData.getKey());
+         }
 
       } catch (ParseException | IOException | InterruptedException e1) {
          e1.printStackTrace();
       }
    }
 
-   private void createModel(boolean cleaned, Date date, ComparisonFinder finder) throws ParseException, InterruptedException, IOException, StreamWriteException, DatabindException {
+   private void createModel(boolean cleaned, Date date, ComparisonFinder finder, int benchmark)
+         throws ParseException, InterruptedException, IOException, StreamWriteException, DatabindException {
       SimpleModel model = new SimpleModel();
       model.setLast(endDate);
-      
+
       System.out.println("Start date: " + finder.getStartDate().toString());
       model.setFirst(finder.getStartDate().toString());
 
@@ -107,7 +110,8 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
       manager.cleanup();
 
-      Constants.OBJECTMAPPER.writeValue(cleaned ? new File("model_cleaned.json") : new File("model.json"), model);
+      File resultFile = cleaned ? new File("model_" + benchmark + "_cleaned.json") : new File("model" + benchmark + ".json");
+      Constants.OBJECTMAPPER.writeValue(resultFile, model);
    }
 
 }
