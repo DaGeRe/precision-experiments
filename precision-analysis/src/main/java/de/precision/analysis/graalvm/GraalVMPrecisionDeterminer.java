@@ -110,7 +110,7 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
       manager.cleanup();
 
-      File resultFile = cleaned ? new File("model_" + benchmark + "_cleaned.json") : new File("model" + benchmark + ".json");
+      File resultFile = cleaned ? new File("model_" + benchmark + "_cleaned.json") : new File("model_" + benchmark + ".json");
       Constants.OBJECTMAPPER.writeValue(resultFile, model);
    }
 
