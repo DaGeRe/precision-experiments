@@ -60,11 +60,14 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          ComparisonCollection comparisons = reader.getComparisons();
 
          for (Map.Entry<Integer, Map<String, Comparison>> benchmarkData : comparisons.getComparisons().entrySet()) {
+            LOG.info("Reading benchmark {}", benchmarkData.getKey());
             Map<String, Comparison> thisBenchmarkComparisons = benchmarkData.getValue();
             ComparisonFinder finder = new ComparisonFinder(thisBenchmarkComparisons, null, date, folder);
 
-            createModel(true, date, finder, benchmarkData.getKey());
-            createModel(false, date, finder, benchmarkData.getKey());
+            if (finder.getStartDate() != null) {
+               createModel(true, date, finder, benchmarkData.getKey());
+               createModel(false, date, finder, benchmarkData.getKey());
+            }
          }
 
       } catch (ParseException | IOException | InterruptedException e1) {

@@ -12,7 +12,8 @@ public class SimpleModel {
    private Counts countTraining;
    private Counts countTesting;
    
-   private Map<String, Double> trainingComparisons = new TreeMap<>();
+   private Map<String, TrainingMetadata> trainingComparisons = new TreeMap<>();
+   private Map<String, TrainingMetadata> testComparisons = new TreeMap<>();
    private Map<Double, Map<String, Integer>> testComparisonFNR = new TreeMap<>();
    
    Map<Double, GraalConfiguration> runs_iterations = new TreeMap<>();
@@ -57,12 +58,20 @@ public class SimpleModel {
       this.countTesting = countTesting;
    }
 
-   public Map<String, Double> getTrainingComparisons() {
+   public Map<String, TrainingMetadata> getTrainingComparisons() {
       return trainingComparisons;
    }
 
-   public void setTrainingComparisons(Map<String, Double> trainingComparisons) {
+   public void setTrainingComparisons(Map<String, TrainingMetadata> trainingComparisons) {
       this.trainingComparisons = trainingComparisons;
+   }
+   
+   public Map<String, TrainingMetadata> getTestComparisons() {
+      return testComparisons;
+   }
+   
+   public void setTestComparisons(Map<String, TrainingMetadata> testComparisons) {
+      this.testComparisons = testComparisons;
    }
 
    public Map<Double, Map<String, Integer>> getTestComparisonFNR() {

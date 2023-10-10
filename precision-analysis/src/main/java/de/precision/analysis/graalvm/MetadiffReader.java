@@ -46,6 +46,8 @@ public class MetadiffReader {
             int pValueIndex = GraalVMReadUtil.getColumnIndex(headline, "p_value");
             int effectSizeIndex = GraalVMReadUtil.getColumnIndex(headline, "size_effect");
             int benchmarkIndex = GraalVMReadUtil.getColumnIndex(headline, "benchmark");
+            int countOldIndex = GraalVMReadUtil.getColumnIndex(headline, "count_old");
+            int countNewIndex = GraalVMReadUtil.getColumnIndex(headline, "count_new");
 
             String line;
             while ((line = reader.readLine()) != null) {
@@ -56,6 +58,8 @@ public class MetadiffReader {
                double pValue = Double.parseDouble(parts[pValueIndex]);
                double effectSize = Double.parseDouble(parts[effectSizeIndex]);
                final int benchmark = Integer.parseInt(parts[benchmarkIndex]);
+               final int runsOld = Integer.parseInt(parts[benchmarkIndex]);
+               final int runsNew = Integer.parseInt(parts[benchmarkIndex]);
 
                String comparisonId = runOld + "_" + runNew;
 
@@ -63,10 +67,10 @@ public class MetadiffReader {
                File folderNew = metadataReader.getFileById(runNew);
                Date dateOld = metadataReader.getFileDates().get(folderOld);
                Date dateNew = metadataReader.getFileDates().get(folderNew);
-
+               
                if (folderOld != null && folderNew != null && 
                      folderOld.exists() && folderNew.exists()) {
-                  Comparison comparison = new Comparison(comparisonId, folderOld, folderNew, dateOld, dateNew, benchmark);
+                  Comparison comparison = new Comparison(comparisonId, folderOld, folderNew, dateOld, dateNew, benchmark, runsOld, runsNew);
                   
                   comparisons.addComparison(benchmark, comparisonId, comparison);
 

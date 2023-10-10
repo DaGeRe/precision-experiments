@@ -12,6 +12,7 @@ import de.dagere.peass.measurement.statistics.bimodal.CompareData;
 import de.precision.analysis.graalvm.resultingData.Counts;
 import de.precision.analysis.graalvm.resultingData.GraalConfiguration;
 import de.precision.analysis.graalvm.resultingData.SimpleModel;
+import de.precision.analysis.graalvm.resultingData.TrainingMetadata;
 import de.precision.analysis.heatmap.Configuration;
 import de.precision.analysis.repetitions.PrecisionComparer;
 import de.precision.analysis.repetitions.PrecisionConfig;
@@ -70,7 +71,12 @@ public class GraalVMPrecisionThread {
       model.setCountTraining(trainingCounts);
       
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
-         model.getTrainingComparisons().put(comparison.getName(), comparison.getPValue());
+         TrainingMetadata metadata = new TrainingMetadata(comparison.getPValue(), comparison.getRunsOld(), comparison.getRunsNew());
+         model.getTrainingComparisons().put(comparison.getName(), metadata);
+      }
+      for (Comparison comparison : finder.getComparisonsTest().values()) {
+         TrainingMetadata metadata = new TrainingMetadata(comparison.getPValue(), comparison.getRunsOld(), comparison.getRunsNew());
+         model.getTestComparisons().put(comparison.getName(), metadata);
       }
    }
 

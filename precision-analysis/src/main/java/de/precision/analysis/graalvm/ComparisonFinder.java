@@ -1,12 +1,11 @@
 package de.precision.analysis.graalvm;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,9 +32,15 @@ public class ComparisonFinder {
       if (startDate != null) {
          this.startDate = startDate;
       } else {
-         Comparison comparison = comparisonsTraining.values().iterator().next();
-         this.startDate = comparison.getDateOld();
-         LOG.info("Setting to... " + this.startDate + " " + comparison.getName());
+         Iterator<Comparison> iterator = comparisonsTraining.values().iterator();
+         if (iterator.hasNext()) {
+            Comparison comparison = iterator.next();
+            this.startDate = comparison.getDateOld();
+            LOG.info("Setting to... " + this.startDate + " " + comparison.getName());
+         } else {
+            this.startDate = null;
+            LOG.error("No training comparison found");
+         }
       }
    }
 
