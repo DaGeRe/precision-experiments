@@ -112,11 +112,12 @@ public class ConfigurationDeterminer {
    private PrecisionData executeComparisons(DiffPairLoader loader, BufferedWriter writer) throws IOException {
       PrecisionData data = new PrecisionData();
       
-      int sizeOld = loader.getDataOld().getChunks().get(0).getResults().size();
-      int sizeNew = loader.getDataNew().getChunks().get(0).getResults().size();
+      int sizeOld = loader.getDataOld().getFirstDatacollectorContent().size();
+      int sizeNew = loader.getDataNew().getFirstDatacollectorContent().size();
       int maxVms = Math.min(sizeOld, sizeNew);
       
       int vmStepSize = Math.max(5, maxVms / 100);
+      LOG.info("VMs step size: {} to {}", vmStepSize, maxVms);
       
       for (int vmCount = 5; vmCount < maxVms; vmCount += vmStepSize) {
          SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark", samplingExecutions);
