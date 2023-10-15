@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
-import de.precision.analysis.graalvm.resultingData.Counts;
+import de.precision.analysis.graalvm.resultingData.ComparisonCounts;
 import de.precision.analysis.graalvm.resultingData.GraalConfiguration;
 import de.precision.analysis.graalvm.resultingData.SimpleModel;
 import de.precision.analysis.graalvm.resultingData.TrainingMetadata;
@@ -67,7 +67,7 @@ public class GraalVMPrecisionThread {
    }
 
    private void buildModelDebugData(ConfigurationDeterminer configurationDeterminer) {
-      Counts trainingCounts = new Counts(configurationDeterminer.getEqual(), configurationDeterminer.getUnequal());
+      ComparisonCounts trainingCounts = new ComparisonCounts(configurationDeterminer.getEqual(), configurationDeterminer.getUnequal());
       model.setCountTraining(trainingCounts);
       
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
@@ -81,13 +81,16 @@ public class GraalVMPrecisionThread {
    }
 
    private void executeTesting(Configuration configuration, GraalConfiguration graalConfig, StatisticalTests statisticalTest) {
-      Map<String, Integer> falseNegativeDetections = new HashMap<>();
-      Map<String, Integer> falsePositiveDetections = new HashMap<>();
+      ComparisonCounts counts = getComparisonCounts();
+      model.setCountTesting(counts);
+      
+      if (counts.getUnequal() > 0) {
+         test(configuration, graalConfig, statisticalTest);
+      }
+   }
 
-      Counts counts = new Counts();
-
-      StatisticsConfig statisticsConfig = new StatisticsConfig();
-      PrecisionComparer comparer = new PrecisionComparer(statisticsConfig, precisionConfig);
+   private ComparisonCounts getComparisonCounts() {
+      ComparisonCounts counts = new ComparisonCounts();
       for (Comparison comparison : finder.getComparisonsTest().values()) {
          DiffPairLoader loader = new DiffPairLoader(cleaned);
          loader.loadDiffPair(comparison);
@@ -96,25 +99,17 @@ public class GraalVMPrecisionThread {
          } else {
             counts.setUnequal(counts.getUnequal() + 1);
          }
+      }
+      return counts;
+   }
 
-         Map<StatisticalTestResult, Integer> oldResults = comparer.getOverallResults().getResults().get(statisticalTest);
-         int falseNegatives = oldResults.get(StatisticalTestResult.FALSENEGATIVE);
-         int falsePositives = oldResults.get(StatisticalTestResult.SELECTED) - oldResults.get(StatisticalTestResult.TRUEPOSITIVE);
-         for (int i = 0; i < samplingExecutions; i++) {
-            CompareData data = loader.getShortenedCompareData(configuration.getIterations());
-            SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
-            executor.executeComparisons(loader.getExpected());
-         }
-         if (loader.getExpected() == Relation.EQUAL) {
-            int falsePositiveNew = oldResults.get(StatisticalTestResult.SELECTED) - oldResults.get(StatisticalTestResult.TRUEPOSITIVE);
-            int falsePositivesThisRun = falsePositiveNew - falsePositives;
-            falsePositiveDetections.put(comparison.getName(), falsePositivesThisRun);
-         } else {
-            int falseNegativesThisRun = oldResults.get(StatisticalTestResult.FALSENEGATIVE) - falseNegatives;
-            falseNegativeDetections.put(comparison.getName(), falseNegativesThisRun);
-            LOG.debug("False negative: {} Count: {}", comparison.getName(), falseNegativesThisRun);
-         }
-
+   private void test(Configuration configuration, GraalConfiguration graalConfig, StatisticalTests statisticalTest) {
+      Map<String, Integer> falseNegativeDetections = new HashMap<>();
+      Map<String, Integer> falsePositiveDetections = new HashMap<>();
+      StatisticsConfig statisticsConfig = new StatisticsConfig();
+      PrecisionComparer comparer = new PrecisionComparer(statisticsConfig, precisionConfig);
+      for (Comparison comparison : finder.getComparisonsTest().values()) {
+         testOneComparison(configuration, statisticalTest, falseNegativeDetections, falsePositiveDetections, comparer, comparison);
       }
       double falseNegativeRate = comparer.getFalseNegativeRate(statisticalTest);
       double fScore = comparer.getFScore(statisticalTest);
@@ -125,12 +120,31 @@ public class GraalVMPrecisionThread {
       graalConfig.setType2error(falseNegativeRate);
       graalConfig.setType2error_above1percent(comparer.getFalseNegativeRateAbove1Percent(statisticalTest));
       
-      model.setCountTesting(counts);
       model.addComparison(type2error, falseNegativeDetections);
-      
-//      model.setCountTesting(counts);
-//      ConfigurationResult configurationResult = new ConfigurationResult(configuration.getRepetitions(), falsePositiveDetections, falseNegativeDetections);
-//      model.addDetection(vmCount, vmCount, type2error, fScore, configurationResult);
+   }
+
+   private void testOneComparison(Configuration configuration, StatisticalTests statisticalTest, Map<String, Integer> falseNegativeDetections,
+         Map<String, Integer> falsePositiveDetections, PrecisionComparer comparer, Comparison comparison) {
+      DiffPairLoader loader = new DiffPairLoader(cleaned);
+      loader.loadDiffPair(comparison);
+
+      Map<StatisticalTestResult, Integer> oldResults = comparer.getOverallResults().getResults().get(statisticalTest);
+      int falseNegatives = oldResults.get(StatisticalTestResult.FALSENEGATIVE);
+      int falsePositives = oldResults.get(StatisticalTestResult.SELECTED) - oldResults.get(StatisticalTestResult.TRUEPOSITIVE);
+      for (int i = 0; i < samplingExecutions; i++) {
+         CompareData data = loader.getShortenedCompareData(configuration.getIterations());
+         SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
+         executor.executeComparisons(loader.getExpected());
+      }
+      if (loader.getExpected() == Relation.EQUAL) {
+         int falsePositiveNew = oldResults.get(StatisticalTestResult.SELECTED) - oldResults.get(StatisticalTestResult.TRUEPOSITIVE);
+         int falsePositivesThisRun = falsePositiveNew - falsePositives;
+         falsePositiveDetections.put(comparison.getName(), falsePositivesThisRun);
+      } else {
+         int falseNegativesThisRun = oldResults.get(StatisticalTestResult.FALSENEGATIVE) - falseNegatives;
+         falseNegativeDetections.put(comparison.getName(), falseNegativesThisRun);
+         LOG.debug("False negative: {} Count: {}", comparison.getName(), falseNegativesThisRun);
+      }
    }
 
 }

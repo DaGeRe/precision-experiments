@@ -1,13 +1,13 @@
 package de.precision.analysis.graalvm.resultingData;
 
-public class Counts {
+public class ComparisonCounts {
    private int equal;
    private int unequal;
 
-   public Counts() {
+   public ComparisonCounts() {
    }
 
-   public Counts(int equal, int unequal) {
+   public ComparisonCounts(int equal, int unequal) {
       this.equal = equal;
       this.unequal = unequal;
    }

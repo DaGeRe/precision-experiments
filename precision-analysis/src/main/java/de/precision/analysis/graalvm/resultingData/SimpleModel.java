@@ -7,8 +7,8 @@ public class SimpleModel {
    private String first;
    private String last;
    
-   private Counts countTraining;
-   private Counts countTesting;
+   private ComparisonCounts countTraining;
+   private ComparisonCounts countTesting;
    
    private Map<String, TrainingMetadata> trainingComparisons = new TreeMap<>();
    private Map<String, TrainingMetadata> testComparisons = new TreeMap<>();
@@ -40,19 +40,19 @@ public class SimpleModel {
       this.runs_iterations = runs_iterations;
    }
    
-   public Counts getCountTraining() {
+   public ComparisonCounts getCountTraining() {
       return countTraining;
    }
    
-   public void setCountTraining(Counts countTraining) {
+   public void setCountTraining(ComparisonCounts countTraining) {
       this.countTraining = countTraining;
    }
    
-   public Counts getCountTesting() {
+   public ComparisonCounts getCountTesting() {
       return countTesting;
    }
    
-   public void setCountTesting(Counts countTesting) {
+   public void setCountTesting(ComparisonCounts countTesting) {
       this.countTesting = countTesting;
    }
 
