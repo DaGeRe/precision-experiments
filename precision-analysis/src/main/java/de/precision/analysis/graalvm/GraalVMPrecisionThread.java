@@ -43,15 +43,20 @@ public class GraalVMPrecisionThread {
    }
 
    public void getConfigurationAndTest() {
-      ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(cleaned, type2error, precisionConfig, manager, samplingExecutions);
+      ComparisonCounts counts = getTestComparisonCounts();
+      model.setCountTesting(counts);
       
-      Configuration configuration = configurationDeterminer.determineConfiguration(finder);
-      
-      buildModelDebugData(configurationDeterminer);
-      
-      GraalConfiguration graalConfig = buildConfig(configurationDeterminer, configuration);
-
-      executeTesting(configuration, graalConfig, StatisticalTests.TTEST);
+      if (counts.getUnequal() > 0) {
+         ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(cleaned, type2error, precisionConfig, manager, samplingExecutions);
+         
+         Configuration configuration = configurationDeterminer.determineConfiguration(finder);
+         
+         buildModelDebugData(configurationDeterminer);
+         
+         GraalConfiguration graalConfig = buildConfig(configurationDeterminer, configuration);
+         
+         test(configuration, graalConfig, StatisticalTests.TTEST);
+      }
    }
 
    private GraalConfiguration buildConfig(ConfigurationDeterminer configurationDeterminer, Configuration configuration) {
@@ -80,16 +85,7 @@ public class GraalVMPrecisionThread {
       }
    }
 
-   private void executeTesting(Configuration configuration, GraalConfiguration graalConfig, StatisticalTests statisticalTest) {
-      ComparisonCounts counts = getComparisonCounts();
-      model.setCountTesting(counts);
-      
-      if (counts.getUnequal() > 0) {
-         test(configuration, graalConfig, statisticalTest);
-      }
-   }
-
-   private ComparisonCounts getComparisonCounts() {
+   private ComparisonCounts getTestComparisonCounts() {
       ComparisonCounts counts = new ComparisonCounts();
       for (Comparison comparison : finder.getComparisonsTest().values()) {
          DiffPairLoader loader = new DiffPairLoader(cleaned);
