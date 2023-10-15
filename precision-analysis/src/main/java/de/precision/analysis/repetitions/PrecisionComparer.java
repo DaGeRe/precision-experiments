@@ -164,9 +164,9 @@ public class PrecisionComparer {
 
    public double getFalseNegativeRateAbove1Percent(StatisticalTests statisticMethod) {
       final Map<StatisticalTestResult, Integer> methodResults = overallResults.getResults().get(statisticMethod);
-      final int truenegative = methodResults.get(StatisticalTestResult.TRUENEGATIVE);
+      final int truePositive = methodResults.get(StatisticalTestResult.TRUEPOSITIVE);
       final int falsenegative = methodResults.get(StatisticalTestResult.FALSENEGATIVE_ABOVE_1_PERCENT);
-      final double falseNegativeRate = 100d * (((double) falsenegative) / (truenegative + falsenegative));
+      final double falseNegativeRate = 100d * (((double) falsenegative) / (truePositive + falsenegative));
       return falseNegativeRate;
    }
 }

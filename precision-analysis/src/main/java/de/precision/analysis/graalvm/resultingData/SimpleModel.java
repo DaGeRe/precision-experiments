@@ -3,8 +3,6 @@ package de.precision.analysis.graalvm.resultingData;
 import java.util.Map;
 import java.util.TreeMap;
 
-import de.precision.analysis.heatmap.Configuration;
-
 public class SimpleModel {
    private String first;
    private String last;
