@@ -43,11 +43,10 @@ public class GraalVMPrecisionThread {
    }
 
    public void getConfigurationAndTest() {
-      ComparisonCounts counts = getTestComparisonCounts();
-      model.setCountTesting(counts);
+      ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(cleaned, type2error, precisionConfig, manager, samplingExecutions);
+      determineCounts(configurationDeterminer);
       
-      if (counts.getUnequal() > 0) {
-         ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(cleaned, type2error, precisionConfig, manager, samplingExecutions);
+      if (model.getCountTesting().getUnequal() > 0) {
          
          Configuration configuration = configurationDeterminer.determineConfiguration(finder);
          
@@ -57,6 +56,14 @@ public class GraalVMPrecisionThread {
          
          test(configuration, graalConfig, StatisticalTests.TTEST);
       }
+   }
+
+   private void determineCounts(ConfigurationDeterminer configurationDeterminer) {
+      ComparisonCounts trainingCounts = configurationDeterminer.determineComparisonCounts(finder);
+      model.setCountTraining(trainingCounts);
+      
+      ComparisonCounts testCounts = getTestComparisonCounts();
+      model.setCountTesting(testCounts);
    }
 
    private GraalConfiguration buildConfig(ConfigurationDeterminer configurationDeterminer, Configuration configuration) {
@@ -72,8 +79,6 @@ public class GraalVMPrecisionThread {
    }
 
    private void buildModelDebugData(ConfigurationDeterminer configurationDeterminer) {
-      ComparisonCounts trainingCounts = new ComparisonCounts(configurationDeterminer.getEqual(), configurationDeterminer.getUnequal());
-      model.setCountTraining(trainingCounts);
       
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
          TrainingMetadata metadata = new TrainingMetadata(comparison.getPValue(), comparison.getRunsOld(), comparison.getRunsNew());

@@ -16,6 +16,7 @@ import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.dataloading.MultipleVMTestUtil;
 import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
+import de.precision.analysis.graalvm.resultingData.ComparisonCounts;
 import de.precision.analysis.heatmap.Configuration;
 import de.precision.analysis.heatmap.GetMinimalFeasibleConfiguration;
 import de.precision.analysis.heatmap.MinimalFeasibleConfigurationDeterminer;
@@ -47,6 +48,26 @@ public class ConfigurationDeterminer {
       this.precisionConfig = precisionConfig;
       this.precisionFileManager = precisionFileManager;
       this.samplingExecutions = samplingExecutions;
+   }
+   
+   public ComparisonCounts determineComparisonCounts(ComparisonFinder finder) {
+      DiffPairLoader loader = new DiffPairLoader(cleaned);
+      
+      int equal = 0, unequal = 0;
+      for (Comparison comparison : finder.getComparisonsTraining().values()) {
+         LOG.debug("Folder existing");
+         loader.loadDiffPair(comparison);
+
+         LOG.info("Expected relation: {}", loader.getExpected());
+         if (loader.getExpected() == Relation.EQUAL) {
+            equal++;
+         } else {
+            unequal++;
+         }
+      }
+      
+      ComparisonCounts trainingCounts = new ComparisonCounts(equal, unequal);
+      return trainingCounts;
    }
 
    public Configuration determineConfiguration(ComparisonFinder finder) {
@@ -167,13 +188,4 @@ public class ConfigurationDeterminer {
       }
       return maxRuns;
    }
-
-   public int getEqual() {
-      return equal;
-   }
-
-   public int getUnequal() {
-      return unequal;
-   }
-
 }
