@@ -59,7 +59,7 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
          ComparisonCollection comparisons = reader.getComparisons();
 
-         for (Map.Entry<Integer, Map<String, Comparison>> benchmarkData : comparisons.getComparisons().entrySet()) {
+         for (Map.Entry<String, Map<String, Comparison>> benchmarkData : comparisons.getComparisons().entrySet()) {
             LOG.info("Reading benchmark {}", benchmarkData.getKey());
             Map<String, Comparison> thisBenchmarkComparisons = benchmarkData.getValue();
             ComparisonFinder finder = new ComparisonFinder(thisBenchmarkComparisons, null, date, folder);
@@ -75,7 +75,7 @@ public class GraalVMPrecisionDeterminer implements Runnable {
       }
    }
 
-   private void createModel(boolean cleaned, Date date, ComparisonFinder finder, int benchmark)
+   private void createModel(boolean cleaned, Date date, ComparisonFinder finder, String benchmarkKey)
          throws ParseException, InterruptedException, IOException, StreamWriteException, DatabindException {
       SimpleModel model = new SimpleModel();
       model.setLast(endDate);
@@ -113,7 +113,7 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
       manager.cleanup();
 
-      File resultFile = cleaned ? new File("model_" + benchmark + "_cleaned.json") : new File("model_" + benchmark + ".json");
+      File resultFile = cleaned ? new File("model_" + benchmarkKey + "_cleaned.json") : new File("model_" + benchmarkKey + ".json");
       Constants.OBJECTMAPPER.writeValue(resultFile, model);
    }
 

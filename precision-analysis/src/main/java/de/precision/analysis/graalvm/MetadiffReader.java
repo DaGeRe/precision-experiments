@@ -46,6 +46,9 @@ public class MetadiffReader {
             int pValueIndex = GraalVMReadUtil.getColumnIndex(headline, "p_value");
             int effectSizeIndex = GraalVMReadUtil.getColumnIndex(headline, "size_effect");
             int benchmarkIndex = GraalVMReadUtil.getColumnIndex(headline, "benchmark");
+            int machineTypeIndex = GraalVMReadUtil.getColumnIndex(headline, "machine_type");
+            int configurationIndex = GraalVMReadUtil.getColumnIndex(headline, "configuration");
+            
             int countOldIndex = GraalVMReadUtil.getColumnIndex(headline, "count_old");
             int countNewIndex = GraalVMReadUtil.getColumnIndex(headline, "count_new");
 
@@ -60,6 +63,7 @@ public class MetadiffReader {
                final int benchmark = Integer.parseInt(parts[benchmarkIndex]);
                final int runsOld = Integer.parseInt(parts[benchmarkIndex]);
                final int runsNew = Integer.parseInt(parts[benchmarkIndex]);
+               String benchmarkKey = parts[machineTypeIndex] + "-" + parts[configurationIndex] + "-" + parts[benchmarkIndex];
 
                String comparisonId = runOld + "_" + runNew;
 
@@ -72,7 +76,7 @@ public class MetadiffReader {
                      folderOld.exists() && folderNew.exists()) {
                   Comparison comparison = new Comparison(comparisonId, folderOld, folderNew, dateOld, dateNew, benchmark, runsOld, runsNew);
                   
-                  comparisons.addComparison(benchmark, comparisonId, comparison);
+                  comparisons.addComparison(benchmarkKey, comparisonId, comparison);
 
                   comparison.setPValue(pValue);
                   if (pValue < 0.01) {
