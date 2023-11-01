@@ -100,7 +100,7 @@ public class ConfigurationDeterminer {
       try {
          BufferedWriter writer = precisionFileManager.getFile(comparison.getVersionIdNew(), loader.getExpected());
          PrecisionData data = executeComparisons(loader, writer);
-         MinimalFeasibleConfigurationDeterminer determiner = new MinimalFeasibleConfigurationDeterminer(100 - type2error);
+         MinimalFeasibleConfigurationDeterminer determiner = new MinimalFeasibleConfigurationDeterminer(100 - (100 * type2error));
          Map<Integer, Configuration> minimalFeasibleConfiguration = determiner.getMinimalFeasibleConfiguration(data);
          Configuration currentConfig = minimalFeasibleConfiguration.get(1);
          if (currentConfig != null) {
