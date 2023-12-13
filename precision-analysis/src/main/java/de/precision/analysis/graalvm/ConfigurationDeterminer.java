@@ -70,13 +70,15 @@ public class ConfigurationDeterminer {
       return trainingCounts;
    }
 
-   public Configuration determineConfiguration(ComparisonFinder finder) {
+   public Configuration determineConfiguration(ComparisonFinder finder, PlottableHistogramWriter histogramWriter) {
       Configuration configuration = null;
       DiffPairLoader loader = new DiffPairLoader(cleaned);
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
          LOG.debug("Folder existing");
          loader.loadDiffPair(comparison);
 
+         histogramWriter.plotTraining(comparison.getName(), loader.getDataOld(), loader.getDataNew());
+         
          LOG.info("Expected relation: {}", loader.getExpected());
          if (loader.getExpected() == Relation.EQUAL) {
             equal++;

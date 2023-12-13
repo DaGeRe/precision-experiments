@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -93,9 +95,11 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
       ExecutorService pool = Executors.newFixedThreadPool(precisionConfigMixin.getThreads());
 
+      final PlottableHistogramWriter histogramWriter = new PlottableHistogramWriter(new File("plottableGraphs/" + benchmarkKey));
+
       // for (int vmCount : new int[] { 5, 10, 20, 30 }) {
       for (double type2error : new double[] { 0.01, 0.1, 0.2, 0.5, 0.75, 0.9 }) {
-         final GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(cleaned, model, precisionConfigMixin.getConfig(), finder, manager, type2error);
+         final GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(cleaned, model, precisionConfigMixin.getConfig(), finder, manager, type2error, histogramWriter);
          pool.submit(() -> {
             try {
                precisionThread.getConfigurationAndTest();

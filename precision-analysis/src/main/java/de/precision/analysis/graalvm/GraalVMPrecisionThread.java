@@ -32,14 +32,16 @@ public class GraalVMPrecisionThread {
    private final PrecisionFileManager manager;
    private final double type2error;
    private final int samplingExecutions = 10000;
+   private final PlottableHistogramWriter histogramWriter;
 
-   public GraalVMPrecisionThread(boolean cleaned, SimpleModel model, PrecisionConfig precisionConfig, ComparisonFinder finder, PrecisionFileManager manager, double type2error) {
+   public GraalVMPrecisionThread(boolean cleaned, SimpleModel model, PrecisionConfig precisionConfig, ComparisonFinder finder, PrecisionFileManager manager, double type2error, PlottableHistogramWriter histogramWriter) {
       this.cleaned = cleaned;
       this.model = model;
       this.precisionConfig = precisionConfig;
       this.finder = finder;
       this.manager = manager;
       this.type2error = type2error;
+      this.histogramWriter = histogramWriter;
    }
 
    public void getConfigurationAndTest() {
@@ -48,7 +50,7 @@ public class GraalVMPrecisionThread {
       
       if (model.getCountTesting().getUnequal() > 0) {
          
-         Configuration configuration = configurationDeterminer.determineConfiguration(finder);
+         Configuration configuration = configurationDeterminer.determineConfiguration(finder, histogramWriter);
          
          buildModelDebugData(configurationDeterminer);
          
@@ -108,9 +110,12 @@ public class GraalVMPrecisionThread {
       Map<String, Integer> falseNegativeDetections = new HashMap<>();
       Map<String, Integer> falsePositiveDetections = new HashMap<>();
       StatisticsConfig statisticsConfig = new StatisticsConfig();
+//      PrecisionConfig config2 = new PrecisionConfig(cleaned, true, 4, new StatisticalTests[] { StatisticalTests.TTEST}, 0, 0, 0, 0);
       PrecisionComparer comparer = new PrecisionComparer(statisticsConfig, precisionConfig);
-      for (Comparison comparison : finder.getComparisonsTest().values()) {
+      
+      for (Comparison comparison : finder.getComparisonsTraining().values()) {
          testOneComparison(configuration, statisticalTest, falseNegativeDetections, falsePositiveDetections, comparer, comparison);
+         LOG.info("Done: {}, FNR: {}", comparison.getPValue(), comparer.getFalseNegativeRate(statisticalTest));
       }
       double falseNegativeRate = comparer.getFalseNegativeRate(statisticalTest);
       double fScore = comparer.getFScore(statisticalTest);
@@ -128,6 +133,8 @@ public class GraalVMPrecisionThread {
          Map<String, Integer> falsePositiveDetections, PrecisionComparer comparer, Comparison comparison) {
       DiffPairLoader loader = new DiffPairLoader(cleaned);
       loader.loadDiffPair(comparison);
+      
+      histogramWriter.plotTesting(comparison.getName(), loader.getDataOld(), loader.getDataNew());
 
       Map<StatisticalTestResult, Integer> oldResults = comparer.getOverallResults().getResults().get(statisticalTest);
       int falseNegatives = oldResults.get(StatisticalTestResult.FALSENEGATIVE);
