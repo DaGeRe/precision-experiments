@@ -9,48 +9,56 @@ import org.apache.logging.log4j.Logger;
 import de.dagere.peass.measurement.statistics.Relation;
 
 public class MetadiffFileReader {
-   
+
    private static final Logger LOG = LogManager.getLogger(MetadiffFileReader.class);
-   
+
    final int runOldIndex;
    final int runNewIndex;
-   
+
    private final int machineType, configuration, benchmark, versionOld, versionNew;
-   
-//   id = machine-type-configuration-benchmark-version_old
-   
-   final int pValueIndex ;
+
+   // id = machine-type-configuration-benchmark-version_old
+
+   final int pValueIndex;
    final int effectSizeIndex;
    final int benchmarkIndex;
    final int machineTypeIndex;
    final int configurationIndex;
-   
+
    private final MetadataFileReader metadataReader;
-   
+
    public MetadiffFileReader(String headline, MetadataFileReader metadataReader) {
       runOldIndex = GraalVMReadUtil.getColumnIndex(headline, "run_id_old");
       runNewIndex = GraalVMReadUtil.getColumnIndex(headline, "run_id_new");
-      
+
       machineType = GraalVMReadUtil.getColumnIndex(headline, "machineType");
       configuration = GraalVMReadUtil.getColumnIndex(headline, "configuration");
       benchmark = GraalVMReadUtil.getColumnIndex(headline, "benchmark");
       versionOld = GraalVMReadUtil.getColumnIndex(headline, "version_old");
       versionNew = GraalVMReadUtil.getColumnIndex(headline, "version_new");
-      
-//      id = machine-type-configuration-benchmark-version_old
-      
+
+      // id = machine-type-configuration-benchmark-version_old
+
       pValueIndex = GraalVMReadUtil.getColumnIndex(headline, "p_value");
       effectSizeIndex = GraalVMReadUtil.getColumnIndex(headline, "size_effect");
       benchmarkIndex = GraalVMReadUtil.getColumnIndex(headline, "benchmark");
       machineTypeIndex = GraalVMReadUtil.getColumnIndex(headline, "machine_type");
       configurationIndex = GraalVMReadUtil.getColumnIndex(headline, "configuration");
-      
+
       this.metadataReader = metadataReader;
    }
-   
+
    public void handleLine(ComparisonCollection comparisons, String[] parts) {
-      String runOld = parts[runOldIndex];
-      String runNew = parts[runNewIndex];
+      String runOld, runNew;
+
+      if (runOldIndex != -1 && runNewIndex != -1) {
+         runOld = parts[runOldIndex];
+         runNew = parts[runNewIndex];
+      } else {
+         runOld = parts[machineType] + "-" + parts[configuration] + "-" + parts[benchmark] + "-" + parts[versionOld];
+         runNew = parts[machineType] + "-" + parts[configuration] + "-" + parts[benchmark] + "-" + parts[versionNew];
+      }
+
       double pValue = Double.parseDouble(parts[pValueIndex]);
       double effectSize = Double.parseDouble(parts[effectSizeIndex]);
       final int benchmark = Integer.parseInt(parts[benchmarkIndex]);
@@ -64,11 +72,11 @@ public class MetadiffFileReader {
       File folderNew = metadataReader.getFileById(runNew);
       Date dateOld = metadataReader.getFileDates().get(folderOld);
       Date dateNew = metadataReader.getFileDates().get(folderNew);
-      
-      if (folderOld != null && folderNew != null && 
+
+      if (folderOld != null && folderNew != null &&
             folderOld.exists() && folderNew.exists()) {
          Comparison comparison = new Comparison(comparisonId, folderOld, folderNew, dateOld, dateNew, benchmark, runsOld, runsNew);
-         
+
          comparisons.addComparison(benchmarkKey, comparisonId, comparison);
 
          comparison.setPValue(pValue);
