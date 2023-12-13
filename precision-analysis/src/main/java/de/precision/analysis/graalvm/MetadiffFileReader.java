@@ -15,7 +15,7 @@ public class MetadiffFileReader {
    final int runOldIndex;
    final int runNewIndex;
 
-   private final int machineType, configuration, benchmark, versionOld, versionNew;
+   private final int versionOld, versionNew;
 
    // id = machine-type-configuration-benchmark-version_old
 
@@ -31,9 +31,6 @@ public class MetadiffFileReader {
       runOldIndex = GraalVMReadUtil.getColumnIndex(headline, "run_id_old");
       runNewIndex = GraalVMReadUtil.getColumnIndex(headline, "run_id_new");
 
-      machineType = GraalVMReadUtil.getColumnIndex(headline, "machine_type");
-      configuration = GraalVMReadUtil.getColumnIndex(headline, "configuration");
-      benchmark = GraalVMReadUtil.getColumnIndex(headline, "benchmark");
       versionOld = GraalVMReadUtil.getColumnIndex(headline, "old_version");
       versionNew = GraalVMReadUtil.getColumnIndex(headline, "new_version");
 
@@ -55,9 +52,9 @@ public class MetadiffFileReader {
          runOld = parts[runOldIndex];
          runNew = parts[runNewIndex];
       } else {
-         String machineTypeLine = parts[machineType];
-         String configurationLine = parts[configuration];
-         String benchmarkLine = parts[benchmark];
+         String machineTypeLine = parts[machineTypeIndex];
+         String configurationLine = parts[configurationIndex];
+         String benchmarkLine = parts[benchmarkIndex];
          runOld = machineTypeLine + "-" + configurationLine + "-" + benchmarkLine + "-" + parts[versionOld];
          runNew = machineTypeLine + "-" + configurationLine + "-" + benchmarkLine + "-" + parts[versionNew];
       }
