@@ -55,8 +55,11 @@ public class MetadiffFileReader {
          runOld = parts[runOldIndex];
          runNew = parts[runNewIndex];
       } else {
-         runOld = parts[machineType] + "-" + parts[configuration] + "-" + parts[benchmark] + "-" + parts[versionOld];
-         runNew = parts[machineType] + "-" + parts[configuration] + "-" + parts[benchmark] + "-" + parts[versionNew];
+         String machineTypeLine = parts[machineType];
+         String configurationLine = parts[configuration];
+         String benchmarkLine = parts[benchmark];
+         runOld = machineTypeLine + "-" + configurationLine + "-" + benchmarkLine + "-" + parts[versionOld];
+         runNew = machineTypeLine + "-" + configurationLine + "-" + benchmarkLine + "-" + parts[versionNew];
       }
 
       double pValue = Double.parseDouble(parts[pValueIndex]);
