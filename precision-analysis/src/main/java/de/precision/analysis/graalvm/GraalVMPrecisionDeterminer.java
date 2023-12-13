@@ -33,10 +33,13 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    @Option(names = { "-folder", "--folder" }, description = "Folder, that contains *all* data folders for the analysis", required = true)
    private File folder;
 
-   @Option(names = { "-first", "--first" }, description = "Start date for the training")
-   private String first;
+   @Option(names = { "-startDate", "--startDate" }, description = "Start date for the training")
+   private String startDate;
+   
+   @Option(names = { "-trainingDate", "--trainingDate" }, description = "End date of the training (so training is between startDate and trainingDate)", required = true)
+   private String trainingDate;
 
-   @Option(names = { "-endDate", "--endDate" }, description = "End date for the training (subsequent data will be used for testing)", required = true)
+   @Option(names = { "-endDate", "--endDate" }, description = "End date for the training (subsequent data will be used for testing)")
    private String endDate;
 
    @Mixin
@@ -53,7 +56,15 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
       try {
          SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
-         Date date = sdf.parse(endDate);
+         
+         
+         Date startDateD = startDate != null ? sdf.parse(startDate) : new Date(2000, 01, 01);
+         System.out.println("Start date: " + startDateD);
+         
+         Date trainingDateD = sdf.parse(trainingDate);
+         System.out.println("Training date: " + trainingDateD);
+         
+         Date date = endDate != null ? sdf.parse(endDate) : new Date(3000, 01, 01);
          System.out.println("End date: " + date);
 
          // ComparisonFinder finder = first == null ? new ComparisonFinder(folder, date) : new ComparisonFinder(folder, DateFormat.getInstance().parse(first), date);
@@ -64,9 +75,9 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          for (Map.Entry<String, Map<String, Comparison>> benchmarkData : comparisons.getComparisons().entrySet()) {
             LOG.info("Reading benchmark {}", benchmarkData.getKey());
             Map<String, Comparison> thisBenchmarkComparisons = benchmarkData.getValue();
-            ComparisonFinder finder = new ComparisonFinder(thisBenchmarkComparisons, null, date, folder);
+            ComparisonFinder finder = new ComparisonFinder(thisBenchmarkComparisons, startDateD, trainingDateD, date, folder);
 
-            if (finder.getStartDate() != null) {
+            if (finder.isComparisonFound()) {
                createModel(true, date, finder, benchmarkData.getKey());
                createModel(false, date, finder, benchmarkData.getKey());
             }

@@ -18,30 +18,47 @@ public class ComparisonFinder {
    private final Map<String, Comparison> comparisonsTraining = new TreeMap<>();
    private final Map<String, Comparison> comparisonsTest = new TreeMap<>();
 
-   public ComparisonFinder(Map<String, Comparison> comparisons, Date startDate, Date endDate, File folder) {
+   private boolean comparisonFound;
+
+   public ComparisonFinder(Map<String, Comparison> comparisons, Date startDate, Date trainingDate, Date endDate, File folder) {
 
       for (Map.Entry<String, Comparison> comparison : comparisons.entrySet()) {
          LOG.debug("Reading: " + comparison.getKey());
          Date date = comparison.getValue().getDateNew();
-         if (date.before(endDate)) {
-            comparisonsTraining.put(comparison.getKey(), comparison.getValue());
-         } else {
-            comparisonsTest.put(comparison.getKey(), comparison.getValue());
+         
+         if (date.after(startDate) && date.before(endDate)) {
+            if (date.before(trainingDate)){
+               comparisonsTraining.put(comparison.getKey(), comparison.getValue());
+            } else {
+               comparisonsTest.put(comparison.getKey(), comparison.getValue());
+            }
          }
       }
-      if (startDate != null) {
-         this.startDate = startDate;
+      
+      this.startDate = startDate;
+      
+      if (!comparisonsTraining.isEmpty()) {
+         LOG.info("Found training comparison, and therefore executing the comparisons");
+         comparisonFound = true;
       } else {
-         Iterator<Comparison> iterator = comparisonsTraining.values().iterator();
-         if (iterator.hasNext()) {
-            Comparison comparison = iterator.next();
-            this.startDate = comparison.getDateOld();
-            LOG.info("Setting to... " + this.startDate + " " + comparison.getName());
-         } else {
-            this.startDate = null;
-            LOG.error("No training comparison found");
-         }
+         comparisonFound = false;
       }
+//      Iterator<Comparison> iterator = comparisonsTraining.values().iterator();
+//      if (iterator.hasNext()) {
+//         Comparison comparison = iterator.next();
+//         this.startDate = comparison.getDateOld();
+//         if (comparison.getDateOld().before(startDate)) {
+//            this.startDate = startDate;
+//         } else {
+//            
+//         }
+//         LOG.info("Setting to... " + this.startDate + " " + comparison.getName());
+//         comparisonFound = true;
+//      } else {
+//         comparisonFound = false;
+//         LOG.error("No training comparison found");
+//         this.startDate = startDate;
+//      }
    }
 
    public Map<String, Comparison> getComparisonsTraining() {
@@ -50,6 +67,10 @@ public class ComparisonFinder {
 
    public Map<String, Comparison> getComparisonsTest() {
       return comparisonsTest;
+   }
+
+   public boolean isComparisonFound() {
+      return comparisonFound;
    }
 
    public Date getStartDate() {
