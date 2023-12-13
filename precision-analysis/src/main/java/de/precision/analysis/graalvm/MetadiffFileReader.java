@@ -34,8 +34,8 @@ public class MetadiffFileReader {
       machineType = GraalVMReadUtil.getColumnIndex(headline, "machine_type");
       configuration = GraalVMReadUtil.getColumnIndex(headline, "configuration");
       benchmark = GraalVMReadUtil.getColumnIndex(headline, "benchmark");
-      versionOld = GraalVMReadUtil.getColumnIndex(headline, "version_old");
-      versionNew = GraalVMReadUtil.getColumnIndex(headline, "version_new");
+      versionOld = GraalVMReadUtil.getColumnIndex(headline, "old_version");
+      versionNew = GraalVMReadUtil.getColumnIndex(headline, "new_version");
 
       // id = machine-type-configuration-benchmark-version_old
 
