@@ -62,16 +62,16 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          
          
          Date trainingStartDateD = trainingStartDate != null ? sdf.parse(trainingStartDate) : new Date(2000, 01, 01);
-         System.out.println("Start date: " + trainingStartDateD);
+         System.out.println("Training start date: " + trainingStartDateD);
          
          Date trainingEndDateD = sdf.parse(trainingEndDate);
-         System.out.println("Training date: " + trainingEndDateD);
+         System.out.println("Training end date: " + trainingEndDateD);
          
          Date testStartDateD = testStartDate != null ? sdf.parse(testStartDate) : new Date(2000, 01, 01);
-         System.out.println("End date: " + testStartDateD);
+         System.out.println("Test start date: " + testStartDateD);
          
          Date testEndDateD = testEndDate != null ? sdf.parse(testEndDate) : new Date(3000, 01, 01);
-         System.out.println("End date: " + testEndDateD);
+         System.out.println("Test end date: " + testEndDateD);
 
          // ComparisonFinder finder = first == null ? new ComparisonFinder(folder, date) : new ComparisonFinder(folder, DateFormat.getInstance().parse(first), date);
          MetadiffReader reader = new MetadiffReader(folder);
