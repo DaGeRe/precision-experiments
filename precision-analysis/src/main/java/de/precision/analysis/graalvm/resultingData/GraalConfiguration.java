@@ -3,6 +3,7 @@ package de.precision.analysis.graalvm.resultingData;
 public class GraalConfiguration {
    int warmup, runs, iterations;
    
+   double falsenegative, truepositive;
    double type2error, type2error_above1percent, type2error_above5percent;
 
    public int getWarmup() {
@@ -51,5 +52,21 @@ public class GraalConfiguration {
    
    public void setType2error_above5percent(double type2error_above5percent) {
       this.type2error_above5percent = type2error_above5percent;
+   }
+   
+   public double getFalsenegative() {
+      return falsenegative;
+   }
+   
+   public void setFalsenegative(double falsenegative) {
+      this.falsenegative = falsenegative;
+   }
+   
+   public double getTruepositive() {
+      return truepositive;
+   }
+   
+   public void setTruepositive(double truepositive) {
+      this.truepositive = truepositive;
    }
 }

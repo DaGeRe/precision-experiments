@@ -123,6 +123,8 @@ public class GraalVMPrecisionThread {
       LOG.info("Simulated false negative rate: {} F_1-score: {}", falseNegativeRate, fScore);
       LOG.info("Iterations: {} Runs: {}", graalConfig.getIterations(), graalConfig.getRuns());
 
+      graalConfig.setFalsenegative(comparer.getFalseNegatives(statisticalTest));
+      graalConfig.setTruepositive(comparer.getTruePositives(statisticalTest));
       graalConfig.setType2error(falseNegativeRate);
       graalConfig.setType2error_above1percent(comparer.getFalseNegativeRateAbove1Percent(statisticalTest));
       graalConfig.setType2error_above5percent(comparer.getFalseNegativeRateAbove5Percent(statisticalTest));
