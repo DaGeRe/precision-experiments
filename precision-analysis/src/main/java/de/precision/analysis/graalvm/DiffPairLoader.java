@@ -20,6 +20,7 @@ public class DiffPairLoader {
    private final boolean cleaned;
    private Kopemedata dataOld, dataNew;
    private Relation expected;
+   private boolean consideredRelevant;
 
    public DiffPairLoader(boolean cleaned) {
       this.cleaned = cleaned;
@@ -32,9 +33,17 @@ public class DiffPairLoader {
       LOG.info("Reading " + folderPredecessor + " " + folderCurrent + " (" + comparison.getName() + ")");
       dataOld = GraalVMReadUtil.readData(folderPredecessor, cleaned);
       dataNew = GraalVMReadUtil.readData(folderCurrent, cleaned);
-      
+
+      CompareData data = new CompareData(dataOld.getFirstDatacollectorContent(), dataNew.getFirstDatacollectorContent());
+
+      if (Math.abs((data.getAvgCurrent() - data.getAvgPredecessor()) / data.getAvgPredecessor()) < 0.01) {
+         consideredRelevant = false;
+      } else {
+         consideredRelevant = true;
+      }
+
       expected = comparison.getRelation();
-      
+
       writeHistogramCSVs(folderPredecessor, folderCurrent);
    }
 
@@ -46,11 +55,11 @@ public class DiffPairLoader {
          HistogramValueWriter.writeValues(dataNew.getFirstDatacollectorContent(), new File(histogramData, folderCurrent.getName() + ".csv"));
       }
    }
-   
+
    public CompareData getShortenedCompareData(int iterations) {
       int availableIterationsOld = getPossibleIterations(dataOld);
       int availableIterationsCurrent = getPossibleIterations(dataNew);
-      
+
       int currentlyAvailableIteratins = Math.min(availableIterationsOld, Math.min(availableIterationsCurrent, iterations));
       final List<VMResult> fastShortened = StatisticUtil.shortenValues(dataOld.getFirstDatacollectorContent(), 0, currentlyAvailableIteratins);
       final List<VMResult> slowShortened = StatisticUtil.shortenValues(dataNew.getFirstDatacollectorContent(), 0, currentlyAvailableIteratins);
@@ -76,5 +85,9 @@ public class DiffPairLoader {
 
    public Relation getExpected() {
       return expected;
+   }
+
+   public boolean isConsideredRelevant() {
+      return consideredRelevant;
    }
 }

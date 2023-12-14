@@ -1,5 +1,6 @@
 package de.precision.analysis.graalvm;
 
+import java.lang.reflect.Executable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -137,17 +138,26 @@ public class GraalVMPrecisionThread {
       DiffPairLoader loader = new DiffPairLoader(cleaned);
       loader.loadDiffPair(comparison);
       
+      Relation expected;
+      if (loader.isConsideredRelevant()) {
+         expected = loader.getExpected();
+      } else {
+         expected = Relation.EQUAL;
+      }
+      
+      
       histogramWriter.plotTesting(comparison.getName(), loader.getDataOld(), loader.getDataNew());
 
       Map<StatisticalTestResult, Integer> oldResults = comparer.getOverallResults().getResults().get(statisticalTest);
       int falseNegatives = oldResults.get(StatisticalTestResult.FALSENEGATIVE);
       int falsePositives = oldResults.get(StatisticalTestResult.SELECTED) - oldResults.get(StatisticalTestResult.TRUEPOSITIVE);
+      
       for (int i = 0; i < samplingExecutions; i++) {
          CompareData data = loader.getShortenedCompareData(configuration.getIterations());
          SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
-         executor.executeComparisons(loader.getExpected());
+         executor.executeComparisons(expected);
       }
-      if (loader.getExpected() == Relation.EQUAL) {
+      if (expected == Relation.EQUAL) {
          int falsePositiveNew = oldResults.get(StatisticalTestResult.SELECTED) - oldResults.get(StatisticalTestResult.TRUEPOSITIVE);
          int falsePositivesThisRun = falsePositiveNew - falsePositives;
          falsePositiveDetections.put(comparison.getName(), falsePositivesThisRun);
