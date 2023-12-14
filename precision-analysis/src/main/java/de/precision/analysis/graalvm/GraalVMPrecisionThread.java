@@ -113,7 +113,7 @@ public class GraalVMPrecisionThread {
 //      PrecisionConfig config2 = new PrecisionConfig(cleaned, true, 4, new StatisticalTests[] { StatisticalTests.TTEST}, 0, 0, 0, 0);
       PrecisionComparer comparer = new PrecisionComparer(statisticsConfig, precisionConfig);
       
-      for (Comparison comparison : finder.getComparisonsTraining().values()) {
+      for (Comparison comparison : finder.getComparisonsTest().values()) {
          testOneComparison(configuration, statisticalTest, falseNegativeDetections, falsePositiveDetections, comparer, comparison);
          LOG.info("Done: {}, FNR: {}", comparison.getPValue(), comparer.getFalseNegativeRate(statisticalTest));
       }
