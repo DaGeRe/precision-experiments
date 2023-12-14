@@ -37,7 +37,6 @@ public class ConfigurationDeterminer {
    private final boolean cleaned;
    private final PrecisionConfig precisionConfig;
    private final PrecisionFileManager precisionFileManager;
-   private int equal = 0, unequal = 0;
    private final int samplingExecutions;
    private final StatisticalTests statisticalTest = StatisticalTests.MANNWHITNEY;
 
@@ -80,11 +79,6 @@ public class ConfigurationDeterminer {
          histogramWriter.plotTraining(comparison.getName(), loader.getDataOld(), loader.getDataNew());
 
          LOG.info("Expected relation: {}", loader.getExpected());
-         if (loader.getExpected() == Relation.EQUAL) {
-            equal++;
-         } else {
-            unequal++;
-         }
 
          Configuration currentConfiguration = executeOneComparison(comparison, loader);
          if (configuration == null) {
@@ -131,6 +125,8 @@ public class ConfigurationDeterminer {
       DescriptiveStatistics statistics = new DescriptiveStatistics(dataOld);
       LOG.info("Mean {}: {}", classifier, statistics.getMean());
    }
+   
+   private final boolean checkIterations = false;
 
    private PrecisionData executeComparisons(DiffPairLoader loader, BufferedWriter writer) throws IOException {
       PrecisionData data = new PrecisionData();
@@ -144,50 +140,62 @@ public class ConfigurationDeterminer {
 
       for (int vmCount = 5; vmCount < maxVms; vmCount += vmStepSize) {
          SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark", samplingExecutions);
-         int maxRuns = getMaximumPossibleRuns(loader.getDataOld(), loader.getDataNew());
+         int maxIterations = getMaximumPossibleIterations(loader.getDataOld(), loader.getDataNew());
 
-         int stepsize = Math.max(1, maxRuns / 100);
-         LOG.debug("Stepsize for iterations 1 to {} is {} (VMs: {})", maxRuns, stepsize, vmCount);
-
-         double previous = Double.MAX_VALUE;
-         for (int iterations = 1; iterations < maxRuns; iterations += stepsize) {
-            ExecutionData executionData = new ExecutionData(vmCount, 0, iterations, 1);
-
-            CompareData shortenedData = loader.getShortenedCompareData(iterations);
-
-            StatisticsConfig statisticsConfig = new StatisticsConfig();
-            if (!precisionConfig.isRemoveOutliers()) {
-               statisticsConfig.setOutlierFactor(0.0);
+         if (checkIterations) {
+            int stepsize = Math.max(1, maxIterations / 100);
+            LOG.debug("Stepsize for iterations 1 to {} is {} (VMs: {})", maxIterations, stepsize, vmCount);
+            
+            double previous = Double.MAX_VALUE;
+            for (int iterations = 1; iterations < maxIterations; iterations += stepsize) {
+               ExecutionData executionData = new ExecutionData(vmCount, 0, iterations, 1);
+               double value = executeConfigurationComparison(loader, writer, data, vmCount, samplingConfig, executionData);
+               if (value < type2error && previous < type2error) {
+                  break;
+               }
+               previous = value;
             }
-
-            PrecisionComparer comparer = new PrecisionComparer(statisticsConfig, precisionConfig);
-            for (int i = 0; i < samplingConfig.getSamplingExecutions(); i++) {
-               SamplingExecutor samplingExecutor = new SamplingExecutor(samplingConfig, shortenedData, comparer);
-               samplingExecutor.executeComparisons(loader.getExpected());
-            }
-
-            PrecisionWriter precisionWriter = new PrecisionWriter(comparer, executionData);
-            precisionWriter.writeTestcase(writer, comparer.getOverallResults().getResults());
-
-            double value = Relation.isUnequal(loader.getExpected()) ? comparer.getFScore(statisticalTest) : comparer.getTrueNegativeRate(statisticalTest);
-            data.addData(1, vmCount, iterations, value);
-            if (value < type2error && previous < type2error) {
-               break;
-            }
-            previous = value;
+         } else {
+            ExecutionData executionData = new ExecutionData(vmCount, 0, maxIterations, 1);
+            executeConfigurationComparison(loader, writer, data, vmCount, samplingConfig, executionData);
          }
+         
+        
       }
       return data;
    }
 
-   private int getMaximumPossibleRuns(Kopemedata dataOld, Kopemedata dataNew) {
-      int maxRuns = Integer.MAX_VALUE;
+   private double executeConfigurationComparison(DiffPairLoader loader, BufferedWriter writer, PrecisionData data, int vmCount, SamplingConfig samplingConfig, ExecutionData executionData)
+         throws IOException {
+      CompareData shortenedData = loader.getShortenedCompareData(executionData.getIterations());
+
+      StatisticsConfig statisticsConfig = new StatisticsConfig();
+      if (!precisionConfig.isRemoveOutliers()) {
+         statisticsConfig.setOutlierFactor(0.0);
+      }
+
+      PrecisionComparer comparer = new PrecisionComparer(statisticsConfig, precisionConfig);
+      for (int i = 0; i < samplingConfig.getSamplingExecutions(); i++) {
+         SamplingExecutor samplingExecutor = new SamplingExecutor(samplingConfig, shortenedData, comparer);
+         samplingExecutor.executeComparisons(loader.getExpected());
+      }
+
+      PrecisionWriter precisionWriter = new PrecisionWriter(comparer, executionData);
+      precisionWriter.writeTestcase(writer, comparer.getOverallResults().getResults());
+
+      double value = Relation.isUnequal(loader.getExpected()) ? comparer.getFScore(statisticalTest) : comparer.getTrueNegativeRate(statisticalTest);
+      data.addData(1, vmCount, executionData.getIterations(), value);
+      return value;
+   }
+
+   private int getMaximumPossibleIterations(Kopemedata dataOld, Kopemedata dataNew) {
+      int maxIterations = Integer.MAX_VALUE;
       for (VMResult result : dataOld.getFirstDatacollectorContent()) {
-         maxRuns = Math.min(maxRuns, result.getFulldata().getValues().size());
+         maxIterations = Math.min(maxIterations, result.getFulldata().getValues().size());
       }
       for (VMResult result : dataNew.getFirstDatacollectorContent()) {
-         maxRuns = Math.min(maxRuns, result.getFulldata().getValues().size());
+         maxIterations = Math.min(maxIterations, result.getFulldata().getValues().size());
       }
-      return maxRuns;
+      return maxIterations;
    }
 }
