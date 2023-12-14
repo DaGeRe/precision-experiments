@@ -125,6 +125,7 @@ public class GraalVMPrecisionThread {
 
       graalConfig.setType2error(falseNegativeRate);
       graalConfig.setType2error_above1percent(comparer.getFalseNegativeRateAbove1Percent(statisticalTest));
+      graalConfig.setType2error_above5percent(comparer.getFalseNegativeRateAbove5Percent(statisticalTest));
       
       model.addComparison(type2error, falseNegativeDetections);
    }

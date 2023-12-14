@@ -25,6 +25,7 @@ public class MethodResult {
 			entry.put(StatisticalTestResult.SELECTED, 0);
 			entry.put(StatisticalTestResult.WRONGGREATER, 0);
 			entry.put(StatisticalTestResult.FALSENEGATIVE_ABOVE_1_PERCENT, 0);
+			entry.put(StatisticalTestResult.FALSENEGATIVE_ABOVE_5_PERCENT, 0);
 		}
 	}
 

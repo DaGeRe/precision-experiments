@@ -1,6 +1,7 @@
 package de.precision.analysis.graalvm;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Date;
 
 import de.dagere.peass.measurement.statistics.Relation;
@@ -19,15 +20,23 @@ class Comparison {
    private final int runsOld, runsNew;
    private final int benchmark;
 
-   public Comparison(String name, File oldFolder, File newFolder, Date dateOld, Date dateNew, int benchmark, int runsOld, int runsNew) {
+   public Comparison(String name, File oldFolder, File newFolder, Date dateOld, Date dateNew, int benchmark) {
       this.name = name;
       this.oldFolder = oldFolder;
       this.newFolder = newFolder;
       this.dateOld = dateOld;
       this.dateNew = dateNew;
       this.benchmark = benchmark;
-      this.runsOld = runsOld;
-      this.runsNew = runsNew;
+      FilenameFilter regularCSVFilter = new FilenameFilter() {
+         
+         @Override
+         public boolean accept(File dir, String name) {
+            return name.endsWith(".csv") && !name.endsWith("_cleaned.csv");
+         }
+      };
+      this.runsOld = oldFolder.listFiles(regularCSVFilter).length;
+      this.runsNew = newFolder.listFiles(regularCSVFilter).length;;
+      
       
       if (oldFolder == null || newFolder == null) {
          System.out.println("Old folder: " + oldFolder);

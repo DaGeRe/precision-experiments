@@ -49,10 +49,10 @@ public class ConfigurationDeterminer {
       this.precisionFileManager = precisionFileManager;
       this.samplingExecutions = samplingExecutions;
    }
-   
+
    public ComparisonCounts determineComparisonCounts(ComparisonFinder finder) {
       DiffPairLoader loader = new DiffPairLoader(cleaned);
-      
+
       int equal = 0, unequal = 0;
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
          LOG.debug("Folder existing");
@@ -65,7 +65,7 @@ public class ConfigurationDeterminer {
             unequal++;
          }
       }
-      
+
       ComparisonCounts trainingCounts = new ComparisonCounts(equal, unequal);
       return trainingCounts;
    }
@@ -78,7 +78,7 @@ public class ConfigurationDeterminer {
          loader.loadDiffPair(comparison);
 
          histogramWriter.plotTraining(comparison.getName(), loader.getDataOld(), loader.getDataNew());
-         
+
          LOG.info("Expected relation: {}", loader.getExpected());
          if (loader.getExpected() == Relation.EQUAL) {
             equal++;
@@ -109,16 +109,16 @@ public class ConfigurationDeterminer {
             LOG.info("Found configuration, Runs: {} Iterations: {}", currentConfig.getVMs(), currentConfig.getIterations());
             return currentConfig;
          } else {
-            LOG.info("Did not find a suitable configuration with type 2 error {}, setting to maximum", type2error);
+            LOG.info("Did not find a suitable configuration for {} with type 2 error {}, setting to maximum", comparison.getName(), type2error);
             List<VMResult> vmResults = loader.getDataOld().getFirstDatacollectorContent();
             List<VMResult> measuredData = vmResults;
             int iterations = measuredData.get(0).getFulldata().getValues().size();
             int VMs = measuredData.size();
             LOG.info("Maximum here: VMS: {} Iterations: {}", VMs, iterations);
-            
+
             printDebug(MultipleVMTestUtil.getAverages(loader.getDataOld().getFirstDatacollectorContent()), "old");
             printDebug(MultipleVMTestUtil.getAverages(loader.getDataNew().getFirstDatacollectorContent()), "new");
-            
+
             return new Configuration(1, VMs, iterations);
          }
       } catch (IOException e) {
@@ -134,23 +134,23 @@ public class ConfigurationDeterminer {
 
    private PrecisionData executeComparisons(DiffPairLoader loader, BufferedWriter writer) throws IOException {
       PrecisionData data = new PrecisionData();
-      
+
       int sizeOld = loader.getDataOld().getFirstDatacollectorContent().size();
       int sizeNew = loader.getDataNew().getFirstDatacollectorContent().size();
       int maxVms = Math.min(sizeOld, sizeNew);
-      
+
       int vmStepSize = Math.max(5, maxVms / 100);
       LOG.info("VMs step size: {} to {}", vmStepSize, maxVms);
-      
+
       for (int vmCount = 5; vmCount < maxVms; vmCount += vmStepSize) {
          SamplingConfig samplingConfig = new SamplingConfig(vmCount, "GraalVMBenchmark", samplingExecutions);
          int maxRuns = getMaximumPossibleRuns(loader.getDataOld(), loader.getDataNew());
-         
+
          int stepsize = Math.max(1, maxRuns / 100);
          LOG.debug("Stepsize for iterations 1 to {} is {} (VMs: {})", maxRuns, stepsize, vmCount);
-         
+
          double previous = Double.MAX_VALUE;
-         for (int iterations = 1; iterations < maxRuns; iterations+=stepsize) {
+         for (int iterations = 1; iterations < maxRuns; iterations += stepsize) {
             ExecutionData executionData = new ExecutionData(vmCount, 0, iterations, 1);
 
             CompareData shortenedData = loader.getShortenedCompareData(iterations);

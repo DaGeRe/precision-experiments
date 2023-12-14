@@ -31,7 +31,7 @@ public class ComparisonFinder {
          }
          
          if (date.after(testStartDate) && date.before(testEndDate)) {
-            comparisonsTraining.put(comparison.getKey(), comparison.getValue());
+            comparisonsTest.put(comparison.getKey(), comparison.getValue());
           }
       }
       
@@ -43,22 +43,6 @@ public class ComparisonFinder {
       } else {
          comparisonFound = false;
       }
-//      Iterator<Comparison> iterator = comparisonsTraining.values().iterator();
-//      if (iterator.hasNext()) {
-//         Comparison comparison = iterator.next();
-//         this.startDate = comparison.getDateOld();
-//         if (comparison.getDateOld().before(startDate)) {
-//            this.startDate = startDate;
-//         } else {
-//            
-//         }
-//         LOG.info("Setting to... " + this.startDate + " " + comparison.getName());
-//         comparisonFound = true;
-//      } else {
-//         comparisonFound = false;
-//         LOG.error("No training comparison found");
-//         this.startDate = startDate;
-//      }
    }
 
    public Map<String, Comparison> getComparisonsTraining() {

@@ -62,8 +62,6 @@ public class MetadiffFileReader {
       double pValue = Double.parseDouble(parts[pValueIndex]);
       double effectSize = Double.parseDouble(parts[effectSizeIndex]);
       final int benchmark = Integer.parseInt(parts[benchmarkIndex]);
-      final int runsOld = Integer.parseInt(parts[benchmarkIndex]);
-      final int runsNew = Integer.parseInt(parts[benchmarkIndex]);
       String benchmarkKey = parts[machineTypeIndex] + "-" + parts[configurationIndex] + "-" + parts[benchmarkIndex];
 
       String comparisonId = runOld + "_" + runNew;
@@ -75,7 +73,7 @@ public class MetadiffFileReader {
 
       if (folderOld != null && folderNew != null &&
             folderOld.exists() && folderNew.exists()) {
-         Comparison comparison = new Comparison(comparisonId, folderOld, folderNew, dateOld, dateNew, benchmark, runsOld, runsNew);
+         Comparison comparison = new Comparison(comparisonId, folderOld, folderNew, dateOld, dateNew, benchmark);
 
          comparisons.addComparison(benchmarkKey, comparisonId, comparison);
 
