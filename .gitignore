@@ -7,6 +7,8 @@ precision-analysis/scripts/configuration-analysis/*.pdf
 precision-analysis/scripts/repetitionHeatmap/sizes/
 precision-analysis/scripts/peass_*
 precision-analysis/*json
+precision-analysis/plottableGraphs/
+precision-analysis/models/
 jmh-test/scripts/exponential_2er/
 precision-analysis/scripts/repetitionHeatmap/*pdf
 precision-analysis/scripts/repetitionHeatmap/*csv
