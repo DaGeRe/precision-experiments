@@ -33,14 +33,17 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    @Option(names = { "-folder", "--folder" }, description = "Folder, that contains *all* data folders for the analysis", required = true)
    private File folder;
 
-   @Option(names = { "-startDate", "--startDate" }, description = "Start date for the training")
-   private String startDate;
+   @Option(names = { "-trainingStartDate", "--trainingStartDate" }, description = "Start date for the training")
+   private String trainingStartDate;
    
-   @Option(names = { "-trainingDate", "--trainingDate" }, description = "End date of the training (so training is between startDate and trainingDate)", required = true)
-   private String trainingDate;
+   @Option(names = { "-trainingEndDate", "--trainingDate" }, description = "End date of the training (so training is between startDate and trainingDate)", required = true)
+   private String trainingEndDate;
 
-   @Option(names = { "-endDate", "--endDate" }, description = "End date for the training (subsequent data will be used for testing)")
-   private String endDate;
+   @Option(names = { "-testStartDate", "--testStartDate" }, description = "End date for the training (subsequent data will be used for testing)")
+   private String testStartDate;
+   
+   @Option(names = { "-testEndDate", "--testEndDate" }, description = "End date for the training (subsequent data will be used for testing)")
+   private String testEndDate;
 
    @Mixin
    private PrecisionConfigMixin precisionConfigMixin;
@@ -58,14 +61,17 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
          
          
-         Date startDateD = startDate != null ? sdf.parse(startDate) : new Date(2000, 01, 01);
-         System.out.println("Start date: " + startDateD);
+         Date trainingStartDateD = trainingStartDate != null ? sdf.parse(trainingStartDate) : new Date(2000, 01, 01);
+         System.out.println("Start date: " + trainingStartDateD);
          
-         Date trainingDateD = sdf.parse(trainingDate);
-         System.out.println("Training date: " + trainingDateD);
+         Date trainingEndDateD = sdf.parse(trainingEndDate);
+         System.out.println("Training date: " + trainingEndDateD);
          
-         Date date = endDate != null ? sdf.parse(endDate) : new Date(3000, 01, 01);
-         System.out.println("End date: " + date);
+         Date testStartDateD = testStartDate != null ? sdf.parse(testStartDate) : new Date(2000, 01, 01);
+         System.out.println("End date: " + testStartDateD);
+         
+         Date testEndDateD = testEndDate != null ? sdf.parse(testEndDate) : new Date(3000, 01, 01);
+         System.out.println("End date: " + testEndDateD);
 
          // ComparisonFinder finder = first == null ? new ComparisonFinder(folder, date) : new ComparisonFinder(folder, DateFormat.getInstance().parse(first), date);
          MetadiffReader reader = new MetadiffReader(folder);
@@ -75,11 +81,11 @@ public class GraalVMPrecisionDeterminer implements Runnable {
          for (Map.Entry<String, Map<String, Comparison>> benchmarkData : comparisons.getComparisons().entrySet()) {
             LOG.info("Reading benchmark {}", benchmarkData.getKey());
             Map<String, Comparison> thisBenchmarkComparisons = benchmarkData.getValue();
-            ComparisonFinder finder = new ComparisonFinder(thisBenchmarkComparisons, startDateD, trainingDateD, date, folder);
+            ComparisonFinder finder = new ComparisonFinder(thisBenchmarkComparisons, trainingStartDateD, trainingEndDateD, testStartDateD, testEndDateD, folder);
 
             if (finder.isComparisonFound()) {
-               createModel(true, date, finder, benchmarkData.getKey());
-               createModel(false, date, finder, benchmarkData.getKey());
+               createModel(true, testEndDateD, finder, benchmarkData.getKey());
+               createModel(false, testEndDateD, finder, benchmarkData.getKey());
             }
          }
 
@@ -91,10 +97,10 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    private void createModel(boolean cleaned, Date date, ComparisonFinder finder, String benchmarkKey)
          throws ParseException, InterruptedException, IOException, StreamWriteException, DatabindException {
       SimpleModel model = new SimpleModel();
-      model.setLast(endDate);
-
-      System.out.println("Start date: " + finder.getStartDate().toString());
-      model.setFirst(finder.getStartDate().toString());
+      model.setTrainingStartDate(trainingStartDate);
+      model.setTrainingEndDate(trainingEndDate);
+      model.setTestStartDate(testStartDate);
+      model.setTestEndDate(testEndDate);
 
       System.out.println("Training comparisons: " + finder.getComparisonsTraining().size());
       System.out.println("Test comparisons: " + finder.getComparisonsTest().size());

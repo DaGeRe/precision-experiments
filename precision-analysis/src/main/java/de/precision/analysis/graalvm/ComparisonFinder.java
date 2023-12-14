@@ -20,22 +20,22 @@ public class ComparisonFinder {
 
    private boolean comparisonFound;
 
-   public ComparisonFinder(Map<String, Comparison> comparisons, Date startDate, Date trainingDate, Date endDate, File folder) {
+   public ComparisonFinder(Map<String, Comparison> comparisons, Date trainingStartDate, Date trainingEndDate, Date testStartDate, Date testEndDate, File folder) {
 
       for (Map.Entry<String, Comparison> comparison : comparisons.entrySet()) {
          LOG.debug("Reading: " + comparison.getKey());
          Date date = comparison.getValue().getDateNew();
          
-         if (date.after(startDate) && date.before(endDate)) {
-            if (date.before(trainingDate)){
-               comparisonsTraining.put(comparison.getKey(), comparison.getValue());
-            } else {
-               comparisonsTest.put(comparison.getKey(), comparison.getValue());
-            }
+         if (date.after(trainingStartDate) && date.before(trainingEndDate)) {
+           comparisonsTraining.put(comparison.getKey(), comparison.getValue());
          }
+         
+         if (date.after(testStartDate) && date.before(testEndDate)) {
+            comparisonsTraining.put(comparison.getKey(), comparison.getValue());
+          }
       }
       
-      this.startDate = startDate;
+      this.startDate = trainingStartDate;
       
       if (!comparisonsTraining.isEmpty()) {
          LOG.info("Found training comparison, and therefore executing the comparisons");
