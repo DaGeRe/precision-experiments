@@ -28,7 +28,7 @@ jobs:
         java-version: ${{ matrix.java }}
     - name: Build with Maven
       run: |
-         cd /home/runner/work/ && git clone -b develop https://github.com/DaGeRe/peass.git && cd peass && mvn clean install -DskipTests
+#         cd /home/runner/work/ && git clone -b develop https://github.com/DaGeRe/peass.git && cd peass && mvn clean install -DskipTests
          cd /home/runner/work/precision-experiments/precision-experiments/ && ./gradlew assemble -x test
          cd /home/runner/work/precision-experiments/precision-experiments/precision-analysis/ && ../gradlew test publishToMavenLocal
     - name: Publish Test Report
