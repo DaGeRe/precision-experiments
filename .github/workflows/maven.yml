@@ -5,9 +5,9 @@ name: Build with Gradle
 
 on:
   push:
-    branches: [ main, graalvm-fulldata ]
+    branches: [ main, develop, graalvm-fulldata ]
   pull_request:
-    branches: [ main, graalvm-fulldata ]
+    branches: [ main, develop, graalvm-fulldata ]
   workflow_dispatch:
   schedule:
     - cron: "0 3 * * *"
