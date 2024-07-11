@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -78,23 +79,35 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
          ComparisonCollection comparisons = reader.getComparisons();
 
+         ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(precisionConfigMixin.getThreads());
+         
          for (Map.Entry<String, Map<String, Comparison>> benchmarkData : comparisons.getComparisons().entrySet()) {
             LOG.info("Reading benchmark {}", benchmarkData.getKey());
             Map<String, Comparison> thisBenchmarkComparisons = benchmarkData.getValue();
             ComparisonFinder finder = new ComparisonFinder(thisBenchmarkComparisons, trainingStartDateD, trainingEndDateD, testStartDateD, testEndDateD, folder);
 
+            
+            
             if (finder.isComparisonFound()) {
-               createModel(true, testEndDateD, finder, benchmarkData.getKey());
-               createModel(false, testEndDateD, finder, benchmarkData.getKey());
+               createModel(true, testEndDateD, finder, benchmarkData.getKey(), pool);
+               createModel(false, testEndDateD, finder, benchmarkData.getKey(), pool);
+            }
+            
+            LOG.info("Active threads: {}", pool.getActiveCount());
+            if (pool.getActiveCount() > precisionConfigMixin.getThreads()) {
+               pool.awaitTermination(10, TimeUnit.SECONDS);
             }
          }
-
+         
+         pool.shutdown();
+         pool.awaitTermination(10, TimeUnit.HOURS);
+         
       } catch (ParseException | IOException | InterruptedException e1) {
          e1.printStackTrace();
       }
    }
 
-   private void createModel(boolean cleaned, Date date, ComparisonFinder finder, String benchmarkKey)
+   private void createModel(boolean cleaned, Date date, ComparisonFinder finder, String benchmarkKey, ExecutorService pool)
          throws ParseException, InterruptedException, IOException, StreamWriteException, DatabindException {
       SimpleModel model = new SimpleModel();
       model.setTrainingStartDate(trainingStartDate);
@@ -110,32 +123,28 @@ public class GraalVMPrecisionDeterminer implements Runnable {
 
       PrecisionFileManager manager = new PrecisionFileManager();
 
-      ExecutorService pool = Executors.newFixedThreadPool(precisionConfigMixin.getThreads());
+      
 
       final PlottableHistogramWriter histogramWriter = new PlottableHistogramWriter(new File("plottableGraphs/" + benchmarkKey));
 
-      // for (int vmCount : new int[] { 5, 10, 20, 30 }) {
-      for (double type2error : new double[] { 0.01, 0.1, 0.2, 0.5}) {
+      for (double type2error : new double[] { 0.01 }) {
          final GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(cleaned, model, precisionConfigMixin.getConfig(), finder, manager, type2error, histogramWriter);
          pool.submit(() -> {
             try {
                precisionThread.getConfigurationAndTest();
+               
+               manager.cleanup();
+
+               File resultFile = cleaned ? new File("model_" + benchmarkKey + "_cleaned.json") : new File("model_" + benchmarkKey + ".json");
+               Constants.OBJECTMAPPER.writeValue(resultFile, model);
             } catch (Throwable t) {
                t.printStackTrace();
             }
          });
       }
-      // }
 
-      LOG.info("Waiting for thread completion...");
-      pool.shutdown();
-      pool.awaitTermination(100, TimeUnit.HOURS);
-      LOG.info("Finished");
-
-      manager.cleanup();
-
-      File resultFile = cleaned ? new File("model_" + benchmarkKey + "_cleaned.json") : new File("model_" + benchmarkKey + ".json");
-      Constants.OBJECTMAPPER.writeValue(resultFile, model);
+      LOG.info("Thread added...");
+      
    }
 
 }

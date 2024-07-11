@@ -32,7 +32,7 @@ public class GraalVMPrecisionThread {
    private final ComparisonFinder finder;
    private final PrecisionFileManager manager;
    private final double type2error;
-   private final int samplingExecutions = 10000;
+   private final int samplingExecutions = 100;
    private final PlottableHistogramWriter histogramWriter;
 
    public GraalVMPrecisionThread(boolean cleaned, SimpleModel model, PrecisionConfig precisionConfig, ComparisonFinder finder, PrecisionFileManager manager, double type2error, PlottableHistogramWriter histogramWriter) {

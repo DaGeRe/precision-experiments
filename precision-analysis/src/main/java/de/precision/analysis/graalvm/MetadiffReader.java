@@ -40,6 +40,9 @@ public class MetadiffReader {
       for (File metadiffFile : metadiffFolder.listFiles((FilenameFilter) new WildcardFileFilter("*_metadiff.csv"))) {
          readMetadiffFile(comparisons, metadiffFile);
       }
+
+      File metadiffFile = new File(metadiffFolder, "../diffs.csv");
+      readMetadiffFile(comparisons, metadiffFile);
       return comparisons;
    }
 

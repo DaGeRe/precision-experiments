@@ -39,6 +39,8 @@ public class CalculateResults {
                hypothesicBenchmarkRuns += Math.min(metadata.getRunsNew(), peassRuns);
             }
             System.out.println(file +";" + realBenchmarkRuns + ";" + hypothesicBenchmarkRuns + ";" + (realBenchmarkRuns - hypothesicBenchmarkRuns) + ";" + graalConfiguration.getType2error() + ";" + graalConfiguration.getType2error_above5percent() + ";" + graalConfiguration.getType2error_above10percent());
+         } else {
+            System.out.println(file);
          }
       }
    }
