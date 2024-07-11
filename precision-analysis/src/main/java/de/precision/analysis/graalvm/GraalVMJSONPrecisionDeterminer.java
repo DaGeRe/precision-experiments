@@ -8,7 +8,7 @@ import picocli.CommandLine.Option;
 public class GraalVMJSONPrecisionDeterminer implements Runnable {
    
    @Option(names = { "-inputJSON", "--inputJSON" }, description = "Input JSON file from GraalVM", required = true)
-   private File inputJSON;
+   private File inputJSONs[];
    
    public static void main(String[] args) {
       GraalVMJSONPrecisionDeterminer plot = new GraalVMJSONPrecisionDeterminer();
@@ -18,7 +18,8 @@ public class GraalVMJSONPrecisionDeterminer implements Runnable {
 
    @Override
    public void run() {
-      System.out.println("Reading " + inputJSON);
+      for (File inputJSON : inputJSONs)
+         System.out.println("Reading " + inputJSON);
       
    }
 }
