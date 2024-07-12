@@ -40,39 +40,45 @@ public class GraalVMReadUtil {
       };
 
       for (File versionDataFile : vmFolder.listFiles(filter)) {
-         try (BufferedReader reader = new BufferedReader(new FileReader(versionDataFile))) {
-            String line;
-
-            SummaryStatistics statistics = new SummaryStatistics();
-
-            String headline = reader.readLine();
-
-            int columnIndex = getColumnIndex(headline, "iteration_time_ns");
-
-            line = reader.readLine();
-
-            String[] firstParts = line.split(",");
-            String benchmarkName = firstParts[1];
-            VMResult vmResult = createNewVMResult(data, benchmarkName, vmFolder.getName());
-            List<MeasuredValue> values = vmResult.getFulldata().getValues();
-            int lineIndex = 0;
-            readPartData(statistics, values, firstParts, lineIndex++, columnIndex);
-
-            while ((line = reader.readLine()) != null) {
-               String[] parts = line.split(",");
-               if (!"index".equals(parts[0])) {
-                  readPartData(statistics, values, parts, lineIndex++, columnIndex);
-               }
-            }
-            vmResult.setValue(statistics.getMean());
-            vmResult.setDeviation(statistics.getStandardDeviation());
-         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-         } catch (IOException e) {
-            e.printStackTrace();
-         }
+         String commitName = vmFolder.getName();
+         readVersionDataFile(data, versionDataFile, commitName);
       }
       return data;
+   }
+
+   public static void readVersionDataFile(Kopemedata data, File versionDataFile, String commitName) {
+      try (BufferedReader reader = new BufferedReader(new FileReader(versionDataFile))) {
+         String line;
+
+         SummaryStatistics statistics = new SummaryStatistics();
+
+         String headline = reader.readLine();
+
+         int columnIndex = getColumnIndex(headline, "iteration_time_ns");
+
+         line = reader.readLine();
+
+         String[] firstParts = line.split(",");
+         String benchmarkName = firstParts[1];
+         
+         VMResult vmResult = createNewVMResult(data, benchmarkName, commitName);
+         List<MeasuredValue> values = vmResult.getFulldata().getValues();
+         int lineIndex = 0;
+         readPartData(statistics, values, firstParts, lineIndex++, columnIndex);
+
+         while ((line = reader.readLine()) != null) {
+            String[] parts = line.split(",");
+            if (!"index".equals(parts[0])) {
+               readPartData(statistics, values, parts, lineIndex++, columnIndex);
+            }
+         }
+         vmResult.setValue(statistics.getMean());
+         vmResult.setDeviation(statistics.getStandardDeviation());
+      } catch (FileNotFoundException e) {
+         e.printStackTrace();
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
    }
 
    static int getColumnIndex(String headline, String columnName) {

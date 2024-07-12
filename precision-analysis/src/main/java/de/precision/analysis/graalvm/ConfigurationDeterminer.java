@@ -16,6 +16,9 @@ import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.dataloading.MultipleVMTestUtil;
 import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
+import de.precision.analysis.graalvm.json.Pair;
+import de.precision.analysis.graalvm.loading.DataLoader;
+import de.precision.analysis.graalvm.loading.DiffPairLoader;
 import de.precision.analysis.graalvm.resultingData.ComparisonCounts;
 import de.precision.analysis.heatmap.Configuration;
 import de.precision.analysis.heatmap.GetMinimalFeasibleConfiguration;
@@ -73,28 +76,45 @@ public class ConfigurationDeterminer {
       Configuration configuration = null;
       DiffPairLoader loader = new DiffPairLoader(cleaned);
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
-         LOG.debug("Folder existing");
          loader.loadDiffPair(comparison);
-
-         histogramWriter.plotTraining(comparison.getName(), loader.getDataOld(), loader.getDataNew());
-
-         LOG.info("Expected relation: {}", loader.getExpected());
-
-         Configuration currentConfiguration = executeOneComparison(comparison, loader);
-         if (configuration == null) {
-            configuration = currentConfiguration;
-         } else if (currentConfiguration != null) {
-            configuration = GetMinimalFeasibleConfiguration.mergeConfigurations(1, configuration, currentConfiguration);
-         }
+         configuration = determineConfiguration(histogramWriter, configuration, loader, comparison);
 
       }
       LOG.info("Final configuration: VMs: {} Iterations: {}", configuration.getVMs(), configuration.getIterations());
       return configuration;
    }
 
-   private Configuration executeOneComparison(Comparison comparison, DiffPairLoader loader) {
+   public Configuration determineConfiguration(PlottableHistogramWriter histogramWriter, Configuration configuration, DataLoader loader, Comparison comparison) {
+      histogramWriter.plotTraining(comparison.getName(), loader.getDataOld(), loader.getDataNew());
+
+      LOG.info("Expected relation: {}", loader.getExpected());
+
+      Configuration currentConfiguration = executeOneComparison("" + comparison.getVersionIdNew(), comparison.getName(), loader);
+      if (configuration == null) {
+         configuration = currentConfiguration;
+      } else if (currentConfiguration != null) {
+         configuration = GetMinimalFeasibleConfiguration.mergeConfigurations(1, configuration, currentConfiguration);
+      }
+      return configuration;
+   }
+   
+   public Configuration determineConfiguration(PlottableHistogramWriter histogramWriter, Configuration configuration, DataLoader loader, Pair comparison) {
+      histogramWriter.plotTraining(comparison.getName(), loader.getDataOld(), loader.getDataNew());
+
+      LOG.info("Expected relation: {}", loader.getExpected());
+
+      Configuration currentConfiguration = executeOneComparison(comparison.getVersionIdNew(), comparison.getName(), loader);
+      if (configuration == null) {
+         configuration = currentConfiguration;
+      } else if (currentConfiguration != null) {
+         configuration = GetMinimalFeasibleConfiguration.mergeConfigurations(1, configuration, currentConfiguration);
+      }
+      return configuration;
+   }
+
+   private Configuration executeOneComparison(String versionIdNew, String name, DataLoader loader) {
       try {
-         BufferedWriter writer = precisionFileManager.getFile(comparison.getVersionIdNew(), loader.getExpected());
+         BufferedWriter writer = precisionFileManager.getFile(versionIdNew, loader.getExpected());
          PrecisionData data = executeComparisons(loader, writer);
          MinimalFeasibleConfigurationDeterminer determiner = new MinimalFeasibleConfigurationDeterminer(100 - (100 * type2error));
          Map<Integer, Configuration> minimalFeasibleConfiguration = determiner.getMinimalFeasibleConfiguration(data);
@@ -103,7 +123,7 @@ public class ConfigurationDeterminer {
             LOG.info("Found configuration, Runs: {} Iterations: {}", currentConfig.getVMs(), currentConfig.getIterations());
             return currentConfig;
          } else {
-            LOG.info("Did not find a suitable configuration for {} with type 2 error {}, setting to maximum", comparison.getName(), type2error);
+            LOG.info("Did not find a suitable configuration for {} with type 2 error {}, setting to maximum", name, type2error);
             List<VMResult> vmResults = loader.getDataOld().getFirstDatacollectorContent();
             List<VMResult> measuredData = vmResults;
             int iterations = measuredData.get(0).getFulldata().getValues().size();
@@ -128,7 +148,7 @@ public class ConfigurationDeterminer {
    
    private final boolean checkIterations = false;
 
-   private PrecisionData executeComparisons(DiffPairLoader loader, BufferedWriter writer) throws IOException {
+   private PrecisionData executeComparisons(DataLoader loader, BufferedWriter writer) throws IOException {
       PrecisionData data = new PrecisionData();
 
       int sizeOld = loader.getDataOld().getFirstDatacollectorContent().size();
@@ -165,7 +185,7 @@ public class ConfigurationDeterminer {
       return data;
    }
 
-   private double executeConfigurationComparison(DiffPairLoader loader, BufferedWriter writer, PrecisionData data, int vmCount, SamplingConfig samplingConfig, ExecutionData executionData)
+   private double executeConfigurationComparison(DataLoader loader, BufferedWriter writer, PrecisionData data, int vmCount, SamplingConfig samplingConfig, ExecutionData executionData)
          throws IOException {
       CompareData shortenedData = loader.getShortenedCompareData(executionData.getIterations());
 

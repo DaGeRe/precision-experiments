@@ -6,7 +6,7 @@ import java.util.Date;
 
 import de.dagere.peass.measurement.statistics.Relation;
 
-class Comparison {
+public class Comparison {
    
    private final String name;
    

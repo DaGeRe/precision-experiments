@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
+import de.precision.analysis.graalvm.loading.DiffPairLoader;
 import de.precision.analysis.graalvm.resultingData.ComparisonCounts;
 import de.precision.analysis.graalvm.resultingData.GraalConfiguration;
 import de.precision.analysis.graalvm.resultingData.SimpleModel;
@@ -53,9 +54,9 @@ public class GraalVMPrecisionThread {
          
          Configuration configuration = configurationDeterminer.determineConfiguration(finder, histogramWriter);
          
-         buildModelDebugData(configurationDeterminer);
+         buildModelDebugData();
          
-         GraalConfiguration graalConfig = buildConfig(configurationDeterminer, configuration);
+         GraalConfiguration graalConfig = buildConfig(configuration);
          
          test(configuration, graalConfig, StatisticalTests.TTEST);
       }
@@ -69,7 +70,7 @@ public class GraalVMPrecisionThread {
       model.setCountTesting(testCounts);
    }
 
-   private GraalConfiguration buildConfig(ConfigurationDeterminer configurationDeterminer, Configuration configuration) {
+   private GraalConfiguration buildConfig(Configuration configuration) {
       GraalConfiguration graalConfig = new GraalConfiguration();
       graalConfig.setRuns(configuration.getVMs());
       graalConfig.setIterations(configuration.getIterations());
@@ -81,7 +82,7 @@ public class GraalVMPrecisionThread {
       return graalConfig;
    }
 
-   private void buildModelDebugData(ConfigurationDeterminer configurationDeterminer) {
+   private void buildModelDebugData() {
       
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
          TrainingMetadata metadata = new TrainingMetadata(comparison.getPValue(), comparison.getRunsOld(), comparison.getRunsNew());

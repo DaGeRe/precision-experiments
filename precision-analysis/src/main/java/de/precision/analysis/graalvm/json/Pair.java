@@ -7,4 +7,12 @@ public record Pair(
       @JsonProperty("new_sample") Sample newSample,
       @JsonProperty("compare_results") CompareResults compareResults,
       Prediction prediction
-  ) {}
+  ) {
+
+   public String getName() {
+      return oldSample.commit() + "-" + newSample.commit();
+   }
+
+   public String getVersionIdNew() {
+      return newSample.commit();
+   }}
