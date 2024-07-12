@@ -29,8 +29,8 @@ public class GraalVMJSONPrecisionDeterminer implements Runnable {
          try {
             data = new ObjectMapper().readValue(inputJSON, GraalVMJSONData.class);
             
-            for (Pair pair : data.getPairs()) {
-               System.out.println(pair.getCompareResults().getpValue());
+            for (Pair pair : data.pairs()) {
+               System.out.println(pair.getCompareResults().pValue());
             }
          } catch (IOException e) {
             e.printStackTrace();
