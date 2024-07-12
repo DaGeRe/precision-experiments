@@ -8,4 +8,10 @@ public record GraalVMJSONData(
       @JsonProperty("benchmark_workload") int benchmarkWorkload,
       @JsonProperty("platform_installation_type") int platformInstallationType,
       Pair[] pairs
-  ) {}
+  ) {
+   
+   public GraalVMJSONData copyWithNewPairs(Pair[] pairs) {
+      return new GraalVMJSONData(machineType, configuration, benchmarkWorkload, platformInstallationType, pairs);
+   }
+   
+}

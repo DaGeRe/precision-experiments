@@ -2,12 +2,15 @@ package de.precision.analysis.graalvm;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.dagere.peass.utils.Constants;
 import de.precision.analysis.graalvm.json.GraalVMJSONData;
 import de.precision.analysis.graalvm.json.Pair;
+import de.precision.analysis.graalvm.json.Prediction;
 import de.precision.analysis.graalvm.loading.DiffPairLoader;
 import de.precision.analysis.graalvm.loading.JSONPairLoader;
 import de.precision.analysis.heatmap.Configuration;
@@ -32,11 +35,15 @@ public class GraalVMJSONPrecisionDeterminer implements Runnable {
 
    @Override
    public void run() {
+      File tempResultsFolder = new File("results/");
+      tempResultsFolder.mkdir();
+      
       for (File inputJSON : inputJSONs) {
          System.out.println("Reading " + inputJSON);
          GraalVMJSONData data;
          try {
-            data = new ObjectMapper().readValue(inputJSON, GraalVMJSONData.class);
+            ObjectMapper objectMapper = new ObjectMapper();
+            data = objectMapper.readValue(inputJSON, GraalVMJSONData.class);
             
             final PlottableHistogramWriter histogramWriter = new PlottableHistogramWriter(new File("plottableGraphs/" + inputJSON.getName()));
             
@@ -48,10 +55,19 @@ public class GraalVMJSONPrecisionDeterminer implements Runnable {
             for (double type2error : new double[] { 0.01 }) {
                ConfigurationDeterminer configDeterminer = new ConfigurationDeterminer(false, type2error, precisionConfigMixin.getConfig(), manager, 10000);
                
+               List<Pair> pairsWithPredictions = new LinkedList<>();
                for (Pair pair : data.pairs()) {
                   loader.loadDiffPair(pair);
-                  configDeterminer.determineConfiguration(histogramWriter, config, loader, pair);
+                  Configuration determinedConfig = configDeterminer.determineConfiguration(histogramWriter, config, loader, pair);
+                  Prediction prediction = new Prediction(determinedConfig.getVMs(), determinedConfig.getVMs(), determinedConfig.getIterations(), determinedConfig.getIterations());
+                  pairsWithPredictions.add(pair.newPairWithPrediction(prediction));
                }
+               
+               GraalVMJSONData withPredictions = data.copyWithNewPairs(pairsWithPredictions.toArray(new Pair[0]));
+               
+               File file = new File(inputJSON.getParentFile(), inputJSON.getName().replace("input_", "output_"));
+               System.out.println("Writing final JSON to " + file.getAbsolutePath());
+               objectMapper.writeValue(file, withPredictions);
             }
          } catch (IOException e) {
             e.printStackTrace();

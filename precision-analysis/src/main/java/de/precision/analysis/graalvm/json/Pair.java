@@ -15,4 +15,12 @@ public record Pair(
 
    public String getVersionIdNew() {
       return newSample.commit();
-   }}
+   }
+   
+   public Pair newPairWithPrediction(Prediction prediction) {
+      if (this.prediction != null) {
+         throw new RuntimeException("Don't overwrite prediction twice!");
+      }
+      return new Pair(oldSample, newSample, compareResults, prediction);
+   }
+}
