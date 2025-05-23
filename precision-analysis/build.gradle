@@ -53,10 +53,10 @@ tasks.named('test', Test) {
 }
 
 dependencies {
-   implementation group: 'de.dagere.peass', name: 'analysis', version: '0.4.0'
+   implementation group: 'de.dagere.peass', name: 'analysis', version: '0.4.1-SNAPSHOT'
    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 
    testImplementation 'org.mockito:mockito-core:5.12.0'
    
-   testImplementation group: 'de.dagere.peass', name: 'measurement', version: '0.3.8-SNAPSHOT', classifier: 'tests'
+   testImplementation group: 'de.dagere.peass', name: 'measurement', version: '0.4.1-SNAPSHOT', classifier: 'tests'
 }
