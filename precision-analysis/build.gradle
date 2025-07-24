@@ -57,6 +57,8 @@ dependencies {
    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 
    testImplementation 'org.mockito:mockito-core:5.18.0'
+   testImplementation("org.junit.jupiter:junit-jupiter:5.12.1")
+   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
    
    testImplementation group: 'de.dagere.peass', name: 'measurement', version: '0.4.1', classifier: 'tests'
 }
