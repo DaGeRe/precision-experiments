@@ -27,10 +27,10 @@ jobs:
       with:
         java-version: ${{ matrix.java }}
         distribution: 'temurin'
-    - name: Build with Maven
-      run: |
-         cd /home/runner/work/precision-experiments/precision-experiments/ && ./gradlew assemble -x test
-         cd /home/runner/work/precision-experiments/precision-experiments/precision-analysis/ && ../gradlew test publishToMavenLocal
+    - name: Build precision-experiments
+      run: cd /home/runner/work/precision-experiments/precision-experiments/ && ./gradlew assemble -x test
+    - name: Build precision-analysis
+      run: cd /home/runner/work/precision-experiments/precision-experiments/precision-analysis/ && ../gradlew test publishToMavenLocal
     - name: Publish Test Report
       if: ${{ always() }}      
       uses: scacap/action-surefire-report@v1
