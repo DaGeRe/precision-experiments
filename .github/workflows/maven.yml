@@ -5,9 +5,9 @@ name: Build with Gradle
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop, graalvm-fulldata ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop, graalvm-fulldata ]
   workflow_dispatch:
   schedule:
     - cron: "0 3 * * *"
@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
        matrix:
-          java: [ 11, 17, 21 ]
+          java: [ 17, 21 ]
        fail-fast: false
     name: Java ${{ matrix.java }} sample
     steps:
@@ -27,11 +27,12 @@ jobs:
       with:
         java-version: ${{ matrix.java }}
         distribution: 'temurin'
-    - name: Build with Maven
-      run: |
-         cd /home/runner/work/ && git clone -b develop https://github.com/DaGeRe/peass.git && cd peass && mvn clean install -DskipTests
-         cd /home/runner/work/precision-experiments/precision-experiments/ && ./gradlew assemble -x test
-         cd /home/runner/work/precision-experiments/precision-experiments/precision-analysis/ && ../gradlew test publishToMavenLocal
+    - name: Install dependencies
+      run: cd /home/runner/work/ && git clone -b develop https://github.com/DaGeRe/peass.git && cd peass && mvn clean install -DskipTests
+    - name: Build precision-experiments
+      run: cd /home/runner/work/precision-experiments/precision-experiments/ && ./gradlew assemble -x test
+    - name: Build precision-analysis
+      run: cd /home/runner/work/precision-experiments/precision-experiments/precision-analysis/ && ../gradlew test publishToMavenLocal
     - name: Publish Test Report
       if: ${{ always() }}      
       uses: scacap/action-surefire-report@v1

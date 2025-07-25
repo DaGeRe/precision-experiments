@@ -20,6 +20,9 @@ public class MinimalFeasibleConfigurationDeterminer {
 
    public MinimalFeasibleConfigurationDeterminer(final double minimalF1Score) {
       this.minimalF1Score = minimalF1Score;
+      if (minimalF1Score > 100 || minimalF1Score < 0) {
+         throw new RuntimeException("Expected F1 score should be between 0 and 100, but was " + minimalF1Score);
+      }
    }
 
    public Map<Integer, Configuration> getMinimalFeasibleConfiguration(final PrecisionData data) {

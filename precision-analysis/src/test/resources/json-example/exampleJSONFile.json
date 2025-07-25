@@ -1,0 +1,37 @@
+{
+    "machine_type": "5",
+    "configuration": "40",
+    "benchmark_workload": "313",
+    "platform_installation_type": "32",
+    "pairs": [
+        {
+            "old_sample": {
+                "platform_installation": 41996,
+                "platform_installation_time": "2022-07-28 15:00:33+0000",
+                "commit": "87a466c132e559e7071a3b72a9f8580942f4de05",
+                "measurements": [
+                    "src/test/resources/json-example/5/40/313/41996/8782864_cleaned_10_60s_5_10.csv",
+                    "src/test/resources/json-example/5/40/313/41996/8782868_cleaned_10_60s_5_10.csv",
+                    "src/test/resources/json-example/5/40/313/41996/8782860_cleaned_10_60s_5_10.csv"
+                ]
+            },
+            "new_sample": {
+                "platform_installation": 41997,
+                "platform_installation_time": "2022-07-28 16:16:48+0000",
+                "commit": "35a5870e780fa0c3e0a413b8ec92cfc1eb3c7eb0",
+                "measurements": [
+                    "src/test/resources/json-example/5/40/313/41997/8783086_cleaned_10_60s_5_10.csv",
+                    "src/test/resources/json-example/5/40/313/41997/8783067_cleaned_10_60s_5_10.csv",
+                    "src/test/resources/json-example/5/40/313/41997/8783074_cleaned_10_60s_5_10.csv"
+                ]
+            },
+            "compare_results": {
+                "column": "iteration_time_ns",
+                "p_value": 0.0,
+                "effect_size": -0.0299,
+                "regression": true,
+                "overview": "https://graal.d3s.mff.cuni.cz/see/difference/2891305"
+            }
+        }
+    ]
+}

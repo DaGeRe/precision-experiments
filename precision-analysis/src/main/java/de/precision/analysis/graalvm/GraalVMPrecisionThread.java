@@ -1,6 +1,6 @@
 package de.precision.analysis.graalvm;
 
-import java.io.File;
+import java.lang.reflect.Executable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,11 +10,11 @@ import org.apache.logging.log4j.Logger;
 import de.dagere.peass.config.StatisticsConfig;
 import de.dagere.peass.measurement.statistics.Relation;
 import de.dagere.peass.measurement.statistics.bimodal.CompareData;
-import de.precision.analysis.graalvm.resultingData.ConfigurationResult;
-import de.precision.analysis.graalvm.resultingData.Counts;
+import de.precision.analysis.graalvm.loading.DiffPairLoader;
+import de.precision.analysis.graalvm.resultingData.ComparisonCounts;
 import de.precision.analysis.graalvm.resultingData.GraalConfiguration;
-import de.precision.analysis.graalvm.resultingData.RegressionDetectionModel;
 import de.precision.analysis.graalvm.resultingData.SimpleModel;
+import de.precision.analysis.graalvm.resultingData.TrainingMetadata;
 import de.precision.analysis.heatmap.Configuration;
 import de.precision.analysis.repetitions.PrecisionComparer;
 import de.precision.analysis.repetitions.PrecisionConfig;
@@ -24,89 +24,149 @@ import de.precision.processing.repetitions.sampling.SamplingConfig;
 import de.precision.processing.repetitions.sampling.SamplingExecutor;
 
 public class GraalVMPrecisionThread {
-   
+
    private static final Logger LOG = LogManager.getLogger(GraalVMPrecisionDeterminer.class);
-   
+
+   private final boolean cleaned;
    private final SimpleModel model;
-   private final File folder;
    private final PrecisionConfig precisionConfig;
    private final ComparisonFinder finder;
    private final PrecisionFileManager manager;
    private final double type2error;
+   private final int samplingExecutions = 100;
+   private final PlottableHistogramWriter histogramWriter;
 
-   public GraalVMPrecisionThread(SimpleModel model, File folder, PrecisionConfig precisionConfig, ComparisonFinder finder, PrecisionFileManager manager, double type2error) {
+   public GraalVMPrecisionThread(boolean cleaned, SimpleModel model, PrecisionConfig precisionConfig, ComparisonFinder finder, PrecisionFileManager manager, double type2error, PlottableHistogramWriter histogramWriter) {
+      this.cleaned = cleaned;
       this.model = model;
-      this.folder = folder;
       this.precisionConfig = precisionConfig;
       this.finder = finder;
       this.manager = manager;
       this.type2error = type2error;
+      this.histogramWriter = histogramWriter;
    }
 
    public void getConfigurationAndTest() {
-      ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(type2error, folder, precisionConfig, manager);
-      Configuration configuration = configurationDeterminer.executeComparisons(finder);
+      ConfigurationDeterminer configurationDeterminer = new ConfigurationDeterminer(cleaned, type2error, precisionConfig, manager, samplingExecutions);
+      determineCounts(configurationDeterminer);
+      
+      if (model.getCountTesting().getUnequal() > 0) {
+         
+         Configuration configuration = configurationDeterminer.determineConfiguration(finder, histogramWriter);
+         
+         buildModelDebugData();
+         
+         GraalConfiguration graalConfig = buildConfig(configuration);
+         
+         test(configuration, graalConfig, StatisticalTests.TTEST);
+      }
+   }
 
-      Counts trainingCounts = new Counts(configurationDeterminer.getEqual(), configurationDeterminer.getUnequal());
+   private void determineCounts(ConfigurationDeterminer configurationDeterminer) {
+      ComparisonCounts trainingCounts = configurationDeterminer.determineComparisonCounts(finder);
       model.setCountTraining(trainingCounts);
+      
+      ComparisonCounts testCounts = getTestComparisonCounts();
+      model.setCountTesting(testCounts);
+   }
 
+   private GraalConfiguration buildConfig(Configuration configuration) {
       GraalConfiguration graalConfig = new GraalConfiguration();
       graalConfig.setRuns(configuration.getVMs());
       graalConfig.setIterations(configuration.getIterations());
       graalConfig.setWarmup(0);
       model.getRuns_iterations().put(type2error, graalConfig);
       
-      System.out.println(configuration.getIterations() + " " + configuration.getVMs());
+      LOG.info("Runs: {} Iterations: {}", configuration.getVMs(), configuration.getIterations());
       
-      executeTesting(finder, configuration, graalConfig);
+      return graalConfig;
    }
 
-   private void executeTesting(ComparisonFinder finder, Configuration configuration, GraalConfiguration graalConfig) {
-      Map<String, Integer> falseNegativeDetections = new HashMap<>();
-      Map<String, Integer> falsePositiveDetections = new HashMap<>();
+   private void buildModelDebugData() {
       
-      Counts counts = new Counts();
-
-      StatisticsConfig statisticsConfig = new StatisticsConfig();
-      PrecisionComparer comparer = new PrecisionComparer(statisticsConfig, precisionConfig);
       for (Comparison comparison : finder.getComparisonsTraining().values()) {
-         DiffPairLoader loader = new DiffPairLoader(folder);
+         TrainingMetadata metadata = new TrainingMetadata(comparison.getPValue(), comparison.getRunsOld(), comparison.getRunsNew());
+         model.getTrainingComparisons().put(comparison.getName(), metadata);
+      }
+      for (Comparison comparison : finder.getComparisonsTest().values()) {
+         TrainingMetadata metadata = new TrainingMetadata(comparison.getPValue(), comparison.getRunsOld(), comparison.getRunsNew());
+         model.getTestComparisons().put(comparison.getName(), metadata);
+      }
+   }
+
+   private ComparisonCounts getTestComparisonCounts() {
+      ComparisonCounts counts = new ComparisonCounts();
+      for (Comparison comparison : finder.getComparisonsTest().values()) {
+         DiffPairLoader loader = new DiffPairLoader(cleaned);
          loader.loadDiffPair(comparison);
          if (loader.getExpected() == Relation.EQUAL) {
             counts.setEqual(counts.getEqual() + 1);
          } else {
             counts.setUnequal(counts.getUnequal() + 1);
          }
-
-         Map<StatisticalTestResult, Integer> oldResults = comparer.getOverallResults().getResults().get(StatisticalTests.TTEST);
-         int falseNegatives = oldResults.get(StatisticalTestResult.FALSENEGATIVE);
-         int falsePositives = oldResults.get(StatisticalTestResult.SELECTED) - oldResults.get(StatisticalTestResult.TRUEPOSITIVE);
-         for (int i = 0; i < 1000; i++) {
-            CompareData data = loader.getShortenedCompareData(configuration.getIterations());
-            SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
-            executor.executeComparisons(loader.getExpected());
-         }
-         if (loader.getExpected() == Relation.EQUAL) {
-            int falsePositiveNew = oldResults.get(StatisticalTestResult.SELECTED) - oldResults.get(StatisticalTestResult.TRUEPOSITIVE);
-            int falsePositivesThisRun = falsePositiveNew - falsePositives;
-            falsePositiveDetections.put(comparison.getName(), falsePositivesThisRun);
-         } else {
-            int falseNegativesThisRun = oldResults.get(StatisticalTestResult.FALSENEGATIVE) - falseNegatives;
-            falseNegativeDetections.put(comparison.getName(), falseNegativesThisRun);
-         }
-         
       }
-      double falseNegativeRate = comparer.getFalseNegativeRate(StatisticalTests.TTEST);
-      double fScore = comparer.getFScore(StatisticalTests.TTEST);
-      LOG.info("F_1-score: " + fScore + " False negative: " + falseNegativeRate);
+      return counts;
+   }
 
+   private void test(Configuration configuration, GraalConfiguration graalConfig, StatisticalTests statisticalTest) {
+      Map<String, Integer> falseNegativeDetections = new HashMap<>();
+      Map<String, Integer> falsePositiveDetections = new HashMap<>();
+      StatisticsConfig statisticsConfig = new StatisticsConfig();
+//      PrecisionConfig config2 = new PrecisionConfig(cleaned, true, 4, new StatisticalTests[] { StatisticalTests.TTEST}, 0, 0, 0, 0);
+      PrecisionComparer comparer = new PrecisionComparer(statisticsConfig, precisionConfig);
+      
+      for (Comparison comparison : finder.getComparisonsTest().values()) {
+         testOneComparison(configuration, statisticalTest, falseNegativeDetections, falsePositiveDetections, comparer, comparison);
+         LOG.info("Done: {}, FNR: {}", comparison.getPValue(), comparer.getFalseNegativeRate(statisticalTest));
+      }
+      double falseNegativeRate = comparer.getFalseNegativeRate(statisticalTest);
+      double fScore = comparer.getFScore(statisticalTest);
+      LOG.info("Goal type 2 error: {}", type2error);
+      LOG.info("Simulated false negative rate: {} F_1-score: {}", falseNegativeRate, fScore);
+      LOG.info("Iterations: {} Runs: {}", graalConfig.getIterations(), graalConfig.getRuns());
+
+      graalConfig.setFalsenegative(comparer.getFalseNegatives(statisticalTest));
+      graalConfig.setTruepositive(comparer.getTruePositives(statisticalTest));
       graalConfig.setType2error(falseNegativeRate);
-      graalConfig.setType2error_above1percent(comparer.getFalseNegativeRateAbove1Percent(StatisticalTests.TTEST));
+      graalConfig.setType2error_above5percent(comparer.getFalseNegativeRateAbove5Percent(statisticalTest));
+      graalConfig.setType2error_above10percent(comparer.getFalseNegativeRateAbove10Percent(statisticalTest));
       
-//      model.setCountTesting(counts);
-//      ConfigurationResult configurationResult = new ConfigurationResult(configuration.getRepetitions(), falsePositiveDetections, falseNegativeDetections);
-//      model.addDetection(vmCount, vmCount, type2error, fScore, configurationResult);
+      model.addComparison(type2error, falseNegativeDetections);
+   }
+
+   private void testOneComparison(Configuration configuration, StatisticalTests statisticalTest, Map<String, Integer> falseNegativeDetections,
+         Map<String, Integer> falsePositiveDetections, PrecisionComparer comparer, Comparison comparison) {
+      DiffPairLoader loader = new DiffPairLoader(cleaned);
+      loader.loadDiffPair(comparison);
       
+      Relation expected;
+      if (loader.isConsideredRelevant()) {
+         expected = loader.getExpected();
+      } else {
+         expected = Relation.EQUAL;
+      }
+      
+      
+      histogramWriter.plotTesting(comparison.getName(), loader.getDataOld(), loader.getDataNew());
+
+      Map<StatisticalTestResult, Integer> oldResults = comparer.getOverallResults().getResults().get(statisticalTest);
+      int falseNegatives = oldResults.get(StatisticalTestResult.FALSENEGATIVE);
+      int falsePositives = oldResults.get(StatisticalTestResult.SELECTED) - oldResults.get(StatisticalTestResult.TRUEPOSITIVE);
+      
+      for (int i = 0; i < samplingExecutions; i++) {
+         CompareData data = loader.getShortenedCompareData(configuration.getIterations());
+         SamplingExecutor executor = new SamplingExecutor(new SamplingConfig(configuration.getVMs(), "graalVM"), data, comparer);
+         executor.executeComparisons(expected);
+      }
+      if (expected == Relation.EQUAL) {
+         int falsePositiveNew = oldResults.get(StatisticalTestResult.SELECTED) - oldResults.get(StatisticalTestResult.TRUEPOSITIVE);
+         int falsePositivesThisRun = falsePositiveNew - falsePositives;
+         falsePositiveDetections.put(comparison.getName(), falsePositivesThisRun);
+      } else {
+         int falseNegativesThisRun = oldResults.get(StatisticalTestResult.FALSENEGATIVE) - falseNegatives;
+         falseNegativeDetections.put(comparison.getName(), falseNegativesThisRun);
+         LOG.debug("False negative: {} Count: {}", comparison.getName(), falseNegativesThisRun);
+      }
    }
 
 }

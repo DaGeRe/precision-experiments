@@ -10,9 +10,9 @@ import java.util.Map;
 import de.dagere.peass.measurement.statistics.Relation;
 
 public class PrecisionFileManager {
-   public Map<Integer, BufferedWriter> files = new HashMap<>();
+   public Map<String, BufferedWriter> files = new HashMap<>();
 
-   public BufferedWriter getFile(Integer id, Relation relation) throws IOException {
+   public BufferedWriter getFile(String id, Relation relation) throws IOException {
       if (!files.containsKey(id)) {
          String fileName = (Relation.isUnequal(relation) ? "unequal_" : "equal_") + id + ".csv";
          File resultFile = new File("results/" + fileName);

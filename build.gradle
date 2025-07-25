@@ -13,7 +13,9 @@ apply plugin: 'maven-publish'
 group = "de.peass"
 version = "0.1-SNAPSHOT"
 
-sourceCompatibility = 1.8
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
 
 repositories {
     mavenCentral()
@@ -25,9 +27,9 @@ repositories {
 
 
 dependencies {
-   implementation group: "de.dagere.kopeme", name: "kopeme-junit4", version: "1.3.5"
-   implementation group: "de.dagere.kopeme", name: "kopeme-junit3", version: "1.3.5"
-   implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+   implementation group: "de.dagere.kopeme", name: "kopeme-junit4", version: "1.4.4"
+   implementation group: "de.dagere.kopeme", name: "kopeme-junit3", version: "1.4.4"
+   implementation("commons-io:commons-io:2.20.0")
    implementation group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.36'
 }
 

@@ -8,8 +8,8 @@ import de.precision.analysis.heatmap.Configuration;
 public class RegressionDetectionModel {
    private String first;
    private String last;
-   private Counts countTraining;
-   private Counts countTesting;
+   private ComparisonCounts countTraining;
+   private ComparisonCounts countTesting;
    
    private PositiveDetections positive = new PositiveDetections();
 
@@ -37,19 +37,19 @@ public class RegressionDetectionModel {
       this.positive = positive;
    }
 
-   public Counts getCountTraining() {
+   public ComparisonCounts getCountTraining() {
       return countTraining;
    }
 
-   public void setCountTraining(Counts countTraining) {
+   public void setCountTraining(ComparisonCounts countTraining) {
       this.countTraining = countTraining;
    }
 
-   public Counts getCountTesting() {
+   public ComparisonCounts getCountTesting() {
       return countTesting;
    }
 
-   public void setCountTesting(Counts countTesting) {
+   public void setCountTesting(ComparisonCounts countTesting) {
       this.countTesting = countTesting;
    }
 

@@ -18,18 +18,23 @@ public class MetadataFileReader {
    public static SimpleDateFormat METADATA_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
    
    private final File folder;
+   private final Map<String, File> fileById = new LinkedHashMap<>();
+   private final Map<File, String> fileIds = new LinkedHashMap<>();
+   private final Map<File, Date> fileDates = new LinkedHashMap<>();
 
    public MetadataFileReader(File folder) {
       this.folder = folder;
+      readFiles();
    }
-
-   public Map<File, Date> getFileDates(){
-      Map<File, Date> fileDates = new LinkedHashMap<>();
+   
+   
+   private void readFiles() {
       File[] metadataFiles = folder.listFiles((FilenameFilter) new WildcardFileFilter("*_metadata.csv"));
       for (File metadataFile : metadataFiles) {
          try (BufferedReader reader = new BufferedReader(new FileReader(metadataFile))){
             
             String headline = reader.readLine();
+            int runIdIndex = GraalVMReadUtil.getColumnIndex(headline, "run_id");
             int pathIndex = GraalVMReadUtil.getColumnIndex(headline, "extracted_path");
             int timeIndex = GraalVMReadUtil.getColumnIndex(headline, "version_time");
             
@@ -43,12 +48,29 @@ public class MetadataFileReader {
                String time = parts[timeIndex];
                Date date = METADATA_TIME_FORMAT.parse(time);
                
+               String runId = parts[runIdIndex];
+               
+               fileIds.put(file.getParentFile(), runId);
                fileDates.put(file.getParentFile(), date);
+               fileById.put(runId, file.getParentFile());
             }
          } catch (IOException | ParseException e) {
             e.printStackTrace();
          } 
       }
+   }
+
+   public Map<File, String> getFileIds(){
+      return fileIds;
+   }
+
+   
+   public Map<File, Date> getFileDates(){
       return fileDates;
+   }
+
+
+   public File getFileById(String id) {
+      return fileById.get(id);
    }
 }

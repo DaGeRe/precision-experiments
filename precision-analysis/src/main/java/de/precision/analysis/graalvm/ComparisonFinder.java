@@ -1,14 +1,11 @@
 package de.precision.analysis.graalvm;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Date;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,89 +14,47 @@ public class ComparisonFinder {
    private static final Logger LOG = LogManager.getLogger(ComparisonFinder.class);
 
    private final Date startDate;
-   private final Date endDate;
 
-   private final Map<Integer, Comparison> comparisonsTraining = new TreeMap<>();
-   private final Map<Integer, Comparison> comparisonsTest = new TreeMap<>();
+   private final Map<String, Comparison> comparisonsTraining = new TreeMap<>();
+   private final Map<String, Comparison> comparisonsTest = new TreeMap<>();
 
-   public ComparisonFinder(File folder, Date endDate) {
-      this(folder, new Date(Long.MIN_VALUE), endDate);
-   }
+   private boolean comparisonFound;
 
-   public ComparisonFinder(File folder, Date startDate, Date endDate) {
-      this.startDate = startDate;
-      this.endDate = endDate;
+   public ComparisonFinder(Map<String, Comparison> comparisons, Date trainingStartDate, Date trainingEndDate, Date testStartDate, Date testEndDate, File folder) {
 
-      detectCommitFolders(folder);
-   }
-
-   private void detectCommitFolders(File folder) {
-      TreeMap<Integer, File> trainingFiles = new TreeMap<>();
-      TreeMap<Integer, File> testFiles = new TreeMap<>();
-
-      Map<File, Date> fileDates = new MetadataFileReader(folder).getFileDates();
-
-      System.out.println(folder.getAbsolutePath());
-      FilenameFilter onlyNumberFilter = (FilenameFilter) new RegexFileFilter("[0-9]+");
-      for (File machineFile : folder.listFiles(onlyNumberFilter)) {
-         for (File configurationIdFile : machineFile.listFiles(onlyNumberFilter)) {
-            for (File suiteIdFile : configurationIdFile.listFiles(onlyNumberFilter)) {
-               for (File benchmarkIdFile : suiteIdFile.listFiles(onlyNumberFilter)) {
-                  for (File platformTypeFile : benchmarkIdFile.listFiles(onlyNumberFilter)) {
-                     for (File repositoryFile : platformTypeFile.listFiles(onlyNumberFilter)) {
-                        for (File platformInstallationIdFile : repositoryFile.listFiles(onlyNumberFilter)) {
-                           for (File versionIdFile : platformInstallationIdFile.listFiles(onlyNumberFilter)) {
-                              int commitName = Integer.parseInt(versionIdFile.getName());
-                              Date date = fileDates.get(versionIdFile);
-                              if (date == null) {
-                                 LOG.warn("File {} has no date according to metadata", versionIdFile);
-                                 trainingFiles.put(commitName, versionIdFile);
-                              }
-
-                              System.out.println("Date: " + date + " " + startDate);
-
-                              if (date != null && date.after(startDate)) {
-                                 if (date.before(endDate)) {
-                                    trainingFiles.put(commitName, versionIdFile);
-                                 } else {
-                                    testFiles.put(commitName, versionIdFile);
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-               }
-            }
+      for (Map.Entry<String, Comparison> comparison : comparisons.entrySet()) {
+         LOG.debug("Reading: " + comparison.getKey());
+         Date date = comparison.getValue().getDateNew();
+         
+         if (date.after(trainingStartDate) && date.before(trainingEndDate)) {
+           comparisonsTraining.put(comparison.getKey(), comparison.getValue());
          }
+         
+         if (date.after(testStartDate) && date.before(testEndDate)) {
+            comparisonsTest.put(comparison.getKey(), comparison.getValue());
+          }
       }
-
-      generateComparisons(trainingFiles, comparisonsTraining);
-      generateComparisons(testFiles, comparisonsTest);
+      
+      this.startDate = trainingStartDate;
+      
+      if (!comparisonsTraining.isEmpty()) {
+         LOG.info("Found training comparison, and therefore executing the comparisons");
+         comparisonFound = true;
+      } else {
+         comparisonFound = false;
+      }
    }
 
-   private void generateComparisons(TreeMap<Integer, File> files, Map<Integer, Comparison> comparisonMap) {
-      File predecessor = null;
-      int i = 0;
-      
-      LOG.info("Files: " + files.size());
-      
-      for (File current : files.values()) {
-         if (predecessor != null) {
-            comparisonMap.put(i++, new Comparison(predecessor, current, null, null));
-            LOG.info("Comparison " + predecessor.getName() + " " + current.getName());
-         }
-         predecessor = current;
-      }
-      LOG.info("Comparisons: " + comparisonMap.size());
-   }
-
-   public Map<Integer, Comparison> getComparisonsTraining() {
+   public Map<String, Comparison> getComparisonsTraining() {
       return comparisonsTraining;
    }
 
-   public Map<Integer, Comparison> getComparisonsTest() {
+   public Map<String, Comparison> getComparisonsTest() {
       return comparisonsTest;
+   }
+
+   public boolean isComparisonFound() {
+      return comparisonFound;
    }
 
    public Date getStartDate() {

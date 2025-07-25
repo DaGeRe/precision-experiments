@@ -50,10 +50,10 @@ public class GenerateGraalVMPrecisionPlot implements Callable<Void> {
       Map<String, Kopemedata> testcasesV1 = new HashMap<>();
       Map<String, Kopemedata> testcasesV2 = new HashMap<>();
 
-      Kopemedata dataV1 = GraalVMReadUtil.readData(v1folder);
+      Kopemedata dataV1 = GraalVMReadUtil.readData(v1folder, false);
       testcasesV1.put(dataV1.getClazz(), dataV1);
       
-      Kopemedata dataV2 = GraalVMReadUtil.readData(v2folder);
+      Kopemedata dataV2 = GraalVMReadUtil.readData(v2folder, false);
       testcasesV2.put(dataV2.getClazz(), dataV2);
       
       System.err.println("Data:" + dataV2.getFirstDatacollectorContent().size());

@@ -4,16 +4,23 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.fasterxml.jackson.core.exc.StreamWriteException;
+import com.fasterxml.jackson.databind.DatabindException;
+
 import de.dagere.peass.utils.Constants;
-import de.precision.analysis.graalvm.resultingData.RegressionDetectionModel;
 import de.precision.analysis.graalvm.resultingData.SimpleModel;
 import de.precision.analysis.repetitions.PrecisionConfigMixin;
 import picocli.CommandLine;
@@ -27,16 +34,20 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    @Option(names = { "-folder", "--folder" }, description = "Folder, that contains *all* data folders for the analysis", required = true)
    private File folder;
 
-   @Option(names = { "-first", "--first" }, description = "Start date for the training")
-   private String first;
+   @Option(names = { "-trainingStartDate", "--trainingStartDate" }, description = "Start date for the training")
+   private String trainingStartDate;
+   
+   @Option(names = { "-trainingEndDate", "--trainingDate" }, description = "End date of the training (so training is between startDate and trainingDate)", required = true)
+   private String trainingEndDate;
 
-   @Option(names = { "-endDate", "--endDate" }, description = "End date for the training (subsequent data will be used for testing)", required = true)
-   private String endDate;
+   @Option(names = { "-testStartDate", "--testStartDate" }, description = "End date for the training (subsequent data will be used for testing)")
+   private String testStartDate;
+   
+   @Option(names = { "-testEndDate", "--testEndDate" }, description = "End date for the training (subsequent data will be used for testing)")
+   private String testEndDate;
 
    @Mixin
    private PrecisionConfigMixin precisionConfigMixin;
-
-   SimpleModel model = new SimpleModel();
 
    public static void main(String[] args) {
       GraalVMPrecisionDeterminer plot = new GraalVMPrecisionDeterminer();
@@ -47,52 +58,93 @@ public class GraalVMPrecisionDeterminer implements Runnable {
    @Override
    public void run() {
 
-      Date date;
       try {
-         date = DateFormat.getInstance().parse(endDate);
-         System.out.println("End date: " + date);
+         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
+         
+         
+         Date trainingStartDateD = trainingStartDate != null ? sdf.parse(trainingStartDate) : new Date(2000, 01, 01);
+         System.out.println("Training start date: " + trainingStartDateD);
+         
+         Date trainingEndDateD = sdf.parse(trainingEndDate);
+         System.out.println("Training end date: " + trainingEndDateD);
+         
+         Date testStartDateD = testStartDate != null ? sdf.parse(testStartDate) : new Date(2000, 01, 01);
+         System.out.println("Test start date: " + testStartDateD);
+         
+         Date testEndDateD = testEndDate != null ? sdf.parse(testEndDate) : new Date(3000, 01, 01);
+         System.out.println("Test end date: " + testEndDateD);
 
-         model.setLast(endDate);
+         // ComparisonFinder finder = first == null ? new ComparisonFinder(folder, date) : new ComparisonFinder(folder, DateFormat.getInstance().parse(first), date);
+         MetadiffReader reader = new MetadiffReader(folder);
 
-         ComparisonFinder finder = first == null ? new ComparisonFinder(folder, date) : new ComparisonFinder(folder, DateFormat.getInstance().parse(first), date);
-         System.out.println("Start date: " + finder.getStartDate().toString());
-         model.setFirst(finder.getStartDate().toString());
+         ComparisonCollection comparisons = reader.getComparisons();
 
-         System.out.println("Training comparisons: " + finder.getComparisonsTraining().size());
-         System.out.println("Test comparisons: " + finder.getComparisonsTest().size());
+         ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(precisionConfigMixin.getThreads());
+         
+         for (Map.Entry<String, Map<String, Comparison>> benchmarkData : comparisons.getComparisons().entrySet()) {
+            LOG.info("Reading benchmark {}", benchmarkData.getKey());
+            Map<String, Comparison> thisBenchmarkComparisons = benchmarkData.getValue();
+            ComparisonFinder finder = new ComparisonFinder(thisBenchmarkComparisons, trainingStartDateD, trainingEndDateD, testStartDateD, testEndDateD, folder);
 
-         File resultsFolder = new File("results");
-         resultsFolder.mkdirs();
-
-         PrecisionFileManager manager = new PrecisionFileManager();
-
-         ExecutorService pool = Executors.newFixedThreadPool(4);
-
-         // for (int vmCount : new int[] { 5, 10, 20, 30 }) {
-         for (double type2error : new double[] { 0.01, 0.1, 0.2, 0.5, 0.75, 0.9 }) {
-            final GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(model, folder, precisionConfigMixin.getConfig(), finder, manager, type2error);
-            pool.submit(() -> {
-               try {
-                  precisionThread.getConfigurationAndTest();
-               } catch (Throwable t) {
-                  t.printStackTrace();
-               }
-            });
+            
+            
+            if (finder.isComparisonFound()) {
+               createModel(true, testEndDateD, finder, benchmarkData.getKey(), pool);
+               createModel(false, testEndDateD, finder, benchmarkData.getKey(), pool);
+            }
+            
+            LOG.info("Active threads: {}", pool.getActiveCount());
+            if (pool.getActiveCount() > precisionConfigMixin.getThreads()) {
+               pool.awaitTermination(10, TimeUnit.SECONDS);
+            }
          }
-         // }
-
-         LOG.info("Waiting for thread completion...");
+         
          pool.shutdown();
-         pool.awaitTermination(100, TimeUnit.HOURS);
-         LOG.info("Finished");
-
-         manager.cleanup();
-
-         Constants.OBJECTMAPPER.writeValue(new File("model.json"), model);
-
+         pool.awaitTermination(10, TimeUnit.HOURS);
+         
       } catch (ParseException | IOException | InterruptedException e1) {
          e1.printStackTrace();
       }
+   }
+
+   private void createModel(boolean cleaned, Date date, ComparisonFinder finder, String benchmarkKey, ExecutorService pool)
+         throws ParseException, InterruptedException, IOException, StreamWriteException, DatabindException {
+      SimpleModel model = new SimpleModel();
+      model.setTrainingStartDate(trainingStartDate);
+      model.setTrainingEndDate(trainingEndDate);
+      model.setTestStartDate(testStartDate);
+      model.setTestEndDate(testEndDate);
+
+      System.out.println("Training comparisons: " + finder.getComparisonsTraining().size());
+      System.out.println("Test comparisons: " + finder.getComparisonsTest().size());
+
+      File resultsFolder = new File("results");
+      resultsFolder.mkdirs();
+
+      PrecisionFileManager manager = new PrecisionFileManager();
+
+      
+
+      final PlottableHistogramWriter histogramWriter = new PlottableHistogramWriter(new File("plottableGraphs/" + benchmarkKey));
+
+      for (double type2error : new double[] { 0.01 }) {
+         final GraalVMPrecisionThread precisionThread = new GraalVMPrecisionThread(cleaned, model, precisionConfigMixin.getConfig(), finder, manager, type2error, histogramWriter);
+         pool.submit(() -> {
+            try {
+               precisionThread.getConfigurationAndTest();
+               
+               manager.cleanup();
+
+               File resultFile = cleaned ? new File("model_" + benchmarkKey + "_cleaned.json") : new File("model_" + benchmarkKey + ".json");
+               Constants.OBJECTMAPPER.writeValue(resultFile, model);
+            } catch (Throwable t) {
+               t.printStackTrace();
+            }
+         });
+      }
+
+      LOG.info("Thread added...");
+      
    }
 
 }

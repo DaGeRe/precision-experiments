@@ -3,7 +3,10 @@ apply plugin: 'eclipse'
 apply plugin: 'checkstyle'
 apply plugin: 'maven-publish'
 
-sourceCompatibility = 1.8
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+}
+
 version = '2.13'
 task fatJar(type: Jar) {
 	manifest {
@@ -39,9 +42,23 @@ repositories {
 	}
 }
 
+tasks.named('test', Test) {
+    useJUnitPlatform()
+
+    maxHeapSize = '1G'
+
+    testLogging {
+        events "passed"
+    }
+}
 
 dependencies {
-   implementation group: 'de.dagere.peass', name: 'analysis', version: '0.3.9'
+   implementation group: 'de.dagere.peass', name: 'analysis', version: '0.4.1'
    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
-   testImplementation group: 'de.dagere.peass', name: 'measurement', version: '0.3.8-SNAPSHOT', classifier: 'tests'
+
+   testImplementation 'org.mockito:mockito-core:5.18.0'
+   testImplementation("org.junit.jupiter:junit-jupiter:5.12.1")
+   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+   
+   testImplementation group: 'de.dagere.peass', name: 'measurement', version: '0.4.1', classifier: 'tests'
 }
